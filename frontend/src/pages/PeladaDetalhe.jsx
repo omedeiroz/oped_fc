@@ -1,38 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
-import { iniciais, corDoNome, formatarData } from '../utils';
-
-const CORES_TIME = ['#16a34a', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#ec4899'];
-
-function LinhaJogador({ p }) {
-  return (
-    <div className="jog-line">
-      <div className="avatar sm" style={{ background: corDoNome(p.JogadorNome) }}>{iniciais(p.JogadorNome)}</div>
-      <span className="nome" style={{ fontWeight: 600 }}>{p.JogadorNome}</span>
-      {p.Gols > 0 && <span className="chip stat-chip gols">⚽ {p.Gols}</span>}
-      {p.Assistencias > 0 && <span className="chip">🅰️ {p.Assistencias}</span>}
-    </div>
-  );
-}
+import { formatarData } from '../utils';
 
 export default function PeladaDetalhe() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dados, setDados] = useState(null);
+  const [comentarios, setComentarios] = useState([]);
+  const [novoComentario, setNovoComentario] = useState('');
   const [erro, setErro] = useState('');
 
   useEffect(() => {
     (async () => {
       try {
-        setDados(await api.get(`/peladas/${id}`));
+        const [d, c] = await Promise.all([
+          api.get(`/peladas/${id}`),
+          api.get(`/peladas/${id}/comentarios`),
+        ]);
+        setDados(d);
+        setComentarios(c);
       } catch (err) {
         setErro(err.message);
       }
     })();
   }, [id]);
+
+  const calc = useMemo(() => {
+    if (!dados) return null;
+    const { times, participacoes } = dados;
+    const golsPorTime = times.map((t) => participacoes.filter((p) => p.TimeId === t.Id).reduce((s, p) => s + p.Gols, 0));
+    const maxVit = Math.max(-1, ...times.map((t) => t.Vitorias));
+    const vencedores = times.filter((t) => t.Vitorias === maxVit && maxVit > 0).map((t) => t.Id);
+    let mvp = null;
+    for (const p of participacoes) {
+      const score = p.Gols + p.Assistencias;
+      if (score > 0 && (!mvp || score > mvp.score)) mvp = { ...p, score };
+    }
+    return { golsPorTime, vencedores, mvp };
+  }, [dados]);
 
   async function excluir() {
     if (!window.confirm('Excluir esta pelada? Esta ação não pode ser desfeita.')) return;
@@ -44,56 +52,102 @@ export default function PeladaDetalhe() {
     }
   }
 
+  async function enviarComentario(e) {
+    e.preventDefault();
+    const texto = novoComentario.trim();
+    if (!texto) return;
+    try {
+      const novo = await api.post(`/peladas/${id}/comentarios`, { texto });
+      setComentarios((prev) => [...prev, novo]);
+      setNovoComentario('');
+    } catch (err) {
+      setErro(err.message);
+    }
+  }
+
   if (erro) return <div className="alert alert-error">{erro}</div>;
-  if (!dados) return <div className="loading">Carregando…</div>;
+  if (!dados || !calc) return <div className="loading">Carregando…</div>;
 
   const { pelada, times, participacoes } = dados;
-  const semTime = participacoes.filter((p) => !p.TimeId);
+  const doisTimes = times.length === 2;
 
   return (
     <div>
-      <div className="between">
-        <div>
-          <Link to="/peladas" className="muted" style={{ fontSize: 14 }}>← Peladas</Link>
-          <h1 style={{ marginTop: 8 }}>{pelada.Local || 'Pelada'}</h1>
-          <p>
-            {formatarData(pelada.DataPelada)} · {pelada.NumTimes} times ·{' '}
-            {pelada.Finalizada ? '✅ finalizada' : '⏳ em andamento'}
-          </p>
+      <div className="between page-head">
+        <div className="mini">
+          <Link to="/peladas" className="muted">← Peladas</Link> · {formatarData(pelada.DataPelada)}
+          {pelada.Local ? ` · ${pelada.Local}` : ''}
         </div>
         {user?.isAdmin && (
           <div className="row">
-            <Link to={`/peladas/${id}/editar`} className="btn btn-ghost">Editar</Link>
-            <button className="btn btn-danger" onClick={excluir}>Excluir</button>
+            <Link to={`/peladas/${id}/editar`} className="btn btn-ghost btn-sm">Editar</Link>
+            <button className="btn btn-danger btn-sm" onClick={excluir}>Excluir</button>
           </div>
         )}
       </div>
 
-      {pelada.Observacao && (
-        <div className="card" style={{ marginBottom: 18 }}><p style={{ margin: 0 }}>{pelada.Observacao}</p></div>
+      {/* Placar (apenas quando 2 times) */}
+      {doisTimes && (
+        <div className="scoreline">
+          <div className="tname a">{times[0].Nome}</div>
+          <div className={`sc ${calc.golsPorTime[0] >= calc.golsPorTime[1] ? 'win' : 'lose'}`}>{calc.golsPorTime[0]}</div>
+          <div className="dash">–</div>
+          <div className={`sc ${calc.golsPorTime[1] > calc.golsPorTime[0] ? 'win' : 'lose'}`}>{calc.golsPorTime[1]}</div>
+          <div className="tname b">{times[1].Nome}</div>
+        </div>
       )}
 
-      <div className="times-grid">
-        {times.map((t, idx) => {
+      {/* MVP */}
+      {calc.mvp && (
+        <div className="mvp-pill">
+          <span style={{ fontSize: 18 }}>🏅</span>
+          <span className="who">MVP: {calc.mvp.JogadorNome}</span>
+          <span className="stat">{calc.mvp.Gols} gols · {calc.mvp.Assistencias} assist.</span>
+        </div>
+      )}
+
+      {pelada.Observacao && <div className="card" style={{ marginBottom: 22 }}><p style={{ margin: 0 }}>{pelada.Observacao}</p></div>}
+
+      {/* Times */}
+      <div className="team-grid">
+        {times.map((t) => {
           const jogadores = participacoes.filter((p) => p.TimeId === t.Id);
-          const cor = CORES_TIME[idx % CORES_TIME.length];
+          const venceu = calc.vencedores.includes(t.Id);
           return (
-            <div className="time-col" key={t.Id} style={{ '--tcor': cor }}>
-              <h4><span className="avatar sm" style={{ background: cor, width: 22, height: 22, fontSize: 11 }}>{idx + 1}</span> {t.Nome}</h4>
-              <div className="time-record">🏆 {t.Vitorias}V · {t.Empates}E · {t.Derrotas}D</div>
+            <div className={`team-card ${venceu ? 'win' : ''}`} key={t.Id}>
+              <div className="tt">{t.Nome}</div>
+              <div className="rec">🏆 {t.Vitorias}V · {t.Empates}E · {t.Derrotas}D</div>
               {jogadores.length === 0 && <div className="mini">Sem jogadores</div>}
-              {jogadores.map((p) => <LinhaJogador key={p.Id} p={p} />)}
+              {jogadores.map((p) => (
+                <div className="team-line" key={p.Id}>
+                  <span className="n">{p.JogadorNome}</span>
+                  <span>
+                    {p.Gols > 0 && <span className="g">⚽ {p.Gols}</span>}
+                    {p.Gols > 0 && p.Assistencias > 0 && ' '}
+                    {p.Assistencias > 0 && <span className="a">🅰️ {p.Assistencias}</span>}
+                  </span>
+                </div>
+              ))}
             </div>
           );
         })}
       </div>
 
-      {semTime.length > 0 && (
-        <div className="card" style={{ marginTop: 18 }}>
-          <div className="mini" style={{ marginBottom: 8 }}>Sem time definido</div>
-          {semTime.map((p) => <LinhaJogador key={p.Id} p={p} />)}
-        </div>
-      )}
+      {/* Comentários */}
+      <div className="card comments">
+        <div className="ct">💬 Comentários</div>
+        {comentarios.length === 0 && <div className="mini" style={{ marginBottom: 14 }}>Seja o primeiro a comentar.</div>}
+        {comentarios.map((c) => (
+          <div className="comment" key={c.Id}>
+            <span className="ca">{c.AutorNome?.split(' ')[0]}:</span>
+            <span className="cx">{c.Texto}</span>
+          </div>
+        ))}
+        <form className="comment-form" onSubmit={enviarComentario}>
+          <input className="inp" value={novoComentario} onChange={(e) => setNovoComentario(e.target.value)} placeholder="Adicionar um comentário…" maxLength={500} />
+          <button className="txt-action" type="submit">Enviar</button>
+        </form>
+      </div>
     </div>
   );
 }

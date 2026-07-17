@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api';
-import { iniciais, corDoNome } from '../utils';
 
-const CORES_TIME = ['#16a34a', '#3b82f6', '#f59e0b', '#ef4444', '#a855f7', '#ec4899'];
+const ETAPAS = ['Dados básicos', 'Jogadores', 'Sorteio / Times', 'Revisão'];
 
 function timesIniciais(n) {
   return Array.from({ length: n }, (_, i) => ({ nome: `Time ${i + 1}`, vitorias: 0, empates: 0, derrotas: 0 }));
@@ -14,6 +13,7 @@ export default function PeladaForm() {
   const editando = Boolean(id);
   const navigate = useNavigate();
 
+  const [step, setStep] = useState(0);
   const [dataPelada, setDataPelada] = useState(() => new Date().toISOString().slice(0, 10));
   const [local, setLocal] = useState('');
   const [observacao, setObservacao] = useState('');
@@ -22,20 +22,18 @@ export default function PeladaForm() {
   const [times, setTimes] = useState(timesIniciais(2));
 
   const [disponiveis, setDisponiveis] = useState([]);
-  const [selecionados, setSelecionados] = useState([]); // { jogadorId, nome, timeIndex, gols, assistencias }
+  const [selecionados, setSelecionados] = useState([]);
   const [selectValue, setSelectValue] = useState('');
   const [novoAvulso, setNovoAvulso] = useState('');
 
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
 
-  // Carrega jogadores disponíveis + (se edição) a pelada existente
   useEffect(() => {
     (async () => {
       try {
         const jogs = await api.get('/jogadores');
         setDisponiveis(jogs);
-
         if (editando) {
           const { pelada, times: ts, participacoes } = await api.get(`/peladas/${id}`);
           setDataPelada(String(pelada.DataPelada).slice(0, 10));
@@ -46,15 +44,11 @@ export default function PeladaForm() {
           setTimes(ts.map((t) => ({ nome: t.Nome, vitorias: t.Vitorias, empates: t.Empates, derrotas: t.Derrotas })));
           const idxPorTime = {};
           ts.forEach((t, i) => { idxPorTime[t.Id] = i; });
-          setSelecionados(
-            participacoes.map((p) => ({
-              jogadorId: p.JogadorId,
-              nome: p.JogadorNome,
-              timeIndex: p.TimeId != null ? idxPorTime[p.TimeId] : null,
-              gols: p.Gols,
-              assistencias: p.Assistencias,
-            }))
-          );
+          setSelecionados(participacoes.map((p) => ({
+            jogadorId: p.JogadorId, nome: p.JogadorNome,
+            timeIndex: p.TimeId != null ? idxPorTime[p.TimeId] : null,
+            gols: p.Gols, assistencias: p.Assistencias,
+          })));
         }
       } catch (err) {
         setErro(err.message);
@@ -70,14 +64,12 @@ export default function PeladaForm() {
       for (let i = 0; i < n && i < prev.length; i++) novo[i] = prev[i];
       return novo;
     });
-    // Remove atribuições de times que não existem mais
     setSelecionados((prev) => prev.map((s) => (s.timeIndex != null && s.timeIndex >= n ? { ...s, timeIndex: null } : s)));
   }
 
   function addJogador(jogadorId) {
     jogadorId = parseInt(jogadorId, 10);
-    if (!jogadorId) return;
-    if (selecionados.some((s) => s.jogadorId === jogadorId)) return;
+    if (!jogadorId || selecionados.some((s) => s.jogadorId === jogadorId)) return;
     const j = disponiveis.find((d) => d.Id === jogadorId);
     if (!j) return;
     setSelecionados((prev) => [...prev, { jogadorId, nome: j.Nome, timeIndex: null, gols: 0, assistencias: 0 }]);
@@ -101,57 +93,51 @@ export default function PeladaForm() {
   function removerJogador(jogadorId) {
     setSelecionados((prev) => prev.filter((s) => s.jogadorId !== jogadorId));
   }
-
   function alterarSelecionado(jogadorId, campo, valor) {
     setSelecionados((prev) => prev.map((s) => (s.jogadorId === jogadorId ? { ...s, [campo]: valor } : s)));
   }
-
-  function sortearTimes() {
-    if (selecionados.length === 0) return;
-    const embaralhados = [...selecionados];
-    for (let i = embaralhados.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [embaralhados[i], embaralhados[j]] = [embaralhados[j], embaralhados[i]];
-    }
-    const comTime = embaralhados.map((s, i) => ({ ...s, timeIndex: i % numTimes }));
-    // Reordena de volta pela ordem original de seleção
-    const mapa = {};
-    comTime.forEach((s) => { mapa[s.jogadorId] = s.timeIndex; });
-    setSelecionados((prev) => prev.map((s) => ({ ...s, timeIndex: mapa[s.jogadorId] })));
-  }
-
   function alterarTime(idx, campo, valor) {
     setTimes((prev) => prev.map((t, i) => (i === idx ? { ...t, [campo]: valor } : t)));
   }
 
-  async function salvar(e) {
-    e.preventDefault();
+  function sortearTimes() {
+    if (selecionados.length === 0) return;
+    const emb = [...selecionados];
+    for (let i = emb.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [emb[i], emb[j]] = [emb[j], emb[i]];
+    }
+    const mapa = {};
+    emb.forEach((s, i) => { mapa[s.jogadorId] = i % numTimes; });
+    setSelecionados((prev) => prev.map((s) => ({ ...s, timeIndex: mapa[s.jogadorId] })));
+  }
+
+  function proximo() {
     setErro('');
-    if (selecionados.length < 2) { setErro('Selecione ao menos 2 jogadores.'); return; }
+    if (step === 0 && !dataPelada) return setErro('Informe a data da pelada.');
+    if (step === 1 && selecionados.length < 2) return setErro('Selecione ao menos 2 jogadores.');
+    setStep((s) => Math.min(3, s + 1));
+  }
+  function voltar() { setErro(''); setStep((s) => Math.max(0, s - 1)); }
+
+  async function salvar() {
+    setErro('');
+    if (selecionados.length < 2) { setStep(1); return setErro('Selecione ao menos 2 jogadores.'); }
     setSalvando(true);
     const payload = {
       dataPelada, local, observacao, finalizada,
       times: times.map((t) => ({
-        nome: t.nome,
-        vitorias: parseInt(t.vitorias, 10) || 0,
-        empates: parseInt(t.empates, 10) || 0,
-        derrotas: parseInt(t.derrotas, 10) || 0,
+        nome: t.nome, vitorias: parseInt(t.vitorias, 10) || 0,
+        empates: parseInt(t.empates, 10) || 0, derrotas: parseInt(t.derrotas, 10) || 0,
       })),
       participacoes: selecionados.map((s) => ({
-        jogadorId: s.jogadorId,
-        timeIndex: s.timeIndex,
-        gols: parseInt(s.gols, 10) || 0,
-        assistencias: parseInt(s.assistencias, 10) || 0,
+        jogadorId: s.jogadorId, timeIndex: s.timeIndex,
+        gols: parseInt(s.gols, 10) || 0, assistencias: parseInt(s.assistencias, 10) || 0,
       })),
     };
     try {
-      if (editando) {
-        await api.put(`/peladas/${id}`, payload);
-        navigate(`/peladas/${id}`);
-      } else {
-        const r = await api.post('/peladas', payload);
-        navigate(`/peladas/${r.id}`);
-      }
+      if (editando) { await api.put(`/peladas/${id}`, payload); navigate(`/peladas/${id}`); }
+      else { const r = await api.post('/peladas', payload); navigate(`/peladas/${r.id}`); }
     } catch (err) {
       setErro(err.message);
       setSalvando(false);
@@ -161,121 +147,178 @@ export default function PeladaForm() {
   const naoSelecionados = disponiveis.filter((d) => !selecionados.some((s) => s.jogadorId === d.Id));
 
   return (
-    <form onSubmit={salvar}>
+    <div>
       <div className="between">
         <h1>{editando ? 'Editar pelada' : 'Nova pelada'}</h1>
-        <button type="button" className="btn btn-ghost" onClick={() => navigate(-1)}>Cancelar</button>
+        <button className="txt-muted" onClick={() => navigate(-1)}>Cancelar</button>
+      </div>
+      <div className="step-label" style={{ marginTop: 8 }}>Etapa {step + 1} de 4 — {ETAPAS[step]}</div>
+      <div className="progress">
+        {ETAPAS.map((_, i) => <i key={i} className={i <= step ? 'on' : ''} />)}
       </div>
 
       {erro && <div className="alert alert-error">{erro}</div>}
 
-      {/* Dados básicos */}
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div className="row" style={{ alignItems: 'flex-end' }}>
-          <div className="field" style={{ flex: '1 1 150px' }}>
+      {/* ETAPA 1 — Dados básicos */}
+      {step === 0 && (
+        <div style={{ maxWidth: 520 }}>
+          <div className="field">
             <label>Data *</label>
-            <input type="date" value={dataPelada} onChange={(e) => setDataPelada(e.target.value)} required />
+            <input className="inp" type="date" value={dataPelada} onChange={(e) => setDataPelada(e.target.value)} />
           </div>
-          <div className="field" style={{ flex: '2 1 220px' }}>
+          <div className="field">
             <label>Local</label>
-            <input value={local} onChange={(e) => setLocal(e.target.value)} placeholder="Ex.: Society do trabalho" />
+            <input className="inp" value={local} onChange={(e) => setLocal(e.target.value)} placeholder="Ex.: Society do trabalho" />
           </div>
-          <div className="field" style={{ flex: '1 1 120px' }}>
-            <label>Nº de times</label>
-            <input type="number" min="2" max="6" value={numTimes} onChange={(e) => mudarNumTimes(parseInt(e.target.value, 10) || 2)} />
+          <div className="field">
+            <label>Número de times</label>
+            <input className="inp" type="number" min="2" max="6" value={numTimes} onChange={(e) => mudarNumTimes(parseInt(e.target.value, 10) || 2)} style={{ maxWidth: 120 }} />
           </div>
+          <div className="field">
+            <label>Observação</label>
+            <input className="inp" value={observacao} onChange={(e) => setObservacao(e.target.value)} placeholder="Opcional" />
+          </div>
+          <label className="check-row">
+            <input type="checkbox" checked={finalizada} onChange={(e) => setFinalizada(e.target.checked)} />
+            Pelada finalizada (resultados fechados)
+          </label>
         </div>
-        <div className="field">
-          <label>Observação</label>
-          <input value={observacao} onChange={(e) => setObservacao(e.target.value)} placeholder="Opcional" />
-        </div>
-        <label className="row" style={{ cursor: 'pointer', gap: 8 }}>
-          <input type="checkbox" style={{ width: 18 }} checked={finalizada} onChange={(e) => setFinalizada(e.target.checked)} />
-          <span>Pelada finalizada (resultados fechados)</span>
-        </label>
-      </div>
+      )}
 
-      {/* Seleção de jogadores */}
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div className="section-title"><h3 style={{ margin: 0 }}>Jogadores</h3><span className="muted">({selecionados.length})</span></div>
-        <div className="row" style={{ marginBottom: 12 }}>
-          <select value={selectValue} onChange={(e) => addJogador(e.target.value)} style={{ flex: '1 1 220px' }}>
-            <option value="">+ Adicionar dos cadastrados…</option>
-            {naoSelecionados.map((d) => (
-              <option key={d.Id} value={d.Id}>{d.Nome}{d.TemLogin ? '' : ' (avulso)'}</option>
-            ))}
-          </select>
-          <span className="row" style={{ flex: '1 1 220px', gap: 6 }}>
-            <input placeholder="Novo avulso…" value={novoAvulso} onChange={(e) => setNovoAvulso(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') adicionarAvulso(e); }} />
-            <button type="button" className="btn btn-ghost" onClick={adicionarAvulso}>Add</button>
-          </span>
-        </div>
-
-        {selecionados.length > 0 && (
-          <>
-            <div className="row" style={{ marginBottom: 12 }}>
+      {/* ETAPA 2 — Jogadores */}
+      {step === 1 && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div>
+            <div className="eyebrow">Adicionar jogadores ({selecionados.length})</div>
+            <select className="inp" value={selectValue} onChange={(e) => addJogador(e.target.value)} style={{ marginBottom: 16 }}>
+              <option value="">+ Adicionar dos cadastrados…</option>
+              {naoSelecionados.map((d) => <option key={d.Id} value={d.Id}>{d.Nome}{d.TemLogin ? '' : ' (avulso)'}</option>)}
+            </select>
+            <div className="row" style={{ marginBottom: 20 }}>
+              <input className="inp" placeholder="Novo avulso…" value={novoAvulso} onChange={(e) => setNovoAvulso(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') adicionarAvulso(e); }} style={{ flex: 1 }} />
+              <button type="button" className="txt-action" onClick={adicionarAvulso}>+ Adicionar</button>
+            </div>
+            <div className="chips">
               {selecionados.map((s) => (
-                <span className="chip" key={s.jogadorId}>
-                  {s.nome}
-                  <span className="x" onClick={() => removerJogador(s.jogadorId)}>×</span>
-                </span>
+                <span className="chip" key={s.jogadorId}>{s.nome}<span className="x" onClick={() => removerJogador(s.jogadorId)}>×</span></span>
               ))}
             </div>
-            <button type="button" className="btn btn-amarelo" onClick={sortearTimes}>🎲 Sortear times</button>
-          </>
+            {selecionados.length >= 2 && (
+              <button type="button" className="btn btn-sm" style={{ marginTop: 22 }} onClick={sortearTimes}>🎲 Sortear times</button>
+            )}
+          </div>
+          <div>
+            <div className="eyebrow">Prévia dos times</div>
+            <div className="preview-teams">
+              {times.map((t, i) => (
+                <div className="preview-team" key={i}>
+                  <div className="pt">{t.nome}</div>
+                  {selecionados.filter((s) => s.timeIndex === i).map((s) => <div className="pl" key={s.jogadorId}>{s.nome}</div>)}
+                  {selecionados.filter((s) => s.timeIndex === i).length === 0 && <div className="pl">—</div>}
+                </div>
+              ))}
+            </div>
+            {selecionados.some((s) => s.timeIndex == null) && (
+              <div className="mini" style={{ marginTop: 12 }}>{selecionados.filter((s) => s.timeIndex == null).length} jogador(es) ainda sem time — sorteie ou defina na próxima etapa.</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ETAPA 3 — Sorteio / Times */}
+      {step === 2 && (
+        <div>
+          <div className="team-grid">
+            {times.map((t, idx) => {
+              const jogadores = selecionados.filter((s) => s.timeIndex === idx);
+              return (
+                <div className="team-edit" key={idx}>
+                  <input className="inp" value={t.nome} onChange={(e) => alterarTime(idx, 'nome', e.target.value)} style={{ fontWeight: 700, marginBottom: 10 }} />
+                  <div className="row" style={{ gap: 8, marginBottom: 12 }}>
+                    <label className="mini">V <input className="num-input" type="number" min="0" value={t.vitorias} onChange={(e) => alterarTime(idx, 'vitorias', e.target.value)} /></label>
+                    <label className="mini">E <input className="num-input" type="number" min="0" value={t.empates} onChange={(e) => alterarTime(idx, 'empates', e.target.value)} /></label>
+                    <label className="mini">D <input className="num-input" type="number" min="0" value={t.derrotas} onChange={(e) => alterarTime(idx, 'derrotas', e.target.value)} /></label>
+                  </div>
+                  {jogadores.length === 0 && <div className="mini">Nenhum jogador neste time</div>}
+                  {jogadores.map((s) => (
+                    <div className="team-line" key={s.jogadorId}>
+                      <span className="n">{s.nome}</span>
+                      <span className="row" style={{ gap: 6 }}>
+                        <label className="mini" title="Gols">⚽<input className="num-input" type="number" min="0" value={s.gols} onChange={(e) => alterarSelecionado(s.jogadorId, 'gols', e.target.value)} /></label>
+                        <label className="mini" title="Assistências">🅰️<input className="num-input" type="number" min="0" value={s.assistencias} onChange={(e) => alterarSelecionado(s.jogadorId, 'assistencias', e.target.value)} /></label>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+          <div className="row" style={{ marginTop: 8 }}>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={sortearTimes}>🎲 Sortear de novo</button>
+          </div>
+          {selecionados.some((s) => s.timeIndex == null) && (
+            <div className="card" style={{ marginTop: 18 }}>
+              <div className="eyebrow">Sem time — defina manualmente</div>
+              {selecionados.filter((s) => s.timeIndex == null).map((s) => (
+                <div className="team-line" key={s.jogadorId}>
+                  <span className="n">{s.nome}</span>
+                  <select className="inp" style={{ width: 150 }} value="" onChange={(e) => alterarSelecionado(s.jogadorId, 'timeIndex', parseInt(e.target.value, 10))}>
+                    <option value="">Escolher time…</option>
+                    {times.map((t, i) => <option key={i} value={i}>{t.nome}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ETAPA 4 — Revisão */}
+      {step === 3 && (
+        <div>
+          <div className="card" style={{ marginBottom: 18 }}>
+            <div className="eyebrow">Resumo</div>
+            <div style={{ fontSize: 15 }}>
+              <strong>{new Date(dataPelada).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</strong>
+              {local ? ` · ${local}` : ''} · {numTimes} times · {selecionados.length} jogadores
+              {finalizada ? ' · ✅ finalizada' : ' · ⏳ em andamento'}
+            </div>
+          </div>
+          <div className="team-grid">
+            {times.map((t, idx) => {
+              const jogadores = selecionados.filter((s) => s.timeIndex === idx);
+              return (
+                <div className="team-card" key={idx}>
+                  <div className="tt">{t.nome}</div>
+                  <div className="rec">🏆 {t.vitorias}V · {t.empates}E · {t.derrotas}D</div>
+                  {jogadores.map((s) => (
+                    <div className="team-line" key={s.jogadorId}>
+                      <span className="n">{s.nome}</span>
+                      <span>
+                        {s.gols > 0 && <span className="g">⚽ {s.gols}</span>}{' '}
+                        {s.assistencias > 0 && <span className="a">🅰️ {s.assistencias}</span>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Navegação */}
+      <div className="wizard-nav">
+        {step > 0 ? <button type="button" className="txt-action" onClick={voltar}>← Voltar</button> : <span />}
+        {step < 3 ? (
+          <button type="button" className="btn" onClick={proximo}>Próximo → {ETAPAS[step + 1]}</button>
+        ) : (
+          <button type="button" className="btn" onClick={salvar} disabled={salvando}>
+            {salvando ? 'Salvando…' : editando ? 'Salvar alterações' : 'Criar pelada'}
+          </button>
         )}
       </div>
-
-      {/* Times + estatísticas */}
-      {selecionados.length > 0 && (
-        <div className="times-grid" style={{ marginBottom: 16 }}>
-          {times.map((t, idx) => {
-            const jogadores = selecionados.filter((s) => s.timeIndex === idx);
-            const cor = CORES_TIME[idx % CORES_TIME.length];
-            return (
-              <div className="time-col" key={idx} style={{ '--tcor': cor }}>
-                <h4>
-                  <span className="avatar sm" style={{ background: cor, width: 22, height: 22, fontSize: 11 }}>{idx + 1}</span>
-                  <input value={t.nome} onChange={(e) => alterarTime(idx, 'nome', e.target.value)} />
-                </h4>
-                <div className="row" style={{ gap: 6, marginBottom: 10 }}>
-                  <label className="mini">V <input className="num-input" type="number" min="0" value={t.vitorias} onChange={(e) => alterarTime(idx, 'vitorias', e.target.value)} /></label>
-                  <label className="mini">E <input className="num-input" type="number" min="0" value={t.empates} onChange={(e) => alterarTime(idx, 'empates', e.target.value)} /></label>
-                  <label className="mini">D <input className="num-input" type="number" min="0" value={t.derrotas} onChange={(e) => alterarTime(idx, 'derrotas', e.target.value)} /></label>
-                </div>
-                {jogadores.length === 0 && <div className="mini">Sorteie ou escolha o time abaixo</div>}
-                {jogadores.map((s) => (
-                  <div className="jog-line" key={s.jogadorId}>
-                    <div className="avatar sm" style={{ background: corDoNome(s.nome) }}>{iniciais(s.nome)}</div>
-                    <span className="nome" style={{ fontWeight: 600 }}>{s.nome}</span>
-                    <label className="mini" title="Gols">⚽<input className="num-input" type="number" min="0" value={s.gols} onChange={(e) => alterarSelecionado(s.jogadorId, 'gols', e.target.value)} /></label>
-                    <label className="mini" title="Assistências">🅰️<input className="num-input" type="number" min="0" value={s.assistencias} onChange={(e) => alterarSelecionado(s.jogadorId, 'assistencias', e.target.value)} /></label>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Jogadores ainda sem time */}
-      {selecionados.some((s) => s.timeIndex == null) && (
-        <div className="card" style={{ marginBottom: 16 }}>
-          <div className="mini" style={{ marginBottom: 8 }}>Sem time — defina manualmente ou sorteie</div>
-          {selecionados.filter((s) => s.timeIndex == null).map((s) => (
-            <div className="jog-line" key={s.jogadorId}>
-              <span className="nome">{s.nome}</span>
-              <select value="" onChange={(e) => alterarSelecionado(s.jogadorId, 'timeIndex', parseInt(e.target.value, 10))} style={{ width: 130 }}>
-                <option value="">Escolher time…</option>
-                {times.map((t, i) => <option key={i} value={i}>{t.nome}</option>)}
-              </select>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <button className="btn" disabled={salvando}>{salvando ? 'Salvando…' : editando ? 'Salvar alterações' : 'Criar pelada'}</button>
-    </form>
+    </div>
   );
 }

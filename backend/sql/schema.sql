@@ -96,3 +96,34 @@ BEGIN
     CREATE INDEX IX_Part_JogadorId ON dbo.PeladaParticipacoes (JogadorId);
 END
 GO
+
+/* ---------- Comentários das peladas ---------- */
+IF OBJECT_ID('dbo.PeladaComentarios', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.PeladaComentarios (
+        Id        INT IDENTITY(1,1) PRIMARY KEY,
+        PeladaId  INT NOT NULL,
+        UsuarioId INT NOT NULL,
+        Texto     NVARCHAR(500) NOT NULL,
+        CriadoEm  DATETIME2 NOT NULL CONSTRAINT DF_Coment_CriadoEm DEFAULT (SYSDATETIME()),
+        CONSTRAINT FK_Coment_Peladas  FOREIGN KEY (PeladaId)  REFERENCES dbo.Peladas (Id),
+        CONSTRAINT FK_Coment_Usuarios FOREIGN KEY (UsuarioId) REFERENCES dbo.Usuarios (Id)
+    );
+    CREATE INDEX IX_Coment_PeladaId ON dbo.PeladaComentarios (PeladaId);
+END
+GO
+
+/* ---------- Confirmação de presença (próxima pelada) ---------- */
+IF OBJECT_ID('dbo.PeladaPresencas', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.PeladaPresencas (
+        Id        INT IDENTITY(1,1) PRIMARY KEY,
+        PeladaId  INT NOT NULL,
+        JogadorId INT NOT NULL,
+        CriadoEm  DATETIME2 NOT NULL CONSTRAINT DF_Presenca_CriadoEm DEFAULT (SYSDATETIME()),
+        CONSTRAINT FK_Presenca_Peladas   FOREIGN KEY (PeladaId)  REFERENCES dbo.Peladas (Id),
+        CONSTRAINT FK_Presenca_Jogadores FOREIGN KEY (JogadorId) REFERENCES dbo.Jogadores (Id),
+        CONSTRAINT UQ_Presenca UNIQUE (PeladaId, JogadorId)
+    );
+END
+GO

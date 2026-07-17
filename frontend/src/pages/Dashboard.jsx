@@ -1,18 +1,30 @@
 import { useEffect, useState, useMemo } from 'react';
 import { api } from '../api';
-import { iniciais, corDoNome } from '../utils';
 
 const ORDENACOES = [
-  { key: 'Gols', label: '⚽ Artilheiros', cap: 'gols' },
-  { key: 'Assistencias', label: '🅰️ Garçons', cap: 'assist.' },
-  { key: 'Vitorias', label: '🏆 Vitórias', cap: 'vitórias' },
-  { key: 'Jogos', label: '📅 Presença', cap: 'jogos' },
+  { key: 'Gols', label: '⚽ Artilheiros', hero: 'Artilheiro', metric: 'gols', cap: 'gols' },
+  { key: 'Assistencias', label: '🅰️ Garçons', hero: 'Garçom', metric: 'assist', cap: 'assistências' },
+  { key: 'Vitorias', label: '🏆 Vitórias', hero: 'Mais vitórias', metric: 'vitorias', cap: 'vitórias' },
+  { key: 'Jogos', label: '📅 Presença', hero: 'Mais presente', metric: 'jogos', cap: 'jogos' },
 ];
-const MEDALHAS = ['🥇', '🥈', '🥉'];
+
+function Spark({ valores }) {
+  const ultimos = valores.slice(-6);
+  const max = Math.max(1, ...ultimos);
+  if (ultimos.length === 0) return <span className="spark" />;
+  return (
+    <span className="spark">
+      {ultimos.map((v, i) => (
+        <i key={i} className={v > 0 && v >= max ? 'hi' : ''} style={{ height: v <= 0 ? 4 : 6 + (v / max) * 14 }} />
+      ))}
+    </span>
+  );
+}
 
 export default function Dashboard() {
   const [stats, setStats] = useState([]);
   const [resumo, setResumo] = useState(null);
+  const [historico, setHistorico] = useState({});
   const [ordem, setOrdem] = useState('Gols');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -20,9 +32,10 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const [s, r] = await Promise.all([api.get('/stats'), api.get('/stats/resumo')]);
-        setStats(s);
-        setResumo(r);
+        const [s, r, h] = await Promise.all([
+          api.get('/stats'), api.get('/stats/resumo'), api.get('/stats/historico'),
+        ]);
+        setStats(s); setResumo(r); setHistorico(h);
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -36,88 +49,68 @@ export default function Dashboard() {
     () => [...stats].sort((a, b) => b[ordem] - a[ordem] || b.Gols - a.Gols || a.Nome.localeCompare(b.Nome)),
     [stats, ordem]
   );
-  const podio = ranking.slice(0, 3).filter((j) => j[ordem] > 0);
+  const lider = ranking[0] && ranking[0][ordem] > 0 ? ranking[0] : null;
+
+  function sparkOf(jogadorId) {
+    return (historico[jogadorId] || []).map((e) => e[conf.metric]);
+  }
 
   if (carregando) return <div className="loading">Carregando estatísticas…</div>;
   if (erro) return <div className="alert alert-error">{erro}</div>;
 
   return (
     <div>
-      <div className="page-head">
-        <h1>Ranking geral</h1>
-        <p>Estatísticas acumuladas de todas as peladas.</p>
-      </div>
-
-      {resumo && (
-        <div className="stat-grid">
-          <div className="stat verde"><div className="ico">📅</div><div className="n">{resumo.TotalPeladas}</div><div className="l">Peladas</div></div>
-          <div className="stat"><div className="ico">👥</div><div className="n">{resumo.TotalJogadores}</div><div className="l">Jogadores</div></div>
-          <div className="stat amarelo"><div className="ico">⚽</div><div className="n">{resumo.TotalGols}</div><div className="l">Gols</div></div>
-          <div className="stat"><div className="ico">🅰️</div><div className="n">{resumo.TotalAssist}</div><div className="l">Assistências</div></div>
+      <div className="between page-head">
+        <div>
+          <h1>Ranking geral</h1>
+          <p>{resumo?.TotalPeladas ? `Temporada 2026 · ${resumo.TotalPeladas} peladas disputadas` : 'Ainda sem peladas'}</p>
         </div>
-      )}
-
-      <div className="between">
-        <div className="segmented">
-          {ORDENACOES.map((o) => (
-            <button key={o.key} className={ordem === o.key ? 'active' : ''} onClick={() => setOrdem(o.key)}>{o.label}</button>
-          ))}
-        </div>
-      </div>
-
-      {podio.length > 0 && (
-        <div className="podium">
-          {podio.map((j, i) => (
-            <div className={`podium-card p${i + 1}`} key={j.Id}>
-              <span className="medal">{MEDALHAS[i]}</span>
-              <div className="avatar lg" style={{ background: corDoNome(j.Nome) }}>{iniciais(j.Nome)}</div>
-              <div className="nome">{j.Nome}</div>
-              <div className="val">{j[ordem]}</div>
-              <div className="cap">{conf.cap}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="card">
-        {ranking.length === 0 ? (
-          <div className="empty"><div className="big">⚽</div>Nenhuma estatística ainda.<br />Cadastre a primeira pelada!</div>
-        ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ width: 40 }}>#</th>
-                  <th>Jogador</th>
-                  <th className="num">Jogos</th>
-                  <th className="num">Gols</th>
-                  <th className="num">Assist.</th>
-                  <th className="num">Vitórias</th>
-                  <th className="num">G+A</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ranking.map((j, i) => (
-                  <tr key={j.Id}>
-                    <td><span className={`rank-badge ${i < 3 ? 'top' + (i + 1) : ''}`}>{i + 1}</span></td>
-                    <td>
-                      <div className="cell-jog">
-                        <div className="avatar sm" style={{ background: corDoNome(j.Nome) }}>{iniciais(j.Nome)}</div>
-                        <span style={{ fontWeight: 600 }}>{j.Nome}</span>
-                      </div>
-                    </td>
-                    <td className="num">{j.Jogos}</td>
-                    <td className="num gols">{j.Gols}</td>
-                    <td className="num">{j.Assistencias}</td>
-                    <td className="num">{j.Vitorias}</td>
-                    <td className="num">{j.Participacoes}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {resumo && (
+          <div className="head-stats">
+            <div className="hs"><div className="n">{resumo.TotalJogadores}</div><div className="l">jogadores</div></div>
+            <div className="hs"><div className="n accent">{resumo.TotalGols}</div><div className="l">gols</div></div>
+            <div className="hs"><div className="n">{resumo.TotalAssist}</div><div className="l">assist.</div></div>
           </div>
         )}
       </div>
+
+      <div className="tabs">
+        {ORDENACOES.map((o) => (
+          <button key={o.key} className={`tab ${ordem === o.key ? 'active' : ''}`} onClick={() => setOrdem(o.key)}>{o.label}</button>
+        ))}
+      </div>
+
+      {!lider ? (
+        <div className="empty"><div className="big">⚽</div>Nenhuma estatística ainda.<br />Cadastre a primeira pelada!</div>
+      ) : (
+        <div className="rank-wrap">
+          <div className="rank-hero">
+            <div className="cap">{conf.hero}</div>
+            <div className="big">{lider[ordem]}</div>
+            <div className="nome">{lider.Nome}</div>
+            <div className="sub">{conf.cap} em {lider.Jogos} {lider.Jogos === 1 ? 'jogo' : 'jogos'}</div>
+            <div className="badges">
+              <span>🥇 líder</span>
+              {lider.Jogos > 0 && <span>📅 {lider.Jogos} presenças</span>}
+            </div>
+          </div>
+
+          <div>
+            {ranking.map((j, i) => {
+              const destaque = i === 0;
+              return (
+                <div className={`rank-line ${j[ordem] === 0 ? 'dim' : ''}`} key={j.Id}>
+                  <span className="name">{i + 1} · {j.Nome}</span>
+                  <span className="right">
+                    <Spark valores={sparkOf(j.Id)} />
+                    <span className={`val ${destaque && j[ordem] > 0 ? 'hot' : ''}`}>{j[ordem]}</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

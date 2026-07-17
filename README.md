@@ -2,7 +2,7 @@
 
 Site para gerenciar as peladas do pessoal do trabalho: cadastro de jogadores, registro de peladas (times, gols, assistências, vitórias) e rankings (artilheiros, garçons, vitórias, presença).
 
-- **Frontend:** React + Vite (tema "Verde Campo", inspirado no CAEd)
+- **Frontend:** React + Vite (tema "Noite de Jogo" — âmbar sobre preto, inspirado no CAEd)
 - **Backend:** Node.js + Express
 - **Banco:** SQL Server (`OPED_FC`) com **Autenticação do Windows** (Trusted Connection via driver ODBC)
 
@@ -93,3 +93,5 @@ peladaOPED/
 | `Peladas` | Cada pelada (data, local, nº de times) |
 | `PeladaTimes` | Times de cada pelada (vitórias/empates/derrotas) |
 | `PeladaParticipacoes` | Jogador × pelada × time, com gols e assistências |
+| `PeladaComentarios` | Comentários dos usuários em cada pelada |
+| `PeladaPresencas` | Confirmação de presença na próxima pelada |

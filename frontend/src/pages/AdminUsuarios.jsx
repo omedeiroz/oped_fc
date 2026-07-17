@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
-import { iniciais, corDoNome } from '../utils';
 
 export default function AdminUsuarios() {
   const { user } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
+  const [busca, setBusca] = useState('');
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(true);
 
@@ -30,6 +30,12 @@ export default function AdminUsuarios() {
     }
   }
 
+  const filtrados = useMemo(() => {
+    const q = busca.trim().toLowerCase();
+    if (!q) return usuarios;
+    return usuarios.filter((u) => u.Nome.toLowerCase().includes(q) || (u.Usuario || '').toLowerCase().includes(q));
+  }, [usuarios, busca]);
+
   return (
     <div>
       <div className="page-head">
@@ -38,38 +44,28 @@ export default function AdminUsuarios() {
       </div>
 
       {erro && <div className="alert alert-error">{erro}</div>}
+
+      <input className="inp" placeholder="🔍 Buscar usuário…" value={busca} onChange={(e) => setBusca(e.target.value)} style={{ marginBottom: 20, maxWidth: 360 }} />
+
       {carregando ? (
         <div className="loading">Carregando…</div>
       ) : (
-        <div className="card table-wrap">
-          <table>
-            <thead>
-              <tr><th>Nome</th><th>Usuário</th><th className="num">Admin</th><th></th></tr>
-            </thead>
-            <tbody>
-              {usuarios.map((u) => (
-                <tr key={u.Id}>
-                  <td>
-                    <div className="cell-jog">
-                      <div className="avatar sm" style={{ background: corDoNome(u.Nome) }}>{iniciais(u.Nome)}</div>
-                      <span style={{ fontWeight: 600 }}>{u.Nome}</span>
-                    </div>
-                  </td>
-                  <td className="muted">@{u.Usuario || '—'}</td>
-                  <td className="num">{u.IsAdmin ? <span className="badge-admin">admin</span> : <span className="muted">—</span>}</td>
-                  <td className="num">
-                    {u.Id === user.id ? (
-                      <span className="mini">você</span>
-                    ) : (
-                      <button className={`btn btn-sm ${u.IsAdmin ? 'btn-danger' : 'btn-ghost'}`} onClick={() => alternarAdmin(u)}>
-                        {u.IsAdmin ? 'Remover admin' : 'Tornar admin'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div>
+          {filtrados.map((u) => (
+            <div className="user-line" key={u.Id}>
+              <span className="un">{u.Nome} <span className="u">@{u.Usuario || '—'}</span></span>
+              <span className="row" style={{ gap: 14 }}>
+                {u.IsAdmin && <span className="tag-admin">admin</span>}
+                {u.Id === user.id ? (
+                  <span className="muted-2" style={{ fontSize: 12 }}>você</span>
+                ) : (
+                  <button className={u.IsAdmin ? 'txt-muted' : 'txt-action'} onClick={() => alternarAdmin(u)}>
+                    {u.IsAdmin ? 'remover admin' : 'tornar admin →'}
+                  </button>
+                )}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
