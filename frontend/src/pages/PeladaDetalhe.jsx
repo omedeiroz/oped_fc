@@ -4,6 +4,13 @@ import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 import { formatarData } from '../utils';
 
+const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+function cabecalhoData(iso) {
+  const d = new Date(iso);
+  return `${DIAS[d.getUTCDay()]} · ${d.getUTCDate()} ${MESES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
 export default function PeladaDetalhe() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -16,12 +23,8 @@ export default function PeladaDetalhe() {
   useEffect(() => {
     (async () => {
       try {
-        const [d, c] = await Promise.all([
-          api.get(`/peladas/${id}`),
-          api.get(`/peladas/${id}/comentarios`),
-        ]);
-        setDados(d);
-        setComentarios(c);
+        const [d, c] = await Promise.all([api.get(`/peladas/${id}`), api.get(`/peladas/${id}/comentarios`)]);
+        setDados(d); setComentarios(c);
       } catch (err) {
         setErro(err.message);
       }
@@ -44,12 +47,7 @@ export default function PeladaDetalhe() {
 
   async function excluir() {
     if (!window.confirm('Excluir esta pelada? Esta ação não pode ser desfeita.')) return;
-    try {
-      await api.del(`/peladas/${id}`);
-      navigate('/peladas');
-    } catch (err) {
-      setErro(err.message);
-    }
+    try { await api.del(`/peladas/${id}`); navigate('/peladas'); } catch (err) { setErro(err.message); }
   }
 
   async function enviarComentario(e) {
@@ -60,9 +58,7 @@ export default function PeladaDetalhe() {
       const novo = await api.post(`/peladas/${id}/comentarios`, { texto });
       setComentarios((prev) => [...prev, novo]);
       setNovoComentario('');
-    } catch (err) {
-      setErro(err.message);
-    }
+    } catch (err) { setErro(err.message); }
   }
 
   if (erro) return <div className="alert alert-error">{erro}</div>;
@@ -73,42 +69,35 @@ export default function PeladaDetalhe() {
 
   return (
     <div>
-      <div className="between page-head">
-        <div className="mini">
-          <Link to="/peladas" className="muted">← Peladas</Link> · {formatarData(pelada.DataPelada)}
-          {pelada.Local ? ` · ${pelada.Local}` : ''}
-        </div>
+      <div className="diag-header lime">
+        <div className="diag-sub">{cabecalhoData(pelada.DataPelada)}</div>
+        <div className="diag-title">{pelada.Local || 'Pelada'}</div>
+      </div>
+
+      <div className="between" style={{ marginTop: 16 }}>
+        <Link to="/peladas" className="txt-muted">← Peladas</Link>
         {user?.isAdmin && (
           <div className="row">
-            <Link to={`/peladas/${id}/editar`} className="btn btn-ghost btn-sm">Editar</Link>
+            <Link to={`/peladas/${id}/editar`} className="btn btn-outline btn-sm">Editar</Link>
             <button className="btn btn-danger btn-sm" onClick={excluir}>Excluir</button>
           </div>
         )}
       </div>
 
-      {/* Placar (apenas quando 2 times) */}
       {doisTimes && (
-        <div className="scoreline">
-          <div className="tname a">{times[0].Nome}</div>
-          <div className={`sc ${calc.golsPorTime[0] >= calc.golsPorTime[1] ? 'win' : 'lose'}`}>{calc.golsPorTime[0]}</div>
-          <div className="dash">–</div>
-          <div className={`sc ${calc.golsPorTime[1] > calc.golsPorTime[0] ? 'win' : 'lose'}`}>{calc.golsPorTime[1]}</div>
-          <div className="tname b">{times[1].Nome}</div>
+        <div className="placar">
+          <span className="tn a">{times[0].Nome}</span>
+          <span className="sc">{calc.golsPorTime[0]} – {calc.golsPorTime[1]}</span>
+          <span className="tn b">{times[1].Nome}</span>
         </div>
       )}
 
-      {/* MVP */}
       {calc.mvp && (
-        <div className="mvp-pill">
-          <span style={{ fontSize: 18 }}>🏅</span>
-          <span className="who">MVP: {calc.mvp.JogadorNome}</span>
-          <span className="stat">{calc.mvp.Gols} gols · {calc.mvp.Assistencias} assist.</span>
-        </div>
+        <div className="mvp-pill">🏅 MVP: {calc.mvp.JogadorNome} · {calc.mvp.Gols}G {calc.mvp.Assistencias}A</div>
       )}
 
-      {pelada.Observacao && <div className="card" style={{ marginBottom: 22 }}><p style={{ margin: 0 }}>{pelada.Observacao}</p></div>}
+      {pelada.Observacao && <div className="card" style={{ marginBottom: 20 }}><p style={{ margin: 0 }}>{pelada.Observacao}</p></div>}
 
-      {/* Times */}
       <div className="team-grid">
         {times.map((t) => {
           const jogadores = participacoes.filter((p) => p.TimeId === t.Id);
@@ -122,8 +111,7 @@ export default function PeladaDetalhe() {
                 <div className="team-line" key={p.Id}>
                   <span className="n">{p.JogadorNome}</span>
                   <span>
-                    {p.Gols > 0 && <span className="g">⚽ {p.Gols}</span>}
-                    {p.Gols > 0 && p.Assistencias > 0 && ' '}
+                    {p.Gols > 0 && <span className="g">⚽ {p.Gols} </span>}
                     {p.Assistencias > 0 && <span className="a">🅰️ {p.Assistencias}</span>}
                   </span>
                 </div>
@@ -133,18 +121,14 @@ export default function PeladaDetalhe() {
         })}
       </div>
 
-      {/* Comentários */}
       <div className="card comments">
-        <div className="ct">💬 Comentários</div>
-        {comentarios.length === 0 && <div className="mini" style={{ marginBottom: 14 }}>Seja o primeiro a comentar.</div>}
+        <div className="ct">Comentários</div>
+        {comentarios.length === 0 && <div className="mini" style={{ marginBottom: 12 }}>Seja o primeiro a comentar.</div>}
         {comentarios.map((c) => (
-          <div className="comment" key={c.Id}>
-            <span className="ca">{c.AutorNome?.split(' ')[0]}:</span>
-            <span className="cx">{c.Texto}</span>
-          </div>
+          <div className="comment" key={c.Id}><b>{c.AutorNome?.split(' ')[0]}:</b> {c.Texto}</div>
         ))}
         <form className="comment-form" onSubmit={enviarComentario}>
-          <input className="inp" value={novoComentario} onChange={(e) => setNovoComentario(e.target.value)} placeholder="Adicionar um comentário…" maxLength={500} />
+          <input className="inp" value={novoComentario} onChange={(e) => setNovoComentario(e.target.value)} placeholder="Escrever comentário…" maxLength={500} />
           <button className="txt-action" type="submit">Enviar</button>
         </form>
       </div>

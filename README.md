@@ -2,7 +2,7 @@
 
 Site para gerenciar as peladas do pessoal do trabalho: cadastro de jogadores, registro de peladas (times, gols, assistências, vitórias) e rankings (artilheiros, garçons, vitórias, presença).
 
-- **Frontend:** React + Vite (tema "Noite de Jogo" — âmbar sobre preto, inspirado no CAEd)
+- **Frontend:** React + Vite (tema "Esportivo/Energético" — laranja/lime sobre navy, com alternância light/dark)
 - **Backend:** Node.js + Express
 - **Banco:** SQL Server (`OPED_FC`) com **Autenticação do Windows** (Trusted Connection via driver ODBC)
 

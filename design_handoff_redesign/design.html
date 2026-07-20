@@ -7,748 +7,613 @@
 </head>
 <body>
 <x-dc>
-<helmet data-dc-atomics>
+<helmet>
 <meta name="design_doc_mode" content="canvas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;600;700&family=DM+Serif+Display&family=Karla:wght@400;500;700&family=Newsreader:ital,wght@0,500;1,400;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-body{margin:0;background:#f0eee9;font-family:'Inter',system-ui,sans-serif}
-.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
-.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
-.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
-.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
-.dv-grp{margin:30px 0 16px}
-.dv-grp:first-child{margin-top:0}
-.dv-grp-t{font:700 15px/1.2 'Inter',system-ui,sans-serif;color:#1a1a1a;margin-bottom:2px}
-.dv-grp-s{font:400 12px/1.4 system-ui,sans-serif;color:rgba(0,0,0,.5);margin-bottom:14px}
-.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
-.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
-.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
-.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
-.dv-card{max-width:100%;background:#0a0f16;border:1px solid rgba(0,0,0,.08);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
-.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
-.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+  body { margin: 0; background: #e5e5e0; }
+  .badge { font: 700 12px/1 monospace; }
 </style>
 </helmet>
 
-<section class="dv-turn" id="t3">
-<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Versão final — "Noite de Jogo" em tamanho real, todas as telas</span></div>
-<div class="dv-opts" style="flex-direction:column">
+<section id="2" style="padding: 48px 40px 40px; display: flex; flex-direction: column; gap: 28px; background:#dedad2;">
+  <div style="display:flex; align-items:baseline; gap:14px;">
+    <h1 style="margin:0; font: 800 22px/1.2 system-ui, sans-serif; color:#111;">Fluxo completo no estilo 1A — light vs dark</h1>
+    <span style="font:14px system-ui, sans-serif; color:#666;">6 telas: login, ranking, peladas, detalhe, wizard, admin.</span>
+  </div>
 
-<div class="dv-opt" id="3a">
-<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Login / Cadastro</div>
-<div class="dv-card" style="width:1180px">
-<div style="display:flex;min-height:640px;background:#050607">
-<div style="flex:1;padding:64px 56px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid #1c1c1a">
-<div style="font:800 56px/1.05 'Inter',sans-serif;color:#f5f2ec;letter-spacing:-0.03em">PELADA<br>OPED FC</div>
-<div style="width:56px;height:6px;background:#ff6b35;border-radius:3px;margin:20px 0"></div>
-<div style="color:#8a8578;font-size:15px;max-width:340px;line-height:1.6">O ranking, as escalações e o histórico de todas as peladas do time — direto da Fundação CAEd.</div>
-<div style="display:flex;gap:40px;margin-top:44px">
-<div><div style="font:800 32px 'Space Grotesk',sans-serif;color:#f5f2ec">24</div><div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.06em">peladas</div></div>
-<div><div style="font:800 32px 'Space Grotesk',sans-serif;color:#ff6b35">187</div><div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.06em">gols</div></div>
-<div><div style="font:800 32px 'Space Grotesk',sans-serif;color:#f5f2ec">18</div><div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.06em">jogadores</div></div>
-</div>
-</div>
-<div style="width:420px;padding:64px 52px;display:flex;flex-direction:column;justify-content:center">
-<div style="display:flex;gap:26px;margin-bottom:30px"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec;padding-bottom:10px;border-bottom:2px solid #ff6b35">Entrar</span><span style="font:700 15px 'Inter',sans-serif;color:#5c5850;padding-bottom:10px">Criar conta</span></div>
-<div style="display:flex;flex-direction:column;gap:18px">
-<div><div style="color:#5c5850;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Usuário</div><div style="border-bottom:2px solid #2a2a28;padding:9px 2px;color:#8a8578;font-size:15px">arthur.pereira</div></div>
-<div><div style="color:#5c5850;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Senha</div><div style="border-bottom:2px solid #ff6b35;padding:9px 2px;color:#f5f2ec;font-size:15px;letter-spacing:2px">•••••••</div></div>
-<div style="text-align:right;font-size:12px;color:#5c5850">Esqueci minha senha</div>
-<div style="background:#ff6b35;color:#0c0b09;text-align:center;padding:15px;border-radius:4px;font:800 15px 'Inter',sans-serif;margin-top:8px">ENTRAR →</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+  <div style="display:flex; flex-direction:column; gap:20px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="badge" style="background:#111; color:#fff; padding:4px 8px; border-radius:4px;">2a</span>
+      <span style="font:800 15px/1 'Barlow Condensed', sans-serif; letter-spacing:.04em; text-transform:uppercase; color:#111;">Light</span>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:nowrap;">
 
-<div class="dv-opt" id="3b">
-<div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Ranking (Dashboard)</div>
-<div class="dv-card" style="width:1180px">
-<div style="min-height:640px;background:#050607;padding:48px 56px">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:34px">
-<div><div style="font:800 30px 'Inter',sans-serif;color:#f5f2ec">Ranking geral</div><div style="color:#8a8578;font-size:14px;margin-top:4px">Temporada 2026 · 24 peladas disputadas</div></div>
-<div style="display:flex;gap:28px">
-<div style="text-align:right"><div style="font:800 26px 'Space Grotesk',sans-serif;color:#f5f2ec">18</div><div style="color:#5c5850;font-size:11px;text-transform:uppercase">jogadores</div></div>
-<div style="text-align:right"><div style="font:800 26px 'Space Grotesk',sans-serif;color:#ff6b35">187</div><div style="color:#5c5850;font-size:11px;text-transform:uppercase">gols</div></div>
-<div style="text-align:right"><div style="font:800 26px 'Space Grotesk',sans-serif;color:#f5f2ec">124</div><div style="color:#5c5850;font-size:11px;text-transform:uppercase">assist.</div></div>
-</div>
-</div>
-<div style="display:flex;gap:28px;margin-bottom:32px;border-bottom:1px solid #1c1c1a">
-<span style="font:700 14px 'Inter',sans-serif;color:#f5f2ec;padding-bottom:12px;border-bottom:2px solid #ff6b35">⚽ Artilheiros</span>
-<span style="font:700 14px 'Inter',sans-serif;color:#5c5850;padding-bottom:12px">🅰️ Garçons</span>
-<span style="font:700 14px 'Inter',sans-serif;color:#5c5850;padding-bottom:12px">🏆 Vitórias</span>
-<span style="font:700 14px 'Inter',sans-serif;color:#5c5850;padding-bottom:12px">📅 Presença</span>
-</div>
-<div style="display:grid;grid-template-columns:340px 1fr;gap:40px">
-<div>
-<div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Artilheiro</div>
-<div style="font:800 100px/0.9 'Space Grotesk',sans-serif;color:#ff6b35">19</div>
-<div style="font:700 22px 'Inter',sans-serif;color:#f5f2ec;margin-top:10px">Arthur Pereira</div>
-<div style="color:#8a8578;font-size:13px;margin-top:2px">gols em 24 jogos</div>
-<div style="display:flex;gap:8px;margin-top:16px">
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;font-size:11px;padding:4px 9px;border-radius:3px">🥇 admin</span>
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;font-size:11px;padding:4px 9px;border-radius:3px">🔥 5 seguidas</span>
-</div>
-</div>
-<div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #1c1c1a"><span style="color:#f5f2ec;font-size:15px">1 · Arthur Pereira</span><span style="display:flex;align-items:center;gap:16px"><div style="display:flex;gap:3px;align-items:flex-end;height:20px"><div style="width:5px;height:8px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:14px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:10px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:20px;background:#ff6b35;border-radius:1px"></div><div style="width:5px;height:6px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:16px;background:#ff6b35;border-radius:1px"></div></div><span style="font:700 18px 'Space Grotesk',sans-serif;color:#ff6b35;width:24px;text-align:right">19</span></span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #1c1c1a"><span style="color:#f5f2ec;font-size:15px">2 · Lucas Menezes</span><span style="display:flex;align-items:center;gap:16px"><div style="display:flex;gap:3px;align-items:flex-end;height:20px"><div style="width:5px;height:16px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:8px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:12px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:6px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:14px;background:#3a3a37;border-radius:1px"></div><div style="width:5px;height:10px;background:#3a3a37;border-radius:1px"></div></div><span style="font:700 18px 'Space Grotesk',sans-serif;color:#f5f2ec;width:24px;text-align:right">14</span></span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #1c1c1a"><span style="color:#f5f2ec;font-size:15px">3 · Rafael Costa</span><span style="font:700 18px 'Space Grotesk',sans-serif;color:#f5f2ec">11</span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0"><span style="color:#8a8578;font-size:15px">4 · Bruno Almeida</span><span style="font:700 18px 'Space Grotesk',sans-serif;color:#8a8578">9</span></div>
-</div>
-</div>
-</div>
-</div>
+      <!-- LIGHT: Login -->
+      <div style="width:260px; height:560px; background:#F4F7F0; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.15); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="background:#0B1F3A; padding:20px 18px 26px; clip-path:polygon(0 0,100% 0,100% 88%,0 100%);">
+          <div style="font:900 20px/1.05 'Barlow Condensed', sans-serif; color:#fff;">PELADA<br>OPED FC</div>
+          <div style="width:36px; height:4px; background:#FF5A1F; margin-top:8px;"></div>
+        </div>
+        <div style="display:flex; gap:14px; padding:12px 18px 0;">
+          <div style="font:800 13px 'Barlow Condensed', sans-serif; color:#0B1F3A; border-bottom:2px solid #FF5A1F; padding-bottom:6px;">ENTRAR</div>
+          <div style="font:700 13px 'Barlow Condensed', sans-serif; color:#999; padding-bottom:6px;">CRIAR CONTA</div>
+        </div>
+        <div style="padding:16px 18px; display:flex; flex-direction:column; gap:14px; flex:1;">
+          <div style="border-bottom:2px solid #ddd; padding-bottom:6px; font:600 12px 'Barlow', sans-serif; color:#999;">E-mail</div>
+          <div style="border-bottom:2px solid #FF5A1F; padding-bottom:6px; font:600 12px 'Barlow', sans-serif; color:#0B1F3A;">Senha</div>
+          <button style="margin-top:8px; background:#FF5A1F; color:#fff; border:none; border-radius:8px; padding:12px; font:800 13px 'Barlow Condensed', sans-serif; text-transform:uppercase;">Entrar →</button>
+          <div style="margin-top:auto; display:flex; gap:10px;">
+            <div><div style="font:900 18px 'Barlow Condensed', sans-serif; color:#3DDC6B;">312</div><div style="font:600 8px 'Barlow', sans-serif; color:#888; text-transform:uppercase;">Peladas</div></div>
+            <div><div style="font:900 18px 'Barlow Condensed', sans-serif; color:#FF5A1F;">1.4k</div><div style="font:600 8px 'Barlow', sans-serif; color:#888; text-transform:uppercase;">Gols</div></div>
+            <div><div style="font:900 18px 'Barlow Condensed', sans-serif; color:#0B1F3A;">86</div><div style="font:600 8px 'Barlow', sans-serif; color:#888; text-transform:uppercase;">Jogadores</div></div>
+          </div>
+        </div>
+      </div>
 
-<div class="dv-opt" id="3c">
-<div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Peladas — lista</div>
-<div class="dv-card" style="width:1180px">
-<div style="min-height:560px;background:#050607;padding:48px 56px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px"><div><div style="font:800 30px 'Inter',sans-serif;color:#f5f2ec">Peladas</div><div style="color:#8a8578;font-size:14px;margin-top:4px">Histórico completo do time</div></div><div style="background:#ff6b35;color:#0c0b09;padding:13px 22px;border-radius:4px;font:800 14px 'Inter',sans-serif">+ Nova pelada</div></div>
-<div style="display:flex;align-items:center;gap:18px;background:#101214;border:1px solid #ff6b35;border-radius:10px;padding:20px 26px;margin-bottom:28px">
-<div style="font-size:26px">🔔</div>
-<div style="flex:1"><div style="font-weight:700;color:#f5f2ec;font-size:15px">Próxima pelada · sáb, 25 de julho</div><div style="color:#8a8578;font-size:13px;margin-top:2px">Society do trabalho · 8 de 14 confirmados</div></div>
-<div style="background:#ff6b35;color:#0c0b09;padding:11px 20px;border-radius:4px;font:800 13px 'Inter',sans-serif">Confirmar presença</div>
-</div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:24px"><div style="color:#5c5850;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Finalizada</div><div style="font:800 28px 'Inter',sans-serif;color:#f5f2ec;margin-top:8px">13 Jul</div><div style="color:#8a8578;font-size:13px;margin-top:10px">🥅 3 times · 👥 15 jogadores</div><div style="color:#ff6b35;font-size:13px;margin-top:4px;font-weight:700">⚽ 12 gols</div></div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:24px"><div style="color:#5c5850;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Finalizada</div><div style="font:800 28px 'Inter',sans-serif;color:#f5f2ec;margin-top:8px">06 Jul</div><div style="color:#8a8578;font-size:13px;margin-top:10px">🥅 2 times · 👥 12 jogadores</div><div style="color:#ff6b35;font-size:13px;margin-top:4px;font-weight:700">⚽ 9 gols</div></div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:24px"><div style="color:#5c5850;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Finalizada</div><div style="font:800 28px 'Inter',sans-serif;color:#f5f2ec;margin-top:8px">29 Jun</div><div style="color:#8a8578;font-size:13px;margin-top:10px">🥅 2 times · 👥 14 jogadores</div><div style="color:#ff6b35;font-size:13px;margin-top:4px;font-weight:700">⚽ 15 gols</div></div>
-</div>
-</div>
-</div>
-</div>
+      <!-- LIGHT: Ranking -->
+      <div style="width:260px; height:560px; background:#F4F7F0; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.15); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="background:#0B1F3A; padding:18px 16px 24px; clip-path:polygon(0 0,100% 0,100% 84%,0 100%);">
+          <div style="font:900 20px/1 'Barlow Condensed', sans-serif; color:#fff;">RANKING</div>
+          <div style="font:600 10px 'Barlow', sans-serif; color:#9FE6B4; text-transform:uppercase; margin-top:4px;">Temporada 2026</div>
+        </div>
+        <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px; margin-top:-8px;">
+          <div style="display:flex; align-items:center; gap:8px; background:#fff; border-radius:8px; padding:8px 10px;">
+            <div style="width:18px; font:900 13px 'Barlow Condensed', sans-serif; color:#FF5A1F;">1</div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#0B1F3A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 10px 'Barlow', sans-serif;">RM</div>
+            <div style="flex:1; font:700 12px 'Barlow', sans-serif; color:#111;">Rafael Mendes</div>
+            <div style="font:900 14px 'Barlow Condensed', sans-serif; color:#0B1F3A;">98</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:#fff; border-radius:8px; padding:8px 10px;">
+            <div style="width:18px; font:900 13px 'Barlow Condensed', sans-serif; color:#888;">2</div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#3DDC6B; color:#0B1F3A; display:flex; align-items:center; justify-content:center; font:700 10px 'Barlow', sans-serif;">JS</div>
+            <div style="flex:1; font:700 12px 'Barlow', sans-serif; color:#111;">João Silva</div>
+            <div style="font:900 14px 'Barlow Condensed', sans-serif; color:#0B1F3A;">91</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:#fff; border:2px solid #3DDC6B; border-radius:8px; padding:8px 10px;">
+            <div style="width:18px; font:900 13px 'Barlow Condensed', sans-serif; color:#888;">3</div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#FF5A1F; color:#fff; display:flex; align-items:center; justify-content:center; font:700 10px 'Barlow', sans-serif;">VC</div>
+            <div style="flex:1; font:700 12px 'Barlow', sans-serif; color:#111;">Você</div>
+            <div style="font:900 14px 'Barlow Condensed', sans-serif; color:#0B1F3A;">87</div>
+          </div>
+        </div>
+      </div>
 
-<div class="dv-opt" id="3d">
-<div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a>Detalhe da pelada</div>
-<div class="dv-card" style="width:1180px">
-<div style="min-height:680px;background:#050607;padding:48px 56px">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px"><div style="color:#8a8578;font-size:13px">← Peladas · 13 de julho de 2026 · Society do trabalho</div><div style="display:flex;gap:10px"><span style="border:1px solid #2a2a28;color:#f5f2ec;padding:9px 16px;border-radius:4px;font:700 13px 'Inter',sans-serif">Editar</span><span style="border:1px solid #7a2b18;color:#ff9d7a;padding:9px 16px;border-radius:4px;font:700 13px 'Inter',sans-serif">Excluir</span></div></div>
-<div style="display:flex;align-items:center;justify-content:center;gap:30px;margin-bottom:20px">
-<div style="font:700 20px 'Inter',sans-serif;color:#f5f2ec;text-align:right;flex:1">Time A</div><div style="font:800 72px 'Space Grotesk',sans-serif;color:#ff6b35">2</div><div style="font:700 24px 'Space Grotesk',sans-serif;color:#5c5850">–</div><div style="font:800 72px 'Space Grotesk',sans-serif;color:#f5f2ec">1</div><div style="font:700 20px 'Inter',sans-serif;color:#8a8578;flex:1">Time B</div>
-</div>
-<div style="display:flex;align-items:center;justify-content:center;gap:16px;background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:16px 24px;margin-bottom:30px;width:fit-content;margin-left:auto;margin-right:auto"><span style="font-size:18px">🏅</span><span style="color:#f5f2ec;font:700 14px 'Inter',sans-serif">MVP: Arthur Pereira</span><span style="color:#ff6b35;font:700 13px 'Space Grotesk',sans-serif">2 gols · 1 assist.</span></div>
-<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-bottom:26px">
-<div style="background:#101214;border:1px solid #2a2a28;border-top:2px solid #ff6b35;border-radius:10px;padding:18px"><div style="font-weight:700;font-size:14px;color:#f5f2ec;margin-bottom:4px">Time A</div><div style="color:#8a8578;font-size:12px;margin-bottom:12px">🏆 2V · 1E · 0D</div>
-<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1c1c1a"><span style="color:#f5f2ec;font-size:13px">Arthur Pereira</span><span style="color:#ff6b35;font-size:12px;font-weight:700">⚽ 2</span></div>
-<div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:#f5f2ec;font-size:13px">Lucas Menezes</span><span style="color:#8a8578;font-size:12px">🅰️ 1</span></div>
-</div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:18px"><div style="font-weight:700;font-size:14px;color:#f5f2ec;margin-bottom:4px">Time B</div><div style="color:#8a8578;font-size:12px;margin-bottom:12px">🏆 1V · 0E · 1D</div>
-<div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:#f5f2ec;font-size:13px">Rafael Costa</span><span style="color:#ff6b35;font-size:12px;font-weight:700">⚽ 1</span></div>
-</div>
-</div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:22px">
-<div style="font-weight:700;font-size:14px;color:#f5f2ec;margin-bottom:16px">💬 Comentários</div>
-<div style="display:flex;gap:10px;margin-bottom:14px"><span style="color:#f5f2ec;font-size:13px;font-weight:700">Lucas:</span><span style="color:#8a8578;font-size:13px">Time A merecia ganhar de 3 😅</span></div>
-<div style="display:flex;gap:10px;margin-bottom:16px"><span style="color:#f5f2ec;font-size:13px;font-weight:700">Rafael:</span><span style="color:#8a8578;font-size:13px">Hat-trick chegando 🔥</span></div>
-<div style="display:flex;gap:10px;align-items:center"><div style="flex:1;border-bottom:2px solid #2a2a28;padding:8px 2px;color:#5c5850;font-size:13px">Adicionar um comentário…</div><span style="color:#ff6b35;font-weight:700">Enviar</span></div>
-</div>
-</div>
-</div>
-</div>
+      <!-- LIGHT: Peladas -->
+      <div style="width:260px; height:560px; background:#F4F7F0; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.15); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="padding:16px 14px 0;">
+          <div style="font:900 18px 'Barlow Condensed', sans-serif; color:#111;">PELADAS</div>
+        </div>
+        <div style="margin:12px 14px 0; background:#0B1F3A; border-radius:10px; padding:12px; display:flex; align-items:center; gap:8px; clip-path:polygon(0 0,100% 0,100% 90%,0 100%);">
+          <div style="font-size:16px;">🔔</div>
+          <div style="flex:1;">
+            <div style="font:700 11px 'Barlow', sans-serif; color:#fff;">Próxima: Qua 22 Jul</div>
+            <div style="font:600 9px 'Barlow', sans-serif; color:#9FE6B4;">19h30 · Quadra Central</div>
+          </div>
+        </div>
+        <button style="margin:8px 14px 0; background:#3DDC6B; color:#0B1F3A; border:none; border-radius:8px; padding:9px; font:800 11px 'Barlow Condensed', sans-serif; text-transform:uppercase;">Confirmar presença</button>
+        <div style="padding:14px; display:flex; flex-direction:column; gap:10px;">
+          <div style="border:1px solid #ddd; border-radius:10px; padding:12px; display:flex; gap:10px; align-items:center;">
+            <div style="font:900 22px 'Barlow Condensed', sans-serif; color:#FF5A1F;">13<span style="font-size:11px;"> Jul</span></div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#111;">Quadra Central<br><span style="color:#888; font-weight:600;">14 confirmados</span></div>
+          </div>
+          <div style="border:1px solid #ddd; border-radius:10px; padding:12px; display:flex; gap:10px; align-items:center;">
+            <div style="font:900 22px 'Barlow Condensed', sans-serif; color:#FF5A1F;">06<span style="font-size:11px;"> Jul</span></div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#111;">Arena Norte<br><span style="color:#888; font-weight:600;">12 confirmados</span></div>
+          </div>
+          <button style="margin-top:auto; background:transparent; border:2px solid #0B1F3A; border-radius:6px; padding:9px; font:800 11px 'Barlow Condensed', sans-serif; color:#0B1F3A; text-transform:uppercase;">+ Nova pelada</button>
+        </div>
+      </div>
 
-<div class="dv-opt" id="3e">
-<div class="dv-olabel"><a class="dv-oid" href="#3e">3e</a>Nova / editar pelada (wizard)</div>
-<div class="dv-card" style="width:1180px">
-<div style="min-height:600px;background:#050607;padding:48px 56px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font:800 28px 'Inter',sans-serif;color:#f5f2ec">Nova pelada</div><span style="color:#5c5850;font-size:13px">Cancelar</span></div>
-<div style="color:#8a8578;font-size:13px;margin-bottom:16px">Etapa 2 de 4 — Jogadores</div>
-<div style="display:flex;gap:6px;margin-bottom:32px">
-<div style="flex:1;height:4px;background:#ff6b35;border-radius:2px"></div><div style="flex:1;height:4px;background:#ff6b35;border-radius:2px"></div><div style="flex:1;height:4px;background:#1c1c1a;border-radius:2px"></div><div style="flex:1;height:4px;background:#1c1c1a;border-radius:2px"></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:36px">
-<div>
-<div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Adicionar jogadores</div>
-<div style="border-bottom:2px solid #2a2a28;padding:10px 2px;color:#5c5850;font-size:14px;margin-bottom:20px">+ Adicionar dos cadastrados…</div>
-<div style="display:flex;flex-wrap:wrap;gap:8px">
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Arthur Pereira ×</span>
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Lucas Menezes ×</span>
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Rafael Costa ×</span>
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Diego Ramos ×</span>
-</div>
-<div style="margin-top:22px;background:#ff6b35;color:#0c0b09;text-align:center;padding:12px;border-radius:4px;font:800 13px 'Inter',sans-serif;width:fit-content;padding-left:20px;padding-right:20px">🎲 Sortear times</div>
-</div>
-<div>
-<div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Prévia dos times</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:8px;padding:14px"><div style="font-weight:700;font-size:13px;color:#f5f2ec;margin-bottom:8px">Time 1</div><div style="color:#8a8578;font-size:12px;padding:4px 0">Arthur Pereira</div><div style="color:#8a8578;font-size:12px;padding:4px 0">Diego Ramos</div></div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:8px;padding:14px"><div style="font-weight:700;font-size:13px;color:#f5f2ec;margin-bottom:8px">Time 2</div><div style="color:#8a8578;font-size:12px;padding:4px 0">Lucas Menezes</div><div style="color:#8a8578;font-size:12px;padding:4px 0">Rafael Costa</div></div>
-</div>
-</div>
-</div>
-<div style="display:flex;justify-content:space-between;margin-top:36px"><div style="color:#8a8578;font:700 14px 'Inter',sans-serif">← Voltar</div><div style="background:#ff6b35;color:#0c0b09;padding:13px 26px;border-radius:4px;font:800 14px 'Inter',sans-serif">Próximo → Sorteio</div></div>
-</div>
-</div>
-</div>
+      <!-- LIGHT: Detalhe -->
+      <div style="width:260px; height:560px; background:#F4F7F0; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.15); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="background:#3DDC6B; padding:14px; clip-path:polygon(0 0,100% 0,100% 90%,0 100%);">
+          <div style="font:700 9px 'Barlow', sans-serif; color:#0B1F3A; text-transform:uppercase;">Qua · 22 Jul · 19h30</div>
+          <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#0B1F3A;">PELADA DA VÁRZEA</div>
+        </div>
+        <div style="padding:14px; display:flex; flex-direction:column; gap:10px; align-items:center;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="font:700 11px 'Barlow', sans-serif; color:#0B1F3A;">Amarelo</div>
+            <div style="font:900 30px 'Barlow Condensed', sans-serif; color:#FF5A1F;">2 – 1</div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#888;">Azul</div>
+          </div>
+          <div style="background:#0B1F3A; border-radius:20px; padding:6px 12px; font:700 10px 'Barlow', sans-serif; color:#fff; display:flex; gap:6px; align-items:center;">🏅 MVP: Rafael Mendes</div>
+          <div style="width:100%; font:800 11px 'Barlow Condensed', sans-serif; color:#111; text-transform:uppercase; margin-top:4px;">Comentários</div>
+          <div style="width:100%; background:#fff; border-radius:8px; padding:8px 10px; font:500 11px 'Barlow', sans-serif; color:#444;">Carlos: Bora, hoje ganha! 🔥</div>
+          <div style="width:100%; border-bottom:2px solid #ddd; padding-bottom:6px; font:600 11px 'Barlow', sans-serif; color:#999; margin-top:auto;">Escrever comentário...</div>
+        </div>
+      </div>
 
-<div class="dv-opt" id="3f">
-<div class="dv-olabel"><a class="dv-oid" href="#3f">3f</a>Admin — usuários</div>
-<div class="dv-card" style="width:900px">
-<div style="min-height:460px;background:#050607;padding:48px 56px">
-<div style="font:800 28px 'Inter',sans-serif;color:#f5f2ec;margin-bottom:6px">Usuários</div>
-<div style="color:#8a8578;font-size:14px;margin-bottom:22px">Gerencie quem tem permissão de administrador.</div>
-<div style="border-bottom:2px solid #2a2a28;padding:10px 2px;color:#5c5850;font-size:14px;margin-bottom:20px">🔍 Buscar usuário…</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid #1c1c1a"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec">Arthur Pereira <span style="color:#5c5850;font-weight:400">@arthur.pereira</span></span><span style="display:flex;align-items:center;gap:14px"><span style="background:#ff6b35;color:#0c0b09;font:800 10px 'Inter',sans-serif;padding:4px 9px;border-radius:3px;text-transform:uppercase">admin</span><span style="color:#5c5850;font-size:12px">você</span></span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid #1c1c1a"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec">Lucas Menezes <span style="color:#5c5850;font-weight:400">@lucas.menezes</span></span><span style="color:#ff6b35;font:700 13px 'Inter',sans-serif">tornar admin →</span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:18px 0"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec">Rafael Costa <span style="color:#5c5850;font-weight:400">@rafael.costa</span></span><span style="color:#ff6b35;font:700 13px 'Inter',sans-serif">tornar admin →</span></div>
-</div>
-</div>
-</div>
+      <!-- LIGHT: Wizard -->
+      <div style="width:260px; height:560px; background:#F4F7F0; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.15); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="padding:14px 14px 0;">
+          <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#111;">NOVA PELADA</div>
+          <div style="display:flex; gap:4px; margin-top:10px;">
+            <div style="flex:1; height:5px; background:#3DDC6B; border-radius:3px;"></div>
+            <div style="flex:1; height:5px; background:#3DDC6B; border-radius:3px;"></div>
+            <div style="flex:1; height:5px; background:#eee; border-radius:3px;"></div>
+            <div style="flex:1; height:5px; background:#eee; border-radius:3px;"></div>
+          </div>
+          <div style="font:700 10px 'Barlow', sans-serif; color:#888; text-transform:uppercase; margin-top:6px;">Etapa 2 de 4 · Jogadores</div>
+        </div>
+        <div style="padding:14px; display:flex; flex-direction:column; gap:10px; flex:1;">
+          <div style="border-bottom:2px solid #ddd; padding-bottom:6px; font:600 12px 'Barlow', sans-serif; color:#999;">Buscar jogador...</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div style="background:#3DDC6B; color:#0B1F3A; border-radius:20px; padding:4px 10px; font:700 10px 'Barlow', sans-serif;">Rafael ×</div>
+            <div style="background:#3DDC6B; color:#0B1F3A; border-radius:20px; padding:4px 10px; font:700 10px 'Barlow', sans-serif;">João ×</div>
+            <div style="background:#3DDC6B; color:#0B1F3A; border-radius:20px; padding:4px 10px; font:700 10px 'Barlow', sans-serif;">Pedro ×</div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <div style="flex:1; background:#fff; border-radius:8px; padding:8px; font:700 10px 'Barlow', sans-serif; color:#0B1F3A;">Time A<br><span style="color:#888; font-weight:600;">Rafael, João</span></div>
+            <div style="flex:1; background:#fff; border-radius:8px; padding:8px; font:700 10px 'Barlow', sans-serif; color:#0B1F3A;">Time B<br><span style="color:#888; font-weight:600;">Pedro, Carlos</span></div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; padding:14px; border-top:1px solid #eee;">
+          <button style="flex:1; background:transparent; border:2px solid #0B1F3A; border-radius:6px; padding:9px; font:800 10px 'Barlow Condensed', sans-serif; color:#0B1F3A;">← VOLTAR</button>
+          <button style="flex:1; background:#FF5A1F; border:none; border-radius:6px; padding:9px; font:800 10px 'Barlow Condensed', sans-serif; color:#fff;">PRÓXIMO →</button>
+        </div>
+      </div>
 
-</div>
-<p class="dv-next">Ajustes? "muda a cor de destaque de <a class="dv-oid" href="#3b">3b</a>" · "prefiro o header de <a class="dv-oid" href="#1c">1c</a> no lugar do de <a class="dv-oid" href="#3b">3b</a>" · "monte o protótipo interativo dessa direção".</p>
+      <!-- LIGHT: Admin -->
+      <div style="width:260px; height:560px; background:#F4F7F0; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.15); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="padding:16px 14px 0;">
+          <div style="font:900 18px 'Barlow Condensed', sans-serif; color:#111;">USUÁRIOS</div>
+        </div>
+        <div style="padding:14px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #ddd;">
+            <div style="flex:1;"><div style="font:700 12px 'Barlow', sans-serif; color:#111;">Rafael Mendes</div><div style="font:500 10px 'Barlow', sans-serif; color:#999;">@rafaelm</div></div>
+            <div style="background:#FF5A1F; color:#fff; font:800 8px 'Barlow', sans-serif; padding:3px 7px; border-radius:4px;">ADMIN</div>
+          </div>
+          <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #ddd;">
+            <div style="flex:1;"><div style="font:700 12px 'Barlow', sans-serif; color:#111;">João Silva</div><div style="font:500 10px 'Barlow', sans-serif; color:#999;">@joaos</div></div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#0B1F3A;">tornar admin →</div>
+          </div>
+          <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #ddd;">
+            <div style="flex:1;"><div style="font:700 12px 'Barlow', sans-serif; color:#111;">Você</div><div style="font:500 10px 'Barlow', sans-serif; color:#999;">@voce</div></div>
+            <div style="font:600 10px 'Barlow', sans-serif; color:#999;">você</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+      <span class="badge" style="background:#111; color:#fff; padding:4px 8px; border-radius:4px;">2b</span>
+      <span style="font:800 15px/1 'Barlow Condensed', sans-serif; letter-spacing:.04em; text-transform:uppercase; color:#111;">Dark</span>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:nowrap;">
+
+      <!-- DARK: Login -->
+      <div style="width:260px; height:560px; background:#0A1420; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.4); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="background:#122036; padding:20px 18px 26px; clip-path:polygon(0 0,100% 0,100% 88%,0 100%);">
+          <div style="font:900 20px/1.05 'Barlow Condensed', sans-serif; color:#F4F7F0;">PELADA<br>OPED FC</div>
+          <div style="width:36px; height:4px; background:#FF7A45; margin-top:8px;"></div>
+        </div>
+        <div style="display:flex; gap:14px; padding:12px 18px 0;">
+          <div style="font:800 13px 'Barlow Condensed', sans-serif; color:#F4F7F0; border-bottom:2px solid #FF7A45; padding-bottom:6px;">ENTRAR</div>
+          <div style="font:700 13px 'Barlow Condensed', sans-serif; color:#5c6b80; padding-bottom:6px;">CRIAR CONTA</div>
+        </div>
+        <div style="padding:16px 18px; display:flex; flex-direction:column; gap:14px; flex:1;">
+          <div style="border-bottom:2px solid #223349; padding-bottom:6px; font:600 12px 'Barlow', sans-serif; color:#6c7d92;">E-mail</div>
+          <div style="border-bottom:2px solid #FF7A45; padding-bottom:6px; font:600 12px 'Barlow', sans-serif; color:#F4F7F0;">Senha</div>
+          <button style="margin-top:8px; background:#FF7A45; color:#0A1420; border:none; border-radius:8px; padding:12px; font:800 13px 'Barlow Condensed', sans-serif; text-transform:uppercase;">Entrar →</button>
+          <div style="margin-top:auto; display:flex; gap:10px;">
+            <div><div style="font:900 18px 'Barlow Condensed', sans-serif; color:#4AEE85;">312</div><div style="font:600 8px 'Barlow', sans-serif; color:#6c7d92; text-transform:uppercase;">Peladas</div></div>
+            <div><div style="font:900 18px 'Barlow Condensed', sans-serif; color:#FF7A45;">1.4k</div><div style="font:600 8px 'Barlow', sans-serif; color:#6c7d92; text-transform:uppercase;">Gols</div></div>
+            <div><div style="font:900 18px 'Barlow Condensed', sans-serif; color:#F4F7F0;">86</div><div style="font:600 8px 'Barlow', sans-serif; color:#6c7d92; text-transform:uppercase;">Jogadores</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DARK: Ranking -->
+      <div style="width:260px; height:560px; background:#0A1420; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.4); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="background:#122036; padding:18px 16px 24px; clip-path:polygon(0 0,100% 0,100% 84%,0 100%);">
+          <div style="font:900 20px/1 'Barlow Condensed', sans-serif; color:#F4F7F0;">RANKING</div>
+          <div style="font:600 10px 'Barlow', sans-serif; color:#4AEE85; text-transform:uppercase; margin-top:4px;">Temporada 2026</div>
+        </div>
+        <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px; margin-top:-8px;">
+          <div style="display:flex; align-items:center; gap:8px; background:#10203A; border-radius:8px; padding:8px 10px;">
+            <div style="width:18px; font:900 13px 'Barlow Condensed', sans-serif; color:#FF7A45;">1</div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#0A1420; color:#F4F7F0; display:flex; align-items:center; justify-content:center; font:700 10px 'Barlow', sans-serif;">RM</div>
+            <div style="flex:1; font:700 12px 'Barlow', sans-serif; color:#F4F7F0;">Rafael Mendes</div>
+            <div style="font:900 14px 'Barlow Condensed', sans-serif; color:#F4F7F0;">98</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:#10203A; border-radius:8px; padding:8px 10px;">
+            <div style="width:18px; font:900 13px 'Barlow Condensed', sans-serif; color:#5c6b80;">2</div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#4AEE85; color:#0A1420; display:flex; align-items:center; justify-content:center; font:700 10px 'Barlow', sans-serif;">JS</div>
+            <div style="flex:1; font:700 12px 'Barlow', sans-serif; color:#F4F7F0;">João Silva</div>
+            <div style="font:900 14px 'Barlow Condensed', sans-serif; color:#F4F7F0;">91</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:#10203A; border:2px solid #4AEE85; border-radius:8px; padding:8px 10px;">
+            <div style="width:18px; font:900 13px 'Barlow Condensed', sans-serif; color:#5c6b80;">3</div>
+            <div style="width:28px; height:28px; border-radius:50%; background:#FF7A45; color:#0A1420; display:flex; align-items:center; justify-content:center; font:700 10px 'Barlow', sans-serif;">VC</div>
+            <div style="flex:1; font:700 12px 'Barlow', sans-serif; color:#F4F7F0;">Você</div>
+            <div style="font:900 14px 'Barlow Condensed', sans-serif; color:#F4F7F0;">87</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DARK: Peladas -->
+      <div style="width:260px; height:560px; background:#0A1420; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.4); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="padding:16px 14px 0;">
+          <div style="font:900 18px 'Barlow Condensed', sans-serif; color:#F4F7F0;">PELADAS</div>
+        </div>
+        <div style="margin:12px 14px 0; background:#122036; border-radius:10px; padding:12px; display:flex; align-items:center; gap:8px; clip-path:polygon(0 0,100% 0,100% 90%,0 100%); border:1px solid #FF7A45;">
+          <div style="font-size:16px;">🔔</div>
+          <div style="flex:1;">
+            <div style="font:700 11px 'Barlow', sans-serif; color:#F4F7F0;">Próxima: Qua 22 Jul</div>
+            <div style="font:600 9px 'Barlow', sans-serif; color:#4AEE85;">19h30 · Quadra Central</div>
+          </div>
+        </div>
+        <button style="margin:8px 14px 0; background:#4AEE85; color:#0A1420; border:none; border-radius:8px; padding:9px; font:800 11px 'Barlow Condensed', sans-serif; text-transform:uppercase;">Confirmar presença</button>
+        <div style="padding:14px; display:flex; flex-direction:column; gap:10px;">
+          <div style="border:1px solid #223349; border-radius:10px; padding:12px; display:flex; gap:10px; align-items:center;">
+            <div style="font:900 22px 'Barlow Condensed', sans-serif; color:#FF7A45;">13<span style="font-size:11px;"> Jul</span></div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#F4F7F0;">Quadra Central<br><span style="color:#6c7d92; font-weight:600;">14 confirmados</span></div>
+          </div>
+          <div style="border:1px solid #223349; border-radius:10px; padding:12px; display:flex; gap:10px; align-items:center;">
+            <div style="font:900 22px 'Barlow Condensed', sans-serif; color:#FF7A45;">06<span style="font-size:11px;"> Jul</span></div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#F4F7F0;">Arena Norte<br><span style="color:#6c7d92; font-weight:600;">12 confirmados</span></div>
+          </div>
+          <button style="margin-top:auto; background:transparent; border:2px solid #4AEE85; border-radius:6px; padding:9px; font:800 11px 'Barlow Condensed', sans-serif; color:#4AEE85; text-transform:uppercase;">+ Nova pelada</button>
+        </div>
+      </div>
+
+      <!-- DARK: Detalhe -->
+      <div style="width:260px; height:560px; background:#0A1420; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.4); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="background:#122036; padding:14px; clip-path:polygon(0 0,100% 0,100% 90%,0 100%); border-bottom:2px solid #4AEE85;">
+          <div style="font:700 9px 'Barlow', sans-serif; color:#4AEE85; text-transform:uppercase;">Qua · 22 Jul · 19h30</div>
+          <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#F4F7F0;">PELADA DA VÁRZEA</div>
+        </div>
+        <div style="padding:14px; display:flex; flex-direction:column; gap:10px; align-items:center;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="font:700 11px 'Barlow', sans-serif; color:#F4F7F0;">Amarelo</div>
+            <div style="font:900 30px 'Barlow Condensed', sans-serif; color:#FF7A45;">2 – 1</div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#6c7d92;">Azul</div>
+          </div>
+          <div style="background:#4AEE85; border-radius:20px; padding:6px 12px; font:700 10px 'Barlow', sans-serif; color:#0A1420; display:flex; gap:6px; align-items:center;">🏅 MVP: Rafael Mendes</div>
+          <div style="width:100%; font:800 11px 'Barlow Condensed', sans-serif; color:#F4F7F0; text-transform:uppercase; margin-top:4px;">Comentários</div>
+          <div style="width:100%; background:#10203A; border-radius:8px; padding:8px 10px; font:500 11px 'Barlow', sans-serif; color:#c4cbd6;">Carlos: Bora, hoje ganha! 🔥</div>
+          <div style="width:100%; border-bottom:2px solid #223349; padding-bottom:6px; font:600 11px 'Barlow', sans-serif; color:#5c6b80; margin-top:auto;">Escrever comentário...</div>
+        </div>
+      </div>
+
+      <!-- DARK: Wizard -->
+      <div style="width:260px; height:560px; background:#0A1420; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.4); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="padding:14px 14px 0;">
+          <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#F4F7F0;">NOVA PELADA</div>
+          <div style="display:flex; gap:4px; margin-top:10px;">
+            <div style="flex:1; height:5px; background:#4AEE85; border-radius:3px;"></div>
+            <div style="flex:1; height:5px; background:#4AEE85; border-radius:3px;"></div>
+            <div style="flex:1; height:5px; background:#223349; border-radius:3px;"></div>
+            <div style="flex:1; height:5px; background:#223349; border-radius:3px;"></div>
+          </div>
+          <div style="font:700 10px 'Barlow', sans-serif; color:#6c7d92; text-transform:uppercase; margin-top:6px;">Etapa 2 de 4 · Jogadores</div>
+        </div>
+        <div style="padding:14px; display:flex; flex-direction:column; gap:10px; flex:1;">
+          <div style="border-bottom:2px solid #223349; padding-bottom:6px; font:600 12px 'Barlow', sans-serif; color:#6c7d92;">Buscar jogador...</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div style="background:#4AEE85; color:#0A1420; border-radius:20px; padding:4px 10px; font:700 10px 'Barlow', sans-serif;">Rafael ×</div>
+            <div style="background:#4AEE85; color:#0A1420; border-radius:20px; padding:4px 10px; font:700 10px 'Barlow', sans-serif;">João ×</div>
+            <div style="background:#4AEE85; color:#0A1420; border-radius:20px; padding:4px 10px; font:700 10px 'Barlow', sans-serif;">Pedro ×</div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <div style="flex:1; background:#10203A; border-radius:8px; padding:8px; font:700 10px 'Barlow', sans-serif; color:#F4F7F0;">Time A<br><span style="color:#6c7d92; font-weight:600;">Rafael, João</span></div>
+            <div style="flex:1; background:#10203A; border-radius:8px; padding:8px; font:700 10px 'Barlow', sans-serif; color:#F4F7F0;">Time B<br><span style="color:#6c7d92; font-weight:600;">Pedro, Carlos</span></div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; padding:14px; border-top:1px solid #223349;">
+          <button style="flex:1; background:transparent; border:2px solid #4AEE85; border-radius:6px; padding:9px; font:800 10px 'Barlow Condensed', sans-serif; color:#4AEE85;">← VOLTAR</button>
+          <button style="flex:1; background:#FF7A45; border:none; border-radius:6px; padding:9px; font:800 10px 'Barlow Condensed', sans-serif; color:#0A1420;">PRÓXIMO →</button>
+        </div>
+      </div>
+
+      <!-- DARK: Admin -->
+      <div style="width:260px; height:560px; background:#0A1420; border-radius:12px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.4); font-family:'Barlow', sans-serif; display:flex; flex-direction:column;">
+        <div style="padding:16px 14px 0;">
+          <div style="font:900 18px 'Barlow Condensed', sans-serif; color:#F4F7F0;">USUÁRIOS</div>
+        </div>
+        <div style="padding:14px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #223349;">
+            <div style="flex:1;"><div style="font:700 12px 'Barlow', sans-serif; color:#F4F7F0;">Rafael Mendes</div><div style="font:500 10px 'Barlow', sans-serif; color:#6c7d92;">@rafaelm</div></div>
+            <div style="background:#FF7A45; color:#0A1420; font:800 8px 'Barlow', sans-serif; padding:3px 7px; border-radius:4px;">ADMIN</div>
+          </div>
+          <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #223349;">
+            <div style="flex:1;"><div style="font:700 12px 'Barlow', sans-serif; color:#F4F7F0;">João Silva</div><div style="font:500 10px 'Barlow', sans-serif; color:#6c7d92;">@joaos</div></div>
+            <div style="font:700 11px 'Barlow', sans-serif; color:#4AEE85;">tornar admin →</div>
+          </div>
+          <div style="display:flex; align-items:center; padding:10px 0; border-bottom:1px solid #223349;">
+            <div style="flex:1;"><div style="font:700 12px 'Barlow', sans-serif; color:#F4F7F0;">Você</div><div style="font:500 10px 'Barlow', sans-serif; color:#6c7d92;">@voce</div></div>
+            <div style="font:600 10px 'Barlow', sans-serif; color:#6c7d92;">você</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </section>
-<section class="dv-turn" id="t2">
-<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Direção nova — paleta "Noite de Jogo" (âmbar sobre preto, editorial)</span></div>
-<div class="dv-opts">
 
-<div class="dv-opt" id="2a">
-<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Login — hero tipográfico</div>
-<div class="dv-card" style="width:480px">
-<div style="min-height:520px;background:#050607;padding:48px 36px;display:flex;flex-direction:column;justify-content:center">
-<div style="font:800 42px/1.05 'Inter',sans-serif;color:#f5f2ec;letter-spacing:-0.03em;margin-bottom:6px">PELADA<br>OPED FC</div>
-<div style="width:46px;height:5px;background:#ff6b35;border-radius:3px;margin-bottom:16px"></div>
-<div style="color:#8a8578;font-size:14px;margin-bottom:30px">Fundação CAEd · entre para ver o ranking</div>
-<div style="display:flex;flex-direction:column;gap:12px">
-<div style="border-bottom:2px solid #2a2a28;padding:10px 2px;color:#5c5850;font-size:15px">usuário</div>
-<div style="border-bottom:2px solid #2a2a28;padding:10px 2px;color:#5c5850;font-size:15px">senha</div>
-<div style="background:#ff6b35;color:#0c0b09;text-align:center;padding:14px;border-radius:4px;font:800 15px 'Inter',sans-serif;margin-top:10px">ENTRAR →</div>
-</div>
-<div style="margin-top:20px;font-size:13px;color:#5c5850">Novo por aqui? <span style="color:#ff6b35;font-weight:700">Criar conta</span></div>
-</div>
-</div>
-</div>
+<section id="1" style="padding: 48px 40px 80px; display: flex; flex-direction: column; gap: 24px;">
+  <div style="display:flex; align-items:baseline; gap:14px;">
+    <h1 style="margin:0; font: 800 22px/1.2 system-ui, sans-serif; color:#111;">Rebranding OPED FC — 3 direções</h1>
+    <span style="font:14px system-ui, sans-serif; color:#666;">Ranking + Detalhe da pelada em cada estilo. Escolha por tela.</span>
+  </div>
 
-<div class="dv-opt" id="2b">
-<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Ranking — editorial, artilheiro em destaque</div>
-<div class="dv-card" style="width:780px">
-<div style="min-height:520px;background:#050607;padding:40px 40px">
-<div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px">Ranking · Temporada 2026</div>
-<div style="display:flex;align-items:baseline;gap:18px;margin-bottom:6px">
-<div style="font:800 90px/0.9 'Space Grotesk',sans-serif;color:#ff6b35">19</div>
-<div><div style="font:700 24px 'Inter',sans-serif;color:#f5f2ec">Arthur Pereira</div><div style="color:#8a8578;font-size:14px;margin-top:4px">gols nesta temporada · artilheiro</div></div>
-</div>
-<div style="height:1px;background:#2a2a28;margin:26px 0"></div>
-<div style="display:flex;flex-direction:column">
-<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1c1c1a"><span style="color:#f5f2ec;font-size:15px">2 · Lucas Menezes</span><span style="font:700 20px 'Space Grotesk',sans-serif;color:#f5f2ec">14</span></div>
-<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1c1c1a"><span style="color:#f5f2ec;font-size:15px">3 · Rafael Costa</span><span style="font:700 20px 'Space Grotesk',sans-serif;color:#f5f2ec">11</span></div>
-<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0"><span style="color:#8a8578;font-size:15px">4 · Bruno Almeida</span><span style="font:700 20px 'Space Grotesk',sans-serif;color:#8a8578">9</span></div>
-</div>
-</div>
-</div>
-</div>
+  <div style="display:flex; gap:36px; flex-wrap:wrap; align-items:flex-start;">
 
-<div class="dv-opt" id="2c">
-<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Peladas — grade de cartões grandes</div>
-<div class="dv-card" style="width:780px">
-<div style="min-height:400px;background:#050607;padding:40px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px"><div style="font:800 28px 'Inter',sans-serif;color:#f5f2ec">Peladas</div><div style="background:#ff6b35;color:#0c0b09;padding:11px 18px;border-radius:4px;font:700 14px 'Inter',sans-serif">+ Nova</div></div>
-<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
-<div style="background:#ff6b35;border-radius:10px;padding:22px;position:relative;overflow:hidden"><div style="font:700 11px 'Inter',sans-serif;color:#0c0b09;text-transform:uppercase;opacity:0.7">Agendada</div><div style="font:800 24px 'Inter',sans-serif;color:#0c0b09;margin-top:6px">25 Jul</div><div style="color:#0c0b09;font-size:13px;margin-top:6px;opacity:0.8">Society do trabalho · 8/14 confirmados</div></div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:22px"><div style="font:700 11px 'Inter',sans-serif;color:#8a8578;text-transform:uppercase">Finalizada</div><div style="font:800 24px 'Inter',sans-serif;color:#f5f2ec;margin-top:6px">13 Jul</div><div style="color:#8a8578;font-size:13px;margin-top:6px">Society do trabalho · 12 gols</div></div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:22px"><div style="font:700 11px 'Inter',sans-serif;color:#8a8578;text-transform:uppercase">Finalizada</div><div style="font:800 24px 'Inter',sans-serif;color:#f5f2ec;margin-top:6px">06 Jul</div><div style="color:#8a8578;font-size:13px;margin-top:6px">Society do trabalho · 9 gols</div></div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:22px"><div style="font:700 11px 'Inter',sans-serif;color:#8a8578;text-transform:uppercase">Finalizada</div><div style="font:800 24px 'Inter',sans-serif;color:#f5f2ec;margin-top:6px">29 Jun</div><div style="color:#8a8578;font-size:13px;margin-top:6px">Society do trabalho · 15 gols</div></div>
-</div>
-</div>
-</div>
-</div>
+    <!-- ===================== 1a — ESPORTIVO ===================== -->
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="badge" style="background:#111; color:#fff; padding:4px 8px; border-radius:4px;">1a</span>
+        <span style="font:800 15px/1 'Barlow Condensed', sans-serif; letter-spacing:.04em; text-transform:uppercase; color:#111;">Esportivo / Energético</span>
+      </div>
 
-<div class="dv-opt" id="2d">
-<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Detalhe — placar grande</div>
-<div class="dv-card" style="width:680px">
-<div style="min-height:400px;background:#050607;padding:40px;display:flex;flex-direction:column;justify-content:center">
-<div style="color:#5c5850;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px">13 de julho de 2026 · Society do trabalho</div>
-<div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:26px">
-<div style="font:700 18px 'Inter',sans-serif;color:#f5f2ec;text-align:right;flex:1">Time A</div>
-<div style="font:800 64px 'Space Grotesk',sans-serif;color:#ff6b35">2</div>
-<div style="font:700 20px 'Space Grotesk',sans-serif;color:#5c5850">–</div>
-<div style="font:800 64px 'Space Grotesk',sans-serif;color:#f5f2ec">1</div>
-<div style="font:700 18px 'Inter',sans-serif;color:#8a8578;flex:1">Time B</div>
-</div>
-<div style="background:#101214;border:1px solid #2a2a28;border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
-<span style="color:#f5f2ec;font-size:14px">🏅 MVP: Arthur Pereira</span><span style="color:#ff6b35;font:700 14px 'Space Grotesk',sans-serif">2 gols · 1 assist.</span>
-</div>
-</div>
-</div>
-</div>
+      <div style="display:flex; gap:20px;">
+        <!-- Ranking screen -->
+        <div style="width:320px; height:640px; background:#F4F7F0; border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.18); position:relative; font-family:'Barlow', sans-serif;">
+          <div style="background:#0B1F3A; padding:22px 20px 34px; clip-path:polygon(0 0,100% 0,100% 82%,0 100%); position:relative;">
+            <div style="font:900 26px/1 'Barlow Condensed', sans-serif; color:#fff; letter-spacing:.03em;">RANKING</div>
+            <div style="font:600 12px/1 'Barlow', sans-serif; color:#9FE6B4; margin-top:6px; text-transform:uppercase; letter-spacing:.08em;">Temporada 2026 · OPED FC</div>
+            <div style="position:absolute; top:18px; right:18px; width:34px; height:34px; border-radius:50%; background:#FF5A1F; display:flex; align-items:center; justify-content:center; font:800 13px 'Barlow Condensed', sans-serif; color:#fff;">FC</div>
+          </div>
+          <div style="padding:14px 16px; display:flex; flex-direction:column; gap:10px; margin-top:-10px;">
+            <div style="display:flex; gap:8px;">
+              <div style="flex:1; background:#3DDC6B; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font:900 20px 'Barlow Condensed', sans-serif; color:#0B1F3A;">18</div>
+                <div style="font:700 9px 'Barlow', sans-serif; text-transform:uppercase; color:#0B1F3A;">Jogos</div>
+              </div>
+              <div style="flex:1; background:#FF5A1F; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font:900 20px 'Barlow Condensed', sans-serif; color:#fff;">42</div>
+                <div style="font:700 9px 'Barlow', sans-serif; text-transform:uppercase; color:#fff;">Gols</div>
+              </div>
+              <div style="flex:1; background:#0B1F3A; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font:900 20px 'Barlow Condensed', sans-serif; color:#3DDC6B;">6º</div>
+                <div style="font:700 9px 'Barlow', sans-serif; text-transform:uppercase; color:#fff;">Posição</div>
+              </div>
+            </div>
+            <sc-if value="{{ true }}">
+              <div></div>
+            </sc-if>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:10px; background:#fff; border-radius:10px; padding:9px 12px; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                <div style="width:26px; text-align:center; font:900 15px 'Barlow Condensed', sans-serif; color:#FF5A1F;">1</div>
+                <div style="width:34px; height:34px; border-radius:50%; background:#0B1F3A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 12px 'Barlow', sans-serif;">RM</div>
+                <div style="flex:1;">
+                  <div style="font:700 13px 'Barlow', sans-serif; color:#111;">Rafael Mendes</div>
+                  <div style="font:600 10px 'Barlow', sans-serif; color:#888;">Atacante</div>
+                </div>
+                <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#0B1F3A;">98</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; background:#fff; border-radius:10px; padding:9px 12px; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                <div style="width:26px; text-align:center; font:900 15px 'Barlow Condensed', sans-serif; color:#888;">2</div>
+                <div style="width:34px; height:34px; border-radius:50%; background:#3DDC6B; color:#0B1F3A; display:flex; align-items:center; justify-content:center; font:700 12px 'Barlow', sans-serif;">JS</div>
+                <div style="flex:1;">
+                  <div style="font:700 13px 'Barlow', sans-serif; color:#111;">João Silva</div>
+                  <div style="font:600 10px 'Barlow', sans-serif; color:#888;">Meio-campo</div>
+                </div>
+                <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#0B1F3A;">91</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; background:#FF5A1F0d; background:#fff; border:2px solid #3DDC6B; border-radius:10px; padding:9px 12px;">
+                <div style="width:26px; text-align:center; font:900 15px 'Barlow Condensed', sans-serif; color:#888;">3</div>
+                <div style="width:34px; height:34px; border-radius:50%; background:#FF5A1F; color:#fff; display:flex; align-items:center; justify-content:center; font:700 12px 'Barlow', sans-serif;">VC</div>
+                <div style="flex:1;">
+                  <div style="font:700 13px 'Barlow', sans-serif; color:#111;">Você</div>
+                  <div style="font:600 10px 'Barlow', sans-serif; color:#888;">Zagueiro</div>
+                </div>
+                <div style="font:900 16px 'Barlow Condensed', sans-serif; color:#0B1F3A;">87</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute; bottom:0; left:0; right:0; height:58px; background:#fff; border-top:1px solid #eee; display:flex; align-items:center; justify-content:space-around;">
+            <div style="width:8px; height:8px; border-radius:50%; background:#0B1F3A;"></div>
+            <div style="width:8px; height:8px; border-radius:50%; background:#3DDC6B;"></div>
+            <div style="width:8px; height:8px; border-radius:50%; background:#ddd;"></div>
+            <div style="width:8px; height:8px; border-radius:50%; background:#ddd;"></div>
+          </div>
+        </div>
 
-<div class="dv-opt" id="2e">
-<div class="dv-olabel"><a class="dv-oid" href="#2e">2e</a>Formulário — barra de progresso linear</div>
-<div class="dv-card" style="width:680px">
-<div style="min-height:400px;background:#050607;padding:40px">
-<div style="font:800 24px 'Inter',sans-serif;color:#f5f2ec;margin-bottom:6px">Nova pelada</div>
-<div style="color:#8a8578;font-size:13px;margin-bottom:18px">Etapa 2 de 4 — Jogadores</div>
-<div style="height:4px;background:#1c1c1a;border-radius:2px;margin-bottom:26px;overflow:hidden"><div style="width:50%;height:100%;background:#ff6b35"></div></div>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px">
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Arthur Pereira ×</span>
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Lucas Menezes ×</span>
-<span style="background:#101214;border:1px solid #2a2a28;color:#f5f2ec;padding:8px 14px;border-radius:4px;font-size:13px">Rafael Costa ×</span>
-</div>
-<div style="display:flex;justify-content:space-between"><div style="color:#8a8578;font:700 14px 'Inter',sans-serif;padding:12px 0">← Voltar</div><div style="background:#ff6b35;color:#0c0b09;padding:12px 24px;border-radius:4px;font:800 14px 'Inter',sans-serif">Próximo →</div></div>
-</div>
-</div>
-</div>
+        <!-- Detalhe screen -->
+        <div style="width:320px; height:640px; background:#F4F7F0; border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.18); position:relative; font-family:'Barlow', sans-serif;">
+          <div style="background:#3DDC6B; padding:20px; clip-path:polygon(0 0,100% 0,100% 90%,0 100%);">
+            <div style="font:700 11px 'Barlow', sans-serif; text-transform:uppercase; letter-spacing:.08em; color:#0B1F3A;">Quarta · 22 Jul</div>
+            <div style="font:900 24px 'Barlow Condensed', sans-serif; color:#0B1F3A; margin-top:4px;">PELADA DA VÁRZEA</div>
+            <div style="font:600 12px 'Barlow', sans-serif; color:#0B1F3A; margin-top:2px;">19h30 · Quadra Society Central</div>
+          </div>
+          <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; gap:8px;">
+              <div style="flex:1; background:#0B1F3A; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font:900 22px 'Barlow Condensed', sans-serif; color:#3DDC6B;">14</div>
+                <div style="font:700 9px 'Barlow', sans-serif; color:#fff; text-transform:uppercase;">Confirmados</div>
+              </div>
+              <div style="flex:1; background:#fff; border:2px solid #FF5A1F; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font:900 22px 'Barlow Condensed', sans-serif; color:#FF5A1F;">3</div>
+                <div style="font:700 9px 'Barlow', sans-serif; color:#0B1F3A; text-transform:uppercase;">Vagas</div>
+              </div>
+            </div>
+            <div style="font:800 13px 'Barlow Condensed', sans-serif; text-transform:uppercase; letter-spacing:.05em; color:#111; margin-top:4px;">Comentários</div>
+            <div style="background:#fff; border-radius:10px; padding:10px 12px; display:flex; gap:8px;">
+              <div style="width:28px; height:28px; border-radius:50%; background:#FF5A1F; flex-shrink:0;"></div>
+              <div>
+                <div style="font:700 12px 'Barlow', sans-serif; color:#111;">Carlos M. <span style="font-weight:400; color:#888;">· 2h</span></div>
+                <div style="font:500 12px 'Barlow', sans-serif; color:#444;">Bora time, hoje tem que ganhar 🔥</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px; margin-top:2px;">
+              <div style="background:#0B1F3A; color:#3DDC6B; font:700 11px 'Barlow', sans-serif; padding:4px 10px; border-radius:20px;">👍 8</div>
+              <div style="background:#fff; color:#888; font:700 11px 'Barlow', sans-serif; padding:4px 10px; border-radius:20px; border:1px solid #ddd;">🔥 5</div>
+            </div>
+            <button style="margin-top:auto; background:#FF5A1F; color:#fff; border:none; border-radius:10px; padding:14px; font:800 14px 'Barlow Condensed', sans-serif; text-transform:uppercase; letter-spacing:.05em;">Confirmar presença</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div class="dv-opt" id="2f">
-<div class="dv-olabel"><a class="dv-oid" href="#2f">2f</a>Admin — lista minimalista</div>
-<div class="dv-card" style="width:520px">
-<div style="min-height:400px;background:#050607;padding:40px">
-<div style="font:800 24px 'Inter',sans-serif;color:#f5f2ec;margin-bottom:22px">Usuários</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #1c1c1a"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec">Arthur Pereira</span><span style="background:#ff6b35;color:#0c0b09;font:800 10px 'Inter',sans-serif;padding:3px 8px;border-radius:3px;text-transform:uppercase">admin</span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #1c1c1a"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec">Lucas Menezes</span><span style="color:#8a8578;font:700 13px 'Inter',sans-serif">tornar admin →</span></div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0"><span style="font:700 15px 'Inter',sans-serif;color:#f5f2ec">Rafael Costa</span><span style="color:#8a8578;font:700 13px 'Inter',sans-serif">tornar admin →</span></div>
-</div>
-</div>
-</div>
+    <!-- ===================== 1b — RETRÔ VÁRZEA ===================== -->
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="badge" style="background:#111; color:#fff; padding:4px 8px; border-radius:4px;">1b</span>
+        <span style="font:800 15px/1 'Barlow Condensed', sans-serif; letter-spacing:.04em; text-transform:uppercase; color:#111;">Retrô de Várzea</span>
+      </div>
 
-</div>
-<p class="dv-next">Próximo: "combine <a class="dv-oid" href="#2b">2b</a> com o formulário <a class="dv-oid" href="#1i">1i</a>" ou "mais opções de paleta".</p>
+      <div style="display:flex; gap:20px;">
+        <!-- Ranking screen -->
+        <div style="width:320px; height:640px; background:#F2E8D5; border-radius:6px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.18); position:relative; font-family:'Karla', sans-serif; background-image:radial-gradient(rgba(43,28,18,.05) 1px, transparent 1px); background-size:6px 6px;">
+          <div style="padding:22px 20px 16px; border-bottom:3px dashed #B5432A;">
+            <div style="font:400 28px 'DM Serif Display', serif; color:#2B1C12;">Ranking</div>
+            <div style="font:600 11px 'Karla', sans-serif; color:#8A6A4A; text-transform:uppercase; letter-spacing:.1em; margin-top:4px;">OPED FC · Torneio da Rua</div>
+          </div>
+          <div style="padding:16px 18px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="width:70px; height:70px; border-radius:50%; background:#D9A441; border:3px solid #2B1C12; display:flex; align-items:center; justify-content:center; font:400 26px 'DM Serif Display', serif; color:#2B1C12;">1º</div>
+              <div>
+                <div style="font:700 15px 'Karla', sans-serif; color:#2B1C12;">Rafael Mendes</div>
+                <div style="font:400 12px 'Karla', sans-serif; color:#8A6A4A;">98 pts · Artilheiro</div>
+              </div>
+            </div>
+            <div style="height:1px; background:repeating-linear-gradient(90deg, #B5432A 0 6px, transparent 6px 12px);"></div>
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <div style="display:flex; align-items:center; gap:10px; background:#fff8ec; border:1.5px solid #2B1C12; border-radius:4px; padding:9px 12px;">
+                <div style="font:400 16px 'DM Serif Display', serif; color:#B5432A; width:22px;">2</div>
+                <div style="width:30px; height:30px; border-radius:50%; background:#2F4B3C; color:#F2E8D5; display:flex; align-items:center; justify-content:center; font:700 11px 'Karla', sans-serif;">JS</div>
+                <div style="flex:1; font:700 13px 'Karla', sans-serif; color:#2B1C12;">João Silva</div>
+                <div style="font:700 13px 'Karla', sans-serif; color:#8A6A4A;">91</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; background:#fff8ec; border:1.5px solid #2B1C12; border-radius:4px; padding:9px 12px;">
+                <div style="font:400 16px 'DM Serif Display', serif; color:#B5432A; width:22px;">3</div>
+                <div style="width:30px; height:30px; border-radius:50%; background:#D9A441; color:#2B1C12; display:flex; align-items:center; justify-content:center; font:700 11px 'Karla', sans-serif;">VC</div>
+                <div style="flex:1; font:700 13px 'Karla', sans-serif; color:#2B1C12;">Você</div>
+                <div style="font:700 13px 'Karla', sans-serif; color:#8A6A4A;">87</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; background:#fff8ec; border:1.5px solid #2B1C12; border-radius:4px; padding:9px 12px;">
+                <div style="font:400 16px 'DM Serif Display', serif; color:#B5432A; width:22px;">4</div>
+                <div style="width:30px; height:30px; border-radius:50%; background:#B5432A; color:#F2E8D5; display:flex; align-items:center; justify-content:center; font:700 11px 'Karla', sans-serif;">PT</div>
+                <div style="flex:1; font:700 13px 'Karla', sans-serif; color:#2B1C12;">Pedro Torres</div>
+                <div style="font:700 13px 'Karla', sans-serif; color:#8A6A4A;">79</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute; top:20px; right:18px; width:44px; height:44px; border-radius:50%; background:#2F4B3C; border:2px dashed #F2E8D5; display:flex; align-items:center; justify-content:center; font:400 12px 'DM Serif Display', serif; color:#F2E8D5;">FC</div>
+        </div>
+
+        <!-- Detalhe screen -->
+        <div style="width:320px; height:640px; background:#F2E8D5; border-radius:6px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.18); position:relative; font-family:'Karla', sans-serif; background-image:radial-gradient(rgba(43,28,18,.05) 1px, transparent 1px); background-size:6px 6px;">
+          <div style="background:#2F4B3C; padding:20px; border-bottom:4px solid #D9A441;">
+            <div style="font:600 11px 'Karla', sans-serif; color:#D9A441; text-transform:uppercase; letter-spacing:.1em;">Quarta · 22 Jul</div>
+            <div style="font:400 26px 'DM Serif Display', serif; color:#F2E8D5; margin-top:4px;">Pelada da Várzea</div>
+            <div style="font:500 12px 'Karla', sans-serif; color:#cddccf; margin-top:2px;">19h30 · Quadra Society Central</div>
+          </div>
+          <div style="padding:16px 18px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; gap:10px;">
+              <div style="flex:1; background:#fff8ec; border:1.5px solid #2B1C12; border-radius:4px; padding:10px; text-align:center;">
+                <div style="font:400 22px 'DM Serif Display', serif; color:#2B1C12;">14</div>
+                <div style="font:600 9px 'Karla', sans-serif; color:#8A6A4A; text-transform:uppercase;">Confirmados</div>
+              </div>
+              <div style="flex:1; background:#fff8ec; border:1.5px solid #2B1C12; border-radius:4px; padding:10px; text-align:center;">
+                <div style="font:400 22px 'DM Serif Display', serif; color:#B5432A;">3</div>
+                <div style="font:600 9px 'Karla', sans-serif; color:#8A6A4A; text-transform:uppercase;">Vagas</div>
+              </div>
+            </div>
+            <div style="font:400 16px 'DM Serif Display', serif; color:#2B1C12;">Recados do grupo</div>
+            <div style="background:#fff8ec; border:1.5px solid #2B1C12; border-radius:4px; padding:10px 12px; display:flex; gap:8px;">
+              <div style="width:26px; height:26px; border-radius:50%; background:#B5432A; flex-shrink:0;"></div>
+              <div>
+                <div style="font:700 12px 'Karla', sans-serif; color:#2B1C12;">Carlos M. <span style="font-weight:400; color:#8A6A4A;">· 2h</span></div>
+                <div style="font:400 12px 'Karla', sans-serif; color:#4a3626;">Bora time, hoje tem que ganhar</div>
+              </div>
+            </div>
+            <button style="margin-top:auto; background:#B5432A; color:#F2E8D5; border:2px solid #2B1C12; border-radius:4px; padding:14px; font:400 15px 'DM Serif Display', serif;">Confirmar presença</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 1c — EDITORIAL PREMIUM ===================== -->
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="badge" style="background:#111; color:#fff; padding:4px 8px; border-radius:4px;">1c</span>
+        <span style="font:800 15px/1 'Barlow Condensed', sans-serif; letter-spacing:.04em; text-transform:uppercase; color:#111;">Editorial Premium</span>
+      </div>
+
+      <div style="display:flex; gap:20px;">
+        <!-- Ranking screen -->
+        <div style="width:320px; height:640px; background:#121212; border-radius:2px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.35); position:relative; font-family:'Work Sans', sans-serif;">
+          <div style="padding:26px 22px 18px; border-bottom:1px solid #2b2b2b;">
+            <div style="font:500 11px 'Work Sans', sans-serif; color:#C9A227; text-transform:uppercase; letter-spacing:.18em;">OPED FC — Temporada 2026</div>
+            <div style="font:italic 500 30px 'Newsreader', serif; color:#EDEAE4; margin-top:6px;">Ranking</div>
+          </div>
+          <div style="padding:18px 22px; display:flex; flex-direction:column; gap:0;">
+            <div style="display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #262626;">
+              <div style="font:italic 500 20px 'Newsreader', serif; color:#C9A227; width:24px;">1</div>
+              <div style="flex:1;">
+                <div style="font:500 14px 'Work Sans', sans-serif; color:#EDEAE4;">Rafael Mendes</div>
+                <div style="font:400 11px 'Work Sans', sans-serif; color:#777; text-transform:uppercase; letter-spacing:.06em;">Atacante</div>
+              </div>
+              <div style="font:500 15px 'Newsreader', serif; color:#EDEAE4;">98</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #262626;">
+              <div style="font:italic 500 20px 'Newsreader', serif; color:#666; width:24px;">2</div>
+              <div style="flex:1;">
+                <div style="font:500 14px 'Work Sans', sans-serif; color:#EDEAE4;">João Silva</div>
+                <div style="font:400 11px 'Work Sans', sans-serif; color:#777; text-transform:uppercase; letter-spacing:.06em;">Meio-campo</div>
+              </div>
+              <div style="font:500 15px 'Newsreader', serif; color:#EDEAE4;">91</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #C9A227;">
+              <div style="font:italic 500 20px 'Newsreader', serif; color:#666; width:24px;">3</div>
+              <div style="flex:1;">
+                <div style="font:500 14px 'Work Sans', sans-serif; color:#C9A227;">Você</div>
+                <div style="font:400 11px 'Work Sans', sans-serif; color:#777; text-transform:uppercase; letter-spacing:.06em;">Zagueiro</div>
+              </div>
+              <div style="font:500 15px 'Newsreader', serif; color:#C9A227;">87</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #262626;">
+              <div style="font:italic 500 20px 'Newsreader', serif; color:#666; width:24px;">4</div>
+              <div style="flex:1;">
+                <div style="font:500 14px 'Work Sans', sans-serif; color:#EDEAE4;">Pedro Torres</div>
+                <div style="font:400 11px 'Work Sans', sans-serif; color:#777; text-transform:uppercase; letter-spacing:.06em;">Lateral</div>
+              </div>
+              <div style="font:500 15px 'Newsreader', serif; color:#EDEAE4;">79</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalhe screen -->
+        <div style="width:320px; height:640px; background:#121212; border-radius:2px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.35); position:relative; font-family:'Work Sans', sans-serif;">
+          <div style="padding:26px 22px 18px; border-bottom:1px solid #2b2b2b;">
+            <div style="font:500 11px 'Work Sans', sans-serif; color:#C9A227; text-transform:uppercase; letter-spacing:.18em;">Quarta · 22 Jul · 19h30</div>
+            <div style="font:italic 500 26px 'Newsreader', serif; color:#EDEAE4; margin-top:6px;">Pelada da Várzea</div>
+            <div style="font:400 12px 'Work Sans', sans-serif; color:#888; margin-top:4px;">Quadra Society Central</div>
+          </div>
+          <div style="padding:20px 22px; display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; gap:26px;">
+              <div>
+                <div style="font:italic 500 26px 'Newsreader', serif; color:#EDEAE4;">14</div>
+                <div style="font:400 10px 'Work Sans', sans-serif; color:#777; text-transform:uppercase; letter-spacing:.08em;">Confirmados</div>
+              </div>
+              <div>
+                <div style="font:italic 500 26px 'Newsreader', serif; color:#C9A227;">3</div>
+                <div style="font:400 10px 'Work Sans', sans-serif; color:#777; text-transform:uppercase; letter-spacing:.08em;">Vagas</div>
+              </div>
+            </div>
+            <div style="height:1px; background:#262626;"></div>
+            <div style="font:italic 500 16px 'Newsreader', serif; color:#EDEAE4;">Comentários</div>
+            <div style="display:flex; gap:10px;">
+              <div style="width:26px; height:26px; border-radius:50%; background:#333; flex-shrink:0;"></div>
+              <div>
+                <div style="font:500 12px 'Work Sans', sans-serif; color:#EDEAE4;">Carlos M. <span style="font-weight:400; color:#666;">· 2h</span></div>
+                <div style="font:400 12px 'Work Sans', sans-serif; color:#999;">Bora time, hoje tem que ganhar</div>
+              </div>
+            </div>
+            <button style="margin-top:auto; background:transparent; color:#C9A227; border:1px solid #C9A227; border-radius:0; padding:14px; font:500 13px 'Work Sans', sans-serif; text-transform:uppercase; letter-spacing:.1em;">Confirmar presença</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </section>
-<section class="dv-turn" id="t1">
-<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Direção original — Verde Campo, todas as telas (2 opções cada)</span></div>
 
-<div class="dv-grp">
-<div class="dv-grp-t">Login / Cadastro</div>
-<div class="dv-grp-s">Autenticação de todos os jogadores do time</div>
-<div class="dv-opts">
-
-<div class="dv-opt" id="1a">
-<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Painel dividido (marca + form)</div>
-<div class="dv-card" style="width:720px">
-<div style="display:flex;min-height:480px">
-<div style="flex:1;background:linear-gradient(150deg,#22c55e,#16a34a 55%,#12813c);padding:44px 36px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden">
-<div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent,transparent 26px,rgba(255,255,255,0.06) 26px,rgba(255,255,255,0.06) 28px)"></div>
-<div style="position:relative">
-<div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25)">⚽</div>
-</div>
-<div style="position:relative">
-<div style="font:800 26px/1.2 'Inter',sans-serif;color:#fff;letter-spacing:-0.02em">Pelada OPED FC</div>
-<div style="font:600 12px 'Inter',sans-serif;color:rgba(255,255,255,0.85);letter-spacing:0.08em;text-transform:uppercase;margin-top:6px">Fundação CAEd</div>
-<p style="color:rgba(255,255,255,0.8);font-size:14px;line-height:1.5;margin:16px 0 0;max-width:260px">Times, gols, assistências e o ranking de quem manda no campo.</p>
-</div>
-</div>
-<div style="flex:1;padding:44px 40px;display:flex;flex-direction:column;justify-content:center">
-<div style="display:flex;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:4px;margin-bottom:24px">
-<div style="flex:1;text-align:center;padding:10px;border-radius:9px;background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;font:600 14px 'Inter',sans-serif;box-shadow:0 6px 14px -6px rgba(34,197,94,0.6)">Entrar</div>
-<div style="flex:1;text-align:center;padding:10px;color:#8b97a7;font:600 14px 'Inter',sans-serif">Criar conta</div>
-</div>
-<div style="display:flex;flex-direction:column;gap:15px">
-<div>
-<div style="font:600 12px 'Inter',sans-serif;color:#8b97a7;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:7px">Usuário</div>
-<div style="position:relative">
-<span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#5b6675;font-size:15px">@</span>
-<div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:11px 13px 11px 32px;color:#5b6675;font-size:15px">arthur.pereira</div>
-</div>
-</div>
-<div>
-<div style="font:600 12px 'Inter',sans-serif;color:#8b97a7;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:7px">Senha</div>
-<div style="position:relative">
-<div style="background:rgba(0,0,0,0.28);border:1px solid #22c55e;box-shadow:0 0 0 3px rgba(34,197,94,0.18);border-radius:11px;padding:11px 34px 11px 13px;color:#f3f6f9;font-size:14px;letter-spacing:2px">•••••••</div>
-<span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);color:#8b97a7;font-size:12px">👁</span>
-</div>
-</div>
-<div style="display:flex;justify-content:flex-end"><span style="font-size:12px;color:#8b97a7">Esqueci minha senha</span></div>
-<div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;text-align:center;padding:12px;border-radius:12px;font:600 15px 'Inter',sans-serif;box-shadow:0 8px 20px -8px rgba(34,197,94,0.6)">Entrar</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="dv-opt" id="1b">
-<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Cartão único, mobile</div>
-<div class="dv-card" style="width:380px">
-<div style="min-height:560px;background:radial-gradient(700px 400px at 50% -10%,rgba(34,197,94,0.22),transparent 60%),#0a0f16;padding:36px 24px;display:flex;flex-direction:column;justify-content:center">
-<div style="text-align:center;margin-bottom:26px">
-<div style="width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px;box-shadow:0 14px 30px -10px rgba(34,197,94,0.7)">⚽</div>
-<div style="font:800 22px 'Inter',sans-serif;color:#f3f6f9">Pelada OPED FC</div>
-<div style="font:700 11px 'Inter',sans-serif;color:#22c55e;letter-spacing:0.1em;text-transform:uppercase;margin-top:4px">Fundação CAEd</div>
-</div>
-<div style="display:flex;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:4px;margin-bottom:22px">
-<div style="flex:1;text-align:center;padding:9px;border-radius:9px;background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;font:600 13px 'Inter',sans-serif">Entrar</div>
-<div style="flex:1;text-align:center;padding:9px;color:#8b97a7;font:600 13px 'Inter',sans-serif">Criar conta</div>
-</div>
-<div style="display:flex;flex-direction:column;gap:13px">
-<div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:11px 13px;color:#5b6675;font-size:14px">@usuário</div>
-<div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:11px 13px;color:#5b6675;font-size:14px">Senha</div>
-<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8b97a7"><span style="width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,0.25);display:inline-block"></span>Lembrar de mim</label>
-<div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;text-align:center;padding:12px;border-radius:12px;font:600 15px 'Inter',sans-serif;box-shadow:0 8px 20px -8px rgba(34,197,94,0.6)">Entrar</div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="dv-grp">
-<div class="dv-grp-t">Ranking (Dashboard)</div>
-<div class="dv-grp-s">Estatísticas acumuladas de todas as peladas</div>
-<div class="dv-opts">
-
-<div class="dv-opt" id="1c">
-<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Ranking com pódio + tendência</div>
-<div class="dv-card" style="width:820px">
-<div style="padding:26px 28px 30px;background:radial-gradient(900px 500px at 85% -8%,rgba(34,197,94,0.16),transparent 60%),#0a0f16">
-<div style="margin-bottom:20px">
-<div style="font:800 24px 'Inter',sans-serif;color:#f3f6f9;letter-spacing:-0.02em">Ranking geral</div>
-<div style="color:#8b97a7;font-size:14px;margin-top:2px">Estatísticas acumuladas de todas as peladas.</div>
-</div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
-<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 18px"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#16a34a"></div><div style="font-size:20px;margin-bottom:8px">📅</div><div style="font:700 28px 'Space Grotesk',sans-serif;color:#22c55e">24</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px">Peladas</div></div>
-<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 18px"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#16a34a"></div><div style="font-size:20px;margin-bottom:8px">👥</div><div style="font:700 28px 'Space Grotesk',sans-serif;color:#f3f6f9">18</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px">Jogadores</div></div>
-<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 18px"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#facc15"></div><div style="font-size:20px;margin-bottom:8px">⚽</div><div style="font:700 28px 'Space Grotesk',sans-serif;color:#facc15">187</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px">Gols</div></div>
-<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 18px"><div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#16a34a"></div><div style="font-size:20px;margin-bottom:8px">🅰️</div><div style="font:700 28px 'Space Grotesk',sans-serif;color:#f3f6f9">124</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px">Assistências</div></div>
-</div>
-<div style="display:inline-flex;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:4px;gap:4px;margin-bottom:20px">
-<div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;padding:8px 14px;border-radius:9px;font:600 13px 'Inter',sans-serif">⚽ Artilheiros</div>
-<div style="color:#8b97a7;padding:8px 14px;font:600 13px 'Inter',sans-serif">🅰️ Garçons</div>
-<div style="color:#8b97a7;padding:8px 14px;font:600 13px 'Inter',sans-serif">🏆 Vitórias</div>
-<div style="color:#8b97a7;padding:8px 14px;font:600 13px 'Inter',sans-serif">📅 Presença</div>
-</div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-<div style="text-align:center;padding:18px 12px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px"><div style="width:56px;height:56px;border-radius:50%;background:#3b82f6;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">LM</div><div style="font-weight:700;font-size:14px;color:#f3f6f9">Lucas Menezes</div><div style="font:700 22px 'Space Grotesk',sans-serif;color:#f3f6f9;margin-top:4px">14</div><div style="font-size:10px;color:#8b97a7;text-transform:uppercase">gols</div></div>
-<div style="position:relative;text-align:center;padding:20px 12px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(250,204,21,0.5);border-radius:16px;box-shadow:0 18px 40px -14px rgba(250,204,21,0.35)"><span style="position:absolute;top:10px;right:12px;font-size:18px">🥇</span><div style="width:60px;height:60px;border-radius:50%;background:#16a34a;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;box-shadow:0 0 0 3px rgba(250,204,21,0.6)">AP</div><div style="font-weight:700;font-size:14px;color:#f3f6f9">Arthur Pereira</div><div style="font:700 24px 'Space Grotesk',sans-serif;color:#facc15;margin-top:4px">19</div><div style="font-size:10px;color:#8b97a7;text-transform:uppercase">gols</div></div>
-<div style="text-align:center;padding:18px 12px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px"><div style="width:56px;height:56px;border-radius:50%;background:#a855f7;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">RC</div><div style="font-weight:700;font-size:14px;color:#f3f6f9">Rafael Costa</div><div style="font:700 22px 'Space Grotesk',sans-serif;color:#f3f6f9;margin-top:4px">11</div><div style="font-size:10px;color:#8b97a7;text-transform:uppercase">gols</div></div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:6px 20px">
-<table style="width:100%;border-collapse:collapse;font-size:14px">
-<thead><tr><th style="text-align:left;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.07)">#</th><th style="text-align:left;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.07)">Jogador</th><th style="text-align:center;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.07)">Gols</th><th style="text-align:center;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.07)">Últimos 6 jogos</th></tr></thead>
-<tbody>
-<tr><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="width:26px;height:26px;border-radius:8px;background:rgba(250,204,21,0.16);color:#facc15;display:inline-flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif">1</span></td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">AP</div><span style="font-weight:600;color:#f3f6f9">Arthur Pereira</span></div></td><td style="text-align:center;padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07);color:#facc15;font-weight:700;font-family:'Space Grotesk',sans-serif">19</td>
-<td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="display:flex;gap:3px;align-items:flex-end;height:22px;justify-content:center">
-<div style="width:6px;height:8px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:14px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:10px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:20px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:6px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:16px;background:#22c55e;border-radius:2px"></div>
-</div></td></tr>
-<tr><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="width:26px;height:26px;border-radius:8px;background:rgba(203,213,225,0.14);color:#cbd5e1;display:inline-flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif">2</span></td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">LM</div><span style="font-weight:600;color:#f3f6f9">Lucas Menezes</span></div></td><td style="text-align:center;padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07);color:#facc15;font-weight:700;font-family:'Space Grotesk',sans-serif">14</td>
-<td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="display:flex;gap:3px;align-items:flex-end;height:22px;justify-content:center">
-<div style="width:6px;height:16px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:8px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:12px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:6px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:14px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:10px;background:#22c55e;border-radius:2px"></div>
-</div></td></tr>
-<tr><td style="padding:11px 10px"><span style="width:26px;height:26px;border-radius:8px;background:rgba(209,154,102,0.16);color:#e0a878;display:inline-flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif">3</span></td><td style="padding:11px 10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#a855f7;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">RC</div><span style="font-weight:600;color:#f3f6f9">Rafael Costa</span></div></td><td style="text-align:center;padding:11px 10px;color:#facc15;font-weight:700;font-family:'Space Grotesk',sans-serif">11</td>
-<td style="padding:11px 10px"><div style="display:flex;gap:3px;align-items:flex-end;height:22px;justify-content:center">
-<div style="width:6px;height:6px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:10px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:8px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:14px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:12px;background:#22c55e;border-radius:2px"></div><div style="width:6px;height:16px;background:#22c55e;border-radius:2px"></div>
-</div></td></tr>
-</tbody></table>
-</div>
-</div>
-</div>
-</div>
-
-<div class="dv-opt" id="1d">
-<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Perfil individual do jogador</div>
-<div class="dv-card" style="width:820px">
-<div style="padding:26px 28px 30px;background:radial-gradient(900px 500px at 85% -8%,rgba(34,197,94,0.16),transparent 60%),#0a0f16">
-<div style="font-size:13px;color:#8b97a7;margin-bottom:14px">← Ranking</div>
-<div style="display:flex;gap:20px;align-items:center;margin-bottom:22px">
-<div style="width:76px;height:76px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:26px;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12)">AP</div>
-<div>
-<div style="font:800 24px 'Inter',sans-serif;color:#f3f6f9">Arthur Pereira</div>
-<div style="display:flex;gap:8px;margin-top:6px">
-<span style="background:linear-gradient(135deg,#fde047,#facc15);color:#1a1400;font:800 10px 'Inter',sans-serif;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.06em">admin</span>
-<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;font-size:12px;padding:4px 10px;border-radius:999px">🥇 Artilheiro do mês</span>
-<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;font-size:12px;padding:4px 10px;border-radius:999px">🔥 5 jogos seguidos</span>
-</div>
-</div>
-</div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px;text-align:center"><div style="font:700 24px 'Space Grotesk',sans-serif;color:#f3f6f9">24</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;margin-top:3px">Jogos</div></div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px;text-align:center"><div style="font:700 24px 'Space Grotesk',sans-serif;color:#facc15">19</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;margin-top:3px">Gols</div></div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px;text-align:center"><div style="font:700 24px 'Space Grotesk',sans-serif;color:#f3f6f9">7</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;margin-top:3px">Assist.</div></div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px;text-align:center"><div style="font:700 24px 'Space Grotesk',sans-serif;color:#22c55e">16</div><div style="color:#8b97a7;font-size:11px;text-transform:uppercase;margin-top:3px">Vitórias</div></div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:20px;margin-bottom:16px">
-<div style="font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:14px">Gols por pelada — evolução</div>
-<div style="display:flex;gap:10px;align-items:flex-end;height:90px">
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:36px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:6px 6px 0 0"></div><span style="font-size:10px;color:#8b97a7">08/06</span></div>
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:58px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:6px 6px 0 0"></div><span style="font-size:10px;color:#8b97a7">15/06</span></div>
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:20px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:6px 6px 0 0"></div><span style="font-size:10px;color:#8b97a7">22/06</span></div>
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:74px;background:linear-gradient(180deg,#facc15,#facc15);border-radius:6px 6px 0 0"></div><span style="font-size:10px;color:#8b97a7">29/06</span></div>
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:44px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:6px 6px 0 0"></div><span style="font-size:10px;color:#8b97a7">06/07</span></div>
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:64px;background:linear-gradient(180deg,#22c55e,#16a34a);border-radius:6px 6px 0 0"></div><span style="font-size:10px;color:#8b97a7">13/07</span></div>
-</div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:20px">
-<div style="font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:10px">Últimas peladas</div>
-<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px"><span style="color:#f3f6f9">13/07 · Society do trabalho</span><span style="color:#facc15;font-family:'Space Grotesk',sans-serif">2 gols · 1 assist.</span></div>
-<div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px"><span style="color:#f3f6f9">06/07 · Society do trabalho</span><span style="color:#facc15;font-family:'Space Grotesk',sans-serif">1 gol · 0 assist.</span></div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="dv-grp">
-<div class="dv-grp-t">Peladas — Lista</div>
-<div class="dv-grp-s">Histórico e próximos jogos</div>
-<div class="dv-opts">
-
-<div class="dv-opt" id="1e">
-<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Lista com aviso de próxima pelada</div>
-<div class="dv-card" style="width:760px">
-<div style="padding:26px 28px 30px;background:#0a0f16">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-<div><div style="font:800 24px 'Inter',sans-serif;color:#f3f6f9">Peladas</div><div style="color:#8b97a7;font-size:14px;margin-top:2px">Histórico de todas as peladas.</div></div>
-<div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;padding:11px 18px;border-radius:12px;font:600 14px 'Inter',sans-serif;box-shadow:0 8px 20px -8px rgba(34,197,94,0.6)">+ Nova pelada</div>
-</div>
-<div style="display:flex;align-items:center;gap:16px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:16px;padding:16px 20px;margin-bottom:20px">
-<div style="font-size:22px">🔔</div>
-<div style="flex:1"><div style="font-weight:700;color:#f3f6f9;font-size:14px">Próxima pelada: sáb, 25/07</div><div style="color:#8b97a7;font-size:13px;margin-top:2px">Society do trabalho · 8 confirmados de 14</div></div>
-<div style="background:linear-gradient(135deg,#fde047,#facc15);color:#1a1400;padding:9px 16px;border-radius:10px;font:600 13px 'Inter',sans-serif">Confirmar presença</div>
-</div>
-<div style="display:grid;gap:12px">
-<div style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px">
-<div style="width:58px;height:58px;border-radius:14px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font:700 20px 'Space Grotesk',sans-serif;color:#22c55e">13</div><div style="font-size:9px;color:#8b97a7;text-transform:uppercase">jul 2026</div></div>
-<div style="flex:1"><div style="font-weight:700;font-size:15px;color:#f3f6f9">Society do trabalho</div><div style="display:flex;gap:14px;margin-top:4px;flex-wrap:wrap;font-size:12px;color:#8b97a7"><span>🥅 3 times</span><span>👥 15 jogadores</span><span style="color:#facc15">⚽ 12 gols</span><span>✅ finalizada</span></div></div>
-<span style="color:#8b97a7;font-size:20px">›</span>
-</div>
-<div style="display:flex;align-items:center;gap:16px;padding:16px 18px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px">
-<div style="width:58px;height:58px;border-radius:14px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font:700 20px 'Space Grotesk',sans-serif;color:#22c55e">06</div><div style="font-size:9px;color:#8b97a7;text-transform:uppercase">jul 2026</div></div>
-<div style="flex:1"><div style="font-weight:700;font-size:15px;color:#f3f6f9">Society do trabalho</div><div style="display:flex;gap:14px;margin-top:4px;flex-wrap:wrap;font-size:12px;color:#8b97a7"><span>🥅 2 times</span><span>👥 12 jogadores</span><span style="color:#facc15">⚽ 9 gols</span><span>✅ finalizada</span></div></div>
-<span style="color:#8b97a7;font-size:20px">›</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="dv-opt" id="1f">
-<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Linha do tempo por mês</div>
-<div class="dv-card" style="width:680px">
-<div style="padding:26px 28px 30px;background:#0a0f16">
-<div style="font:800 24px 'Inter',sans-serif;color:#f3f6f9;margin-bottom:20px">Peladas</div>
-<div style="font-weight:700;font-size:13px;color:#22c55e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px">Julho 2026</div>
-<div style="display:flex;gap:16px;position:relative;padding-bottom:20px">
-<div style="width:2px;position:absolute;left:29px;top:8px;bottom:0;background:rgba(255,255,255,0.1)"></div>
-<div style="display:flex;flex-direction:column;gap:20px;width:100%">
-<div style="display:flex;gap:16px;align-items:flex-start">
-<div style="width:58px;flex-shrink:0;text-align:center;z-index:1"><div style="width:14px;height:14px;border-radius:50%;background:#22c55e;margin:4px auto;box-shadow:0 0 0 4px #0a0f16"></div><div style="font-size:11px;color:#8b97a7;margin-top:2px">25/07</div></div>
-<div style="flex:1;background:rgba(250,204,21,0.08);border:1px dashed rgba(250,204,21,0.4);border-radius:16px;padding:14px 16px"><div style="font-weight:700;font-size:14px;color:#f3f6f9">Society do trabalho <span style="color:#facc15;font-size:11px;font-weight:600">· agendada</span></div><div style="font-size:12px;color:#8b97a7;margin-top:4px">8 confirmados de 14</div></div>
-</div>
-<div style="display:flex;gap:16px;align-items:flex-start">
-<div style="width:58px;flex-shrink:0;text-align:center;z-index:1"><div style="width:14px;height:14px;border-radius:50%;background:#22c55e;margin:4px auto;box-shadow:0 0 0 4px #0a0f16"></div><div style="font-size:11px;color:#8b97a7;margin-top:2px">13/07</div></div>
-<div style="flex:1;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px"><div style="font-weight:700;font-size:14px;color:#f3f6f9">Society do trabalho</div><div style="display:flex;gap:12px;margin-top:4px;font-size:12px;color:#8b97a7"><span>🥅 3 times</span><span style="color:#facc15">⚽ 12 gols</span></div></div>
-</div>
-<div style="display:flex;gap:16px;align-items:flex-start">
-<div style="width:58px;flex-shrink:0;text-align:center;z-index:1"><div style="width:14px;height:14px;border-radius:50%;background:#22c55e;margin:4px auto;box-shadow:0 0 0 4px #0a0f16"></div><div style="font-size:11px;color:#8b97a7;margin-top:2px">06/07</div></div>
-<div style="flex:1;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px"><div style="font-weight:700;font-size:14px;color:#f3f6f9">Society do trabalho</div><div style="display:flex;gap:12px;margin-top:4px;font-size:12px;color:#8b97a7"><span>🥅 2 times</span><span style="color:#facc15">⚽ 9 gols</span></div></div>
-</div>
-</div>
-</div>
-<div style="font-weight:700;font-size:13px;color:#8b97a7;text-transform:uppercase;letter-spacing:0.06em;margin:6px 0 14px">Junho 2026</div>
-<div style="display:flex;gap:16px;align-items:flex-start">
-<div style="width:58px;flex-shrink:0;text-align:center"><div style="width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.2);margin:4px auto"></div><div style="font-size:11px;color:#8b97a7;margin-top:2px">29/06</div></div>
-<div style="flex:1;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:14px 16px"><div style="font-weight:700;font-size:14px;color:#f3f6f9">Society do trabalho</div><div style="display:flex;gap:12px;margin-top:4px;font-size:12px;color:#8b97a7"><span>🥅 2 times</span><span style="color:#facc15">⚽ 15 gols</span></div></div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="dv-grp">
-<div class="dv-grp-t">Detalhe da Pelada</div>
-<div class="dv-grp-s">Times, gols/assistências e comentários do grupo</div>
-<div class="dv-opts">
-
-<div class="dv-opt" id="1g">
-<div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Times + comentários abaixo</div>
-<div class="dv-card" style="width:820px">
-<div style="padding:26px 28px 30px;background:#0a0f16">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
-<div><div style="font-size:13px;color:#8b97a7;margin-bottom:8px">← Peladas</div><div style="font:800 22px 'Inter',sans-serif;color:#f3f6f9">Society do trabalho</div><div style="color:#8b97a7;font-size:14px;margin-top:2px">13 de julho de 2026 · 3 times · ✅ finalizada</div></div>
-<div style="display:flex;gap:10px"><div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;padding:9px 16px;border-radius:11px;font:600 13px 'Inter',sans-serif">Editar</div><div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.45);color:#fca5a5;padding:9px 16px;border-radius:11px;font:600 13px 'Inter',sans-serif">Excluir</div></div>
-</div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-top:3px solid #16a34a;border-radius:16px;padding:14px">
-<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:6px;background:#16a34a;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff">1</span>Time A</div>
-<div style="font:13px 'Space Grotesk',sans-serif;color:#8b97a7;margin-bottom:8px">🏆 2V · 1E · 0D</div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="width:24px;height:24px;border-radius:50%;background:#16a34a;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">AP</div><span style="flex:1;font-size:13px;color:#f3f6f9">Arthur Pereira</span><span style="background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);color:#facc15;font-size:11px;padding:2px 7px;border-radius:999px">⚽ 2</span></div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><div style="width:24px;height:24px;border-radius:50%;background:#3b82f6;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">LM</div><span style="flex:1;font-size:13px;color:#f3f6f9">Lucas Menezes</span><span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;font-size:11px;padding:2px 7px;border-radius:999px">🅰️ 1</span></div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-top:3px solid #3b82f6;border-radius:16px;padding:14px">
-<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:6px;background:#3b82f6;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff">2</span>Time B</div>
-<div style="font:13px 'Space Grotesk',sans-serif;color:#8b97a7;margin-bottom:8px">🏆 1V · 1E · 1D</div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><div style="width:24px;height:24px;border-radius:50%;background:#a855f7;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">RC</div><span style="flex:1;font-size:13px;color:#f3f6f9">Rafael Costa</span><span style="background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);color:#facc15;font-size:11px;padding:2px 7px;border-radius:999px">⚽ 3</span></div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-top:3px solid #f59e0b;border-radius:16px;padding:14px">
-<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:6px;background:#f59e0b;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff">3</span>Time C</div>
-<div style="font:13px 'Space Grotesk',sans-serif;color:#8b97a7;margin-bottom:8px">🏆 0V · 1E · 2D</div>
-<div style="font-size:12px;color:#8b97a7;padding:6px 0">Sem jogadores</div>
-</div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:20px">
-<div style="font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:14px">💬 Comentários</div>
-<div style="display:flex;gap:10px;margin-bottom:14px"><div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">LM</div><div style="flex:1"><div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:9px 13px;font-size:13px;color:#f3f6f9">Lucas Menezes: Time A merecia ganhar de 3, faltou finalização 😅</div><div style="font-size:11px;color:#8b97a7;margin-top:4px">há 2h · ❤️ 3</div></div></div>
-<div style="display:flex;gap:10px;margin-bottom:14px"><div style="width:28px;height:28px;border-radius:50%;background:#a855f7;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">RC</div><div style="flex:1"><div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:9px 13px;font-size:13px;color:#f3f6f9">Rafael Costa: Hat-trick chegando 🔥</div><div style="font-size:11px;color:#8b97a7;margin-top:4px">há 1h · ❤️ 5</div></div></div>
-<div style="display:flex;gap:10px;align-items:center"><div style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">AP</div><div style="flex:1;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:10px 14px;color:#5b6675;font-size:13px">Adicionar um comentário…</div><div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">➤</div></div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="dv-opt" id="1h">
-<div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>Abas: Times / Estatísticas / Comentários</div>
-<div class="dv-card" style="width:800px">
-<div style="padding:26px 28px 30px;background:#0a0f16">
-<div style="margin-bottom:16px"><div style="font-size:13px;color:#8b97a7;margin-bottom:8px">← Peladas</div><div style="font:800 22px 'Inter',sans-serif;color:#f3f6f9">Society do trabalho</div><div style="color:#8b97a7;font-size:14px;margin-top:2px">13 de julho de 2026 · ✅ finalizada</div></div>
-<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;font-size:12px;padding:6px 12px;border-radius:999px">Time A 🏆 2V</span>
-<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;font-size:12px;padding:6px 12px;border-radius:999px">Time B 🏆 1V</span>
-<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;font-size:12px;padding:6px 12px;border-radius:999px">Time C 🏆 0V</span>
-<span style="background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);color:#facc15;font-size:12px;padding:6px 12px;border-radius:999px">⚽ 12 gols no total</span>
-</div>
-<div style="display:inline-flex;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:4px;gap:4px;margin-bottom:20px">
-<div style="color:#8b97a7;padding:9px 16px;font:600 13px 'Inter',sans-serif">Times</div>
-<div style="color:#8b97a7;padding:9px 16px;font:600 13px 'Inter',sans-serif">Estatísticas</div>
-<div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;padding:9px 16px;border-radius:9px;font:600 13px 'Inter',sans-serif">💬 Comentários (3)</div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:20px">
-<div style="display:flex;gap:10px;margin-bottom:14px"><div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">LM</div><div style="flex:1"><div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:9px 13px;font-size:13px;color:#f3f6f9">Lucas Menezes: Bora marcar a próxima logo!</div><div style="font-size:11px;color:#8b97a7;margin-top:4px">há 2h · ❤️ 2</div></div></div>
-<div style="display:flex;gap:10px;margin-bottom:14px"><div style="width:28px;height:28px;border-radius:50%;background:#a855f7;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">RC</div><div style="flex:1"><div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:9px 13px;font-size:13px;color:#f3f6f9">Rafael Costa: Hat-trick chegando 🔥</div><div style="font-size:11px;color:#8b97a7;margin-top:4px">há 1h · ❤️ 5</div></div></div>
-<div style="display:flex;gap:10px;margin-bottom:16px"><div style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">AP</div><div style="flex:1"><div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:9px 13px;font-size:13px;color:#f3f6f9">Arthur Pereira: Semana que vem tem revanche 😤</div><div style="font-size:11px;color:#8b97a7;margin-top:4px">há 40min · ❤️ 1</div></div></div>
-<div style="display:flex;gap:10px;align-items:center"><div style="flex:1;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:10px 14px;color:#5b6675;font-size:13px">Adicionar um comentário…</div><div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">➤</div></div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="dv-grp">
-<div class="dv-grp-t">Nova / Editar Pelada</div>
-<div class="dv-grp-s">A tela mais complexa hoje — simplificada em etapas</div>
-<div class="dv-opts">
-
-<div class="dv-opt" id="1i">
-<div class="dv-olabel"><a class="dv-oid" href="#1i">1i</a>Wizard linear, stepper no topo</div>
-<div class="dv-card" style="width:760px">
-<div style="padding:26px 28px 30px;background:#0a0f16">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px"><div style="font:800 22px 'Inter',sans-serif;color:#f3f6f9">Nova pelada</div><div style="color:#8b97a7;font-size:13px">Cancelar</div></div>
-<div style="display:flex;align-items:center;margin-bottom:26px">
-<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:80px"><div style="width:30px;height:30px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif">✓</div><span style="font-size:11px;color:#22c55e;font-weight:600">Dados</span></div>
-<div style="flex:1;height:2px;background:#16a34a"></div>
-<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:80px"><div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif;box-shadow:0 0 0 4px rgba(34,197,94,0.18)">2</div><span style="font-size:11px;color:#f3f6f9;font-weight:600">Jogadores</span></div>
-<div style="flex:1;height:2px;background:rgba(255,255,255,0.12)"></div>
-<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:80px"><div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.08);color:#8b97a7;display:flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif">3</div><span style="font-size:11px;color:#8b97a7">Sorteio</span></div>
-<div style="flex:1;height:2px;background:rgba(255,255,255,0.12)"></div>
-<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:80px"><div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.08);color:#8b97a7;display:flex;align-items:center;justify-content:center;font:700 13px 'Space Grotesk',sans-serif">4</div><span style="font-size:11px;color:#8b97a7">Revisão</span></div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:22px;margin-bottom:20px">
-<div style="font-weight:700;font-size:15px;color:#f3f6f9;margin-bottom:4px">Quem vai jogar?</div>
-<div style="color:#8b97a7;font-size:13px;margin-bottom:16px">Adicione dos cadastrados ou inclua um avulso</div>
-<div style="display:flex;gap:8px;margin-bottom:16px">
-<div style="flex:1;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:11px 13px;color:#5b6675;font-size:14px">+ Adicionar dos cadastrados…</div>
-<div style="flex:1;background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:11px 13px;color:#5b6675;font-size:14px">Novo avulso…</div>
-</div>
-<div style="display:flex;flex-wrap:wrap;gap:8px">
-<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:999px;font-size:13px;color:#f3f6f9">Arthur Pereira <span style="color:#8b97a7">×</span></span>
-<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:999px;font-size:13px;color:#f3f6f9">Lucas Menezes <span style="color:#8b97a7">×</span></span>
-<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:999px;font-size:13px;color:#f3f6f9">Rafael Costa <span style="color:#8b97a7">×</span></span>
-<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:999px;font-size:13px;color:#f3f6f9">Bruno Almeida <span style="color:#8b97a7">×</span></span>
-<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);padding:7px 12px;border-radius:999px;font-size:13px;color:#f3f6f9">Diego Ramos <span style="color:#8b97a7">×</span></span>
-</div>
-</div>
-<div style="display:flex;justify-content:space-between"><div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;padding:11px 20px;border-radius:12px;font:600 14px 'Inter',sans-serif">Voltar</div><div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;padding:11px 22px;border-radius:12px;font:600 14px 'Inter',sans-serif;box-shadow:0 8px 20px -8px rgba(34,197,94,0.6)">Próximo → Sorteio</div></div>
-</div>
-</div>
-</div>
-
-<div class="dv-opt" id="1j">
-<div class="dv-olabel"><a class="dv-oid" href="#1j">1j</a>Wizard com sidebar vertical</div>
-<div class="dv-card" style="width:800px">
-<div style="display:flex;min-height:420px;background:#0a0f16">
-<div style="width:190px;background:#131a27;border-right:1px solid rgba(255,255,255,0.07);padding:26px 18px;flex-shrink:0">
-<div style="font:800 17px 'Inter',sans-serif;color:#f3f6f9;margin-bottom:20px">Nova pelada</div>
-<div style="display:flex;flex-direction:column;gap:4px">
-<div style="display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px"><div style="width:22px;height:22px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px">✓</div><span style="font-size:13px;color:#8b97a7">Dados básicos</span></div>
-<div style="display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px"><div style="width:22px;height:22px;border-radius:50%;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px">✓</div><span style="font-size:13px;color:#8b97a7">Jogadores</span></div>
-<div style="display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px;background:rgba(34,197,94,0.12)"><div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">3</div><span style="font-size:13px;color:#f3f6f9;font-weight:600">Sorteio de times</span></div>
-<div style="display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:10px"><div style="width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.08);color:#8b97a7;display:flex;align-items:center;justify-content:center;font-size:11px">4</div><span style="font-size:13px;color:#8b97a7">Revisão</span></div>
-</div>
-</div>
-<div style="flex:1;padding:26px 26px 22px;display:flex;flex-direction:column">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:#f3f6f9">Monte os times</div><div style="background:linear-gradient(135deg,#fde047,#facc15);color:#1a1400;padding:9px 16px;border-radius:10px;font:600 13px 'Inter',sans-serif">🎲 Sortear times</div></div>
-<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;flex:1">
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-top:3px solid #16a34a;border-radius:16px;padding:14px">
-<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:10px"><span style="width:20px;height:20px;border-radius:6px;background:#16a34a;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff">1</span>Time 1</div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="width:22px;height:22px;border-radius:50%;background:#16a34a;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">AP</div><span style="flex:1;font-size:12px;color:#f3f6f9">Arthur Pereira</span></div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><div style="width:22px;height:22px;border-radius:50%;background:#f59e0b;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">DR</div><span style="flex:1;font-size:12px;color:#f3f6f9">Diego Ramos</span></div>
-</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-top:3px solid #3b82f6;border-radius:16px;padding:14px">
-<div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#f3f6f9;margin-bottom:10px"><span style="width:20px;height:20px;border-radius:6px;background:#3b82f6;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff">2</span>Time 2</div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="width:22px;height:22px;border-radius:50%;background:#3b82f6;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">LM</div><span style="flex:1;font-size:12px;color:#f3f6f9">Lucas Menezes</span></div>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 0"><div style="width:22px;height:22px;border-radius:50%;background:#a855f7;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700">RC</div><span style="flex:1;font-size:12px;color:#f3f6f9">Rafael Costa</span></div>
-</div>
-</div>
-<div style="display:flex;justify-content:space-between;margin-top:18px"><div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;padding:10px 18px;border-radius:11px;font:600 13px 'Inter',sans-serif">← Voltar</div><div style="background:linear-gradient(135deg,#22c55e,#16a34a 55%,#12813c);color:#fff;padding:10px 20px;border-radius:11px;font:600 13px 'Inter',sans-serif;box-shadow:0 8px 20px -8px rgba(34,197,94,0.6)">Próximo → Revisão</div></div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="dv-grp">
-<div class="dv-grp-t">Admin — Usuários</div>
-<div class="dv-grp-s">Gerenciar permissões de administrador</div>
-<div class="dv-opts">
-
-<div class="dv-opt" id="1k">
-<div class="dv-olabel"><a class="dv-oid" href="#1k">1k</a>Tabela refinada</div>
-<div class="dv-card" style="width:700px">
-<div style="padding:26px 28px 30px;background:#0a0f16">
-<div style="margin-bottom:18px"><div style="font:800 22px 'Inter',sans-serif;color:#f3f6f9">Usuários</div><div style="color:#8b97a7;font-size:14px;margin-top:2px">Gerencie quem tem permissão de administrador.</div></div>
-<div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:10px 13px;color:#5b6675;font-size:13px;margin-bottom:16px">🔍 Buscar usuário…</div>
-<div style="background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:6px 20px">
-<table style="width:100%;border-collapse:collapse;font-size:14px">
-<thead><tr><th style="text-align:left;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.07)">Nome</th><th style="text-align:left;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.07)">Usuário</th><th style="text-align:center;padding:12px 10px;color:#8b97a7;font-size:10px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,0.07)">Admin</th><th style="border-bottom:1px solid rgba(255,255,255,0.07)"></th></tr></thead>
-<tbody>
-<tr><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#16a34a;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">AP</div><span style="font-weight:600;color:#f3f6f9">Arthur Pereira</span></div></td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07);color:#8b97a7">@arthur.pereira</td><td style="text-align:center;padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="background:linear-gradient(135deg,#fde047,#facc15);color:#1a1400;font:800 10px 'Inter',sans-serif;padding:3px 8px;border-radius:999px;text-transform:uppercase">admin</span></td><td style="text-align:center;padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07);color:#8b97a7;font-size:12px">você</td></tr>
-<tr><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">LM</div><span style="font-weight:600;color:#f3f6f9">Lucas Menezes</span></div></td><td style="padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07);color:#8b97a7">@lucas.menezes</td><td style="text-align:center;padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07);color:#8b97a7">—</td><td style="text-align:center;padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.07)"><span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;padding:6px 12px;border-radius:9px;font:600 12px 'Inter',sans-serif">Tornar admin</span></td></tr>
-<tr><td style="padding:11px 10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:#a855f7;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">RC</div><span style="font-weight:600;color:#f3f6f9">Rafael Costa</span></div></td><td style="padding:11px 10px;color:#8b97a7">@rafael.costa</td><td style="text-align:center;padding:11px 10px;color:#8b97a7">—</td><td style="text-align:center;padding:11px 10px"><span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#f3f6f9;padding:6px 12px;border-radius:9px;font:600 12px 'Inter',sans-serif">Tornar admin</span></td></tr>
-</tbody></table>
-</div>
-</div>
-</div>
-</div>
-
-<div class="dv-opt" id="1l">
-<div class="dv-olabel"><a class="dv-oid" href="#1l">1l</a>Cartões com switch</div>
-<div class="dv-card" style="width:420px">
-<div style="padding:26px 24px 30px;background:#0a0f16">
-<div style="margin-bottom:16px"><div style="font:800 22px 'Inter',sans-serif;color:#f3f6f9">Usuários</div><div style="color:#8b97a7;font-size:13px;margin-top:2px">Gerencie administradores.</div></div>
-<div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:10px 13px;color:#5b6675;font-size:13px;margin-bottom:16px">🔍 Buscar usuário…</div>
-<div style="display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;align-items:center;gap:12px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:13px 16px">
-<div style="width:32px;height:32px;border-radius:50%;background:#16a34a;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700">AP</div>
-<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;color:#f3f6f9">Arthur Pereira</div><div style="font-size:12px;color:#8b97a7">@arthur.pereira</div></div>
-<span style="background:linear-gradient(135deg,#fde047,#facc15);color:#1a1400;font:800 9px 'Inter',sans-serif;padding:3px 7px;border-radius:999px;text-transform:uppercase">admin</span>
-<div style="width:38px;height:22px;border-radius:999px;background:#16a34a;position:relative;flex-shrink:0"><div style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;right:3px"></div></div>
-</div>
-<div style="display:flex;align-items:center;gap:12px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:13px 16px">
-<div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700">LM</div>
-<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;color:#f3f6f9">Lucas Menezes</div><div style="font-size:12px;color:#8b97a7">@lucas.menezes</div></div>
-<div style="width:38px;height:22px;border-radius:999px;background:rgba(255,255,255,0.12);position:relative;flex-shrink:0"><div style="width:16px;height:16px;border-radius:50%;background:#8b97a7;position:absolute;top:3px;left:3px"></div></div>
-</div>
-<div style="display:flex;align-items:center;gap:12px;background:linear-gradient(160deg,#172033,#131a27);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:13px 16px">
-<div style="width:32px;height:32px;border-radius:50%;background:#a855f7;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700">RC</div>
-<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;color:#f3f6f9">Rafael Costa</div><div style="font-size:12px;color:#8b97a7">@rafael.costa</div></div>
-<div style="width:38px;height:22px;border-radius:999px;background:rgba(255,255,255,0.12);position:relative;flex-shrink:0"><div style="width:16px;height:16px;border-radius:50%;background:#8b97a7;position:absolute;top:3px;left:3px"></div></div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<p class="dv-next">Próximo passo: diga algo como "gosto de <a class="dv-oid" href="#1d">1d</a> + <a class="dv-oid" href="#1i">1i</a> + <a class="dv-oid" href="#1e">1e</a>, monte a versão final" ou "faça <a class="dv-oid" href="#1g">1g</a> mais parecido com <a class="dv-oid" href="#1h">1h</a>" ou "quero mais opções para o formulário".</p>
-</section>
 </x-dc>
 </body>
 </html>

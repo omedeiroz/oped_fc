@@ -35,53 +35,52 @@ export default function Login() {
   }
 
   return (
-    <div className="auth">
-      <div className="auth-left">
-        <div className="auth-title">PELADA<br />OPED FC</div>
-        <div className="auth-bar" />
-        <div className="auth-desc">
-          O ranking, as escalações e o histórico de todas as peladas do time — direto da Fundação CAEd.
+    <div className="auth-wrap">
+      <div className="auth-card">
+        <div className="auth-head">
+          <div className="t">Pelada<br />OPED FC</div>
+          <div className="bar" />
         </div>
-        <div className="auth-stats">
-          <div><div className="n">{stats.TotalPeladas}</div><div className="l">peladas</div></div>
-          <div><div className="n accent">{stats.TotalGols}</div><div className="l">gols</div></div>
-          <div><div className="n">{stats.TotalJogadores}</div><div className="l">jogadores</div></div>
-        </div>
-      </div>
-
-      <div className="auth-right">
-        <div className="auth-toggle">
-          <button className={modo === 'login' ? 'active' : ''} onClick={() => { setModo('login'); setErro(''); }}>Entrar</button>
-          <button className={modo === 'cadastro' ? 'active' : ''} onClick={() => { setModo('cadastro'); setErro(''); }}>Criar conta</button>
-        </div>
-
-        {erro && <div className="alert alert-error">{erro}</div>}
-
-        <form onSubmit={submit}>
-          {modo === 'cadastro' && (
-            <div className="field">
-              <label>Nome completo</label>
-              <input className="inp" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="xxxx" required />
-            </div>
-          )}
-          <div className="field">
-            <label>Usuário</label>
-            <input className="inp" value={usuario} onChange={(e) => setUsuario(e.target.value)} placeholder="xxx.xxx" autoCapitalize="none" required />
+        <div className="auth-body">
+          <div className="auth-toggle">
+            <button className={modo === 'login' ? 'active' : ''} onClick={() => { setModo('login'); setErro(''); }}>Entrar</button>
+            <button className={modo === 'cadastro' ? 'active' : ''} onClick={() => { setModo('cadastro'); setErro(''); }}>Criar conta</button>
           </div>
-          {modo === 'cadastro' && (
+
+          {erro && <div className="alert alert-error">{erro}</div>}
+
+          <form onSubmit={submit}>
+            {modo === 'cadastro' && (
+              <div className="field">
+                <label>Nome completo</label>
+                <input className="inp" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="xxxx" required />
+              </div>
+            )}
             <div className="field">
-              <label>Email (opcional)</label>
-              <input className="inp" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@email.com" />
+              <label>Usuário</label>
+              <input className="inp" value={usuario} onChange={(e) => setUsuario(e.target.value)} placeholder="xxx.xxx" autoCapitalize="none" required />
             </div>
-          )}
-          <div className="field">
-            <label>Senha</label>
-            <input className="inp" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="••••••" required />
+            {modo === 'cadastro' && (
+              <div className="field">
+                <label>Email (opcional)</label>
+                <input className="inp" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@email.com" />
+              </div>
+            )}
+            <div className="field">
+              <label>Senha</label>
+              <input className="inp" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="••••••" required />
+            </div>
+            <button className="btn btn-block" disabled={carregando} style={{ marginTop: 6 }}>
+              {carregando ? 'Aguarde…' : modo === 'login' ? 'Entrar →' : 'Cadastrar →'}
+            </button>
+          </form>
+
+          <div className="auth-stats">
+            <div><div className="n lime">{stats.TotalPeladas}</div><div className="l">Peladas</div></div>
+            <div><div className="n orange">{stats.TotalGols}</div><div className="l">Gols</div></div>
+            <div><div className="n navy">{stats.TotalJogadores}</div><div className="l">Jogadores</div></div>
           </div>
-          <button className="btn btn-block" disabled={carregando} style={{ marginTop: 8 }}>
-            {carregando ? 'AGUARDE…' : modo === 'login' ? 'ENTRAR →' : 'CADASTRAR →'}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -10,13 +10,9 @@ export default function AdminUsuarios() {
   const [carregando, setCarregando] = useState(true);
 
   async function carregar() {
-    try {
-      setUsuarios(await api.get('/usuarios'));
-    } catch (err) {
-      setErro(err.message);
-    } finally {
-      setCarregando(false);
-    }
+    try { setUsuarios(await api.get('/usuarios')); }
+    catch (err) { setErro(err.message); }
+    finally { setCarregando(false); }
   }
   useEffect(() => { carregar(); }, []);
 
@@ -25,9 +21,7 @@ export default function AdminUsuarios() {
     try {
       await api.patch(`/usuarios/${u.Id}/admin`, { isAdmin: !u.IsAdmin });
       setUsuarios((prev) => prev.map((x) => (x.Id === u.Id ? { ...x, IsAdmin: !x.IsAdmin } : x)));
-    } catch (err) {
-      setErro(err.message);
-    }
+    } catch (err) { setErro(err.message); }
   }
 
   const filtrados = useMemo(() => {
@@ -38,14 +32,10 @@ export default function AdminUsuarios() {
 
   return (
     <div>
-      <div className="page-head">
-        <h1>Usuários</h1>
-        <p>Gerencie quem tem permissão de administrador.</p>
-      </div>
-
+      <h1 className="page-title">Usuários</h1>
       {erro && <div className="alert alert-error">{erro}</div>}
 
-      <input className="inp" placeholder="🔍 Buscar usuário…" value={busca} onChange={(e) => setBusca(e.target.value)} style={{ marginBottom: 20, maxWidth: 360 }} />
+      <input className="inp" placeholder="🔍 Buscar usuário…" value={busca} onChange={(e) => setBusca(e.target.value)} style={{ marginBottom: 18, maxWidth: 340 }} />
 
       {carregando ? (
         <div className="loading">Carregando…</div>
@@ -53,17 +43,18 @@ export default function AdminUsuarios() {
         <div>
           {filtrados.map((u) => (
             <div className="user-line" key={u.Id}>
-              <span className="un">{u.Nome} <span className="u">@{u.Usuario || '—'}</span></span>
-              <span className="row" style={{ gap: 14 }}>
-                {u.IsAdmin && <span className="tag-admin">admin</span>}
-                {u.Id === user.id ? (
-                  <span className="muted-2" style={{ fontSize: 12 }}>você</span>
-                ) : (
-                  <button className={u.IsAdmin ? 'txt-muted' : 'txt-action'} onClick={() => alternarAdmin(u)}>
-                    {u.IsAdmin ? 'remover admin' : 'tornar admin →'}
-                  </button>
-                )}
-              </span>
+              <div className="info">
+                <div className="nm">{u.Nome}</div>
+                <div className="u">@{u.Usuario || '—'}</div>
+              </div>
+              {u.IsAdmin && <span className="tag-admin" style={{ marginRight: 12 }}>admin</span>}
+              {u.Id === user.id ? (
+                <span className="mini">você</span>
+              ) : (
+                <button className={u.IsAdmin ? 'txt-muted' : 'txt-action navy'} onClick={() => alternarAdmin(u)}>
+                  {u.IsAdmin ? 'remover admin' : 'tornar admin →'}
+                </button>
+              )}
             </div>
           ))}
         </div>

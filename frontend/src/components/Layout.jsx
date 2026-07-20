@@ -1,9 +1,22 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
+
+function lerTema() {
+  return document.documentElement.getAttribute('data-theme') || 'light';
+}
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [tema, setTema] = useState(lerTema);
+
+  function alternarTema() {
+    const novo = tema === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', novo);
+    try { localStorage.setItem('theme', novo); } catch (e) { /* ignore */ }
+    setTema(novo);
+  }
 
   function sair() {
     logout();
@@ -16,7 +29,7 @@ export default function Layout() {
         <div className="topbar-inner">
           <div className="brand">
             <span className="mark" />
-            <span className="txt">PELADA OPED FC<small>Fundação CAEd</small></span>
+            <span className="txt">Pelada OPED FC</span>
           </div>
           <nav className="nav">
             <NavLink to="/" end>Ranking</NavLink>
@@ -25,9 +38,12 @@ export default function Layout() {
           </nav>
           <span className="spacer" />
           <div className="userbox">
+            <button className="theme-toggle" onClick={alternarTema} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+              {tema === 'dark' ? '☀️' : '🌙'}
+            </button>
             <span className="who">{user?.nome?.split(' ')[0]}</span>
             {user?.isAdmin && <span className="tag-admin">admin</span>}
-            <button className="txt-muted" onClick={sair}>Sair</button>
+            <button className="txt-muted" style={{ color: 'rgba(255,255,255,0.7)' }} onClick={sair}>Sair</button>
           </div>
         </div>
       </header>

@@ -3,17 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 
-const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 const MESES_LONG = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-const DIAS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-function cartaoData(iso) {
-  const d = new Date(iso);
-  return `${String(d.getUTCDate()).padStart(2, '0')} ${MESES[d.getUTCMonth()][0].toUpperCase()}${MESES[d.getUTCMonth()].slice(1)}`;
-}
+function dia(iso) { return String(new Date(iso).getUTCDate()).padStart(2, '0'); }
+function mesCurto(iso) { return MESES[new Date(iso).getUTCMonth()]; }
 function dataLonga(iso) {
   const d = new Date(iso);
-  return `${DIAS[d.getUTCDay()]}, ${d.getUTCDate()} de ${MESES_LONG[d.getUTCMonth()]}`;
+  return `${DIAS[d.getUTCDay()]} ${d.getUTCDate()} ${MESES_LONG[d.getUTCMonth()]}`;
 }
 
 export default function Peladas() {
@@ -28,8 +26,7 @@ export default function Peladas() {
     (async () => {
       try {
         const [p, prox] = await Promise.all([api.get('/peladas'), api.get('/peladas/proxima')]);
-        setPeladas(p);
-        setProxima(prox);
+        setPeladas(p); setProxima(prox);
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -55,12 +52,9 @@ export default function Peladas() {
 
   return (
     <div>
-      <div className="between page-head">
-        <div>
-          <h1>Peladas</h1>
-          <p>Histórico completo do time</p>
-        </div>
-        {user?.isAdmin && <Link to="/peladas/nova" className="btn">+ Nova pelada</Link>}
+      <div className="between page-title">
+        <h1>Peladas</h1>
+        {user?.isAdmin && <Link to="/peladas/nova" className="btn btn-outline">+ Nova pelada</Link>}
       </div>
 
       {erro && <div className="alert alert-error">{erro}</div>}
@@ -69,11 +63,11 @@ export default function Peladas() {
         <div className="next-banner">
           <span className="bell">🔔</span>
           <div className="info">
-            <div className="t">Próxima pelada · {dataLonga(proxima.DataPelada)}</div>
+            <div className="t">Próxima: {dataLonga(proxima.DataPelada)}</div>
             <div className="s">{proxima.Local || 'Local a definir'} · {proxima.confirmados} confirmados</div>
           </div>
-          <button className={proxima.confirmadoPorMim ? 'btn btn-ghost' : 'btn'} onClick={toggleConfirmar}>
-            {proxima.confirmadoPorMim ? '✓ Presença confirmada' : 'Confirmar presença'}
+          <button className={proxima.confirmadoPorMim ? 'btn btn-outline btn-sm' : 'btn btn-lime btn-sm'} onClick={toggleConfirmar}>
+            {proxima.confirmadoPorMim ? '✓ Confirmado' : 'Confirmar presença'}
           </button>
         </div>
       )}
@@ -86,10 +80,12 @@ export default function Peladas() {
         <div className="pelada-grid">
           {peladas.map((p) => (
             <div className="pelada-card" key={p.Id} onClick={() => navigate(`/peladas/${p.Id}`)}>
-              <div className="status">{p.Finalizada ? 'Finalizada' : 'Em andamento'}</div>
-              <div className="data">{cartaoData(p.DataPelada)}</div>
-              <div className="meta">🥅 {p.NumTimes} times · 👥 {p.QtdJogadores} jogadores</div>
-              <div className="gols">⚽ {p.TotalGols} gols</div>
+              <div className="data">{dia(p.DataPelada)}<small> {mesCurto(p.DataPelada)}</small></div>
+              <div className="meta">
+                <div className="l">{p.Local || 'Pelada'}</div>
+                <div className="s">🥅 {p.NumTimes} times · 👥 {p.QtdJogadores} · ⚽ {p.TotalGols}</div>
+              </div>
+              <div className="status">{p.Finalizada ? 'Fim' : '●'}</div>
             </div>
           ))}
         </div>

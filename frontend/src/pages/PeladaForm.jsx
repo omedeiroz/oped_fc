@@ -205,7 +205,7 @@ export default function PeladaForm() {
               ))}
             </div>
             {selecionados.length >= 2 && (
-              <button type="button" className="btn btn-sm" style={{ marginTop: 22 }} onClick={sortearTimes}>🎲 Sortear times</button>
+              <button type="button" className="btn btn-lime btn-sm" style={{ marginTop: 22 }} onClick={sortearTimes}>🎲 Sortear times</button>
             )}
           </div>
           <div>
@@ -255,7 +255,7 @@ export default function PeladaForm() {
             })}
           </div>
           <div className="row" style={{ marginTop: 8 }}>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={sortearTimes}>🎲 Sortear de novo</button>
+            <button type="button" className="btn btn-lime btn-sm" onClick={sortearTimes}>🎲 Sortear de novo</button>
           </div>
           {selecionados.some((s) => s.timeIndex == null) && (
             <div className="card" style={{ marginTop: 18 }}>
@@ -310,7 +310,7 @@ export default function PeladaForm() {
 
       {/* Navegação */}
       <div className="wizard-nav">
-        {step > 0 ? <button type="button" className="txt-action" onClick={voltar}>← Voltar</button> : <span />}
+        {step > 0 ? <button type="button" className="btn btn-outline btn-sm" onClick={voltar}>← Voltar</button> : <span />}
         {step < 3 ? (
           <button type="button" className="btn" onClick={proximo}>Próximo → {ETAPAS[step + 1]}</button>
         ) : (
