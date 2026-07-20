@@ -4,7 +4,13 @@ const config = require('./config');
 const { getPool } = require('./db');
 
 const app = express();
-app.use(cors({ origin: config.corsOrigin }));
+app.use(cors({
+  origin(origin, callback) {
+    // Sem Origin (curl, apps nativos) ou dentro da lista liberada
+    if (!origin || config.corsOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`Origem não permitida: ${origin}`));
+  },
+}));
 app.use(express.json());
 
 // Rotas
@@ -28,7 +34,7 @@ app.use((req, res) => res.status(404).json({ error: 'Rota não encontrada.' }));
 
 app.listen(config.port, () => {
   console.log(`\n🟢 Pelada OPED FC - API rodando em http://localhost:${config.port}`);
-  console.log(`   CORS liberado para: ${config.corsOrigin}`);
+  console.log(`   CORS liberado para: ${config.corsOrigins.join(', ')}`);
   // Aquece a conexão com o banco
   getPool()
     .then(() => console.log('   Banco: conectado ✅'))
