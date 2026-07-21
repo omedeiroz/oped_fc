@@ -24,6 +24,15 @@ export default function AdminUsuarios() {
     } catch (err) { setErro(err.message); }
   }
 
+  async function excluir(u) {
+    if (!window.confirm(`Excluir ${u.Nome} (@${u.Usuario})? Se o jogador já tiver estatísticas, ele só será desativado (histórico é preservado).`)) return;
+    setErro('');
+    try {
+      await api.del(`/usuarios/${u.Id}`);
+      setUsuarios((prev) => prev.filter((x) => x.Id !== u.Id));
+    } catch (err) { setErro(err.message); }
+  }
+
   const filtrados = useMemo(() => {
     const q = busca.trim().toLowerCase();
     if (!q) return usuarios;
@@ -51,9 +60,12 @@ export default function AdminUsuarios() {
               {u.Id === user.id ? (
                 <span className="mini">você</span>
               ) : (
-                <button className={u.IsAdmin ? 'txt-muted' : 'txt-action navy'} onClick={() => alternarAdmin(u)}>
-                  {u.IsAdmin ? 'remover admin' : 'tornar admin →'}
-                </button>
+                <div className="row" style={{ gap: 16 }}>
+                  <button className={u.IsAdmin ? 'txt-muted' : 'txt-action navy'} onClick={() => alternarAdmin(u)}>
+                    {u.IsAdmin ? 'remover admin' : 'tornar admin →'}
+                  </button>
+                  <button className="txt-action" style={{ color: '#d33' }} onClick={() => excluir(u)}>excluir</button>
+                </div>
               )}
             </div>
           ))}

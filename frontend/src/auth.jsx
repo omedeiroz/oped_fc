@@ -41,8 +41,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  function atualizarFoto(foto) {
+    setUser((prev) => (prev ? { ...prev, foto } : prev));
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, atualizarFoto }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,10 @@
 // Cliente HTTP simples com token JWT
 const TOKEN_KEY = 'pelada_token';
 
+// Em produção (Vercel), aponta para o backend publicado via VITE_API_URL.
+// Em dev, usa o path relativo /api (o Vite faz proxy para localhost:4000).
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
@@ -14,7 +18,7 @@ async function request(method, path, body) {
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,

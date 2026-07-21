@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: pelada-oped-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false

@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { sql, getPool } = require('../db');
+const { query, withTransaction } = require('../db');
 const { signToken, requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -32,60 +32,42 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'A senha deve ter ao menos 6 caracteres.' });
     }
 
-    const pool = await getPool();
-
-    const existe = await pool
-      .request()
-      .input('usuario', sql.NVarChar(60), usuario)
-      .query('SELECT Id FROM dbo.Usuarios WHERE Usuario = @usuario');
-    if (existe.recordset.length > 0) {
+    const existe = await query('SELECT "Id" FROM "Usuarios" WHERE "Usuario" = $1', [usuario]);
+    if (existe.rows.length > 0) {
       return res.status(409).json({ error: 'Esse usuário já está em uso.' });
     }
     if (email) {
-      const eEmail = await pool
-        .request()
-        .input('email', sql.NVarChar(160), email)
-        .query('SELECT Id FROM dbo.Usuarios WHERE Email = @email');
-      if (eEmail.recordset.length > 0) {
+      const eEmail = await query('SELECT "Id" FROM "Usuarios" WHERE "Email" = $1', [email]);
+      if (eEmail.rows.length > 0) {
         return res.status(409).json({ error: 'Esse email já está em uso.' });
       }
     }
 
     // Primeiro usuário do sistema vira admin automaticamente
-    const totalUsers = await pool.request().query('SELECT COUNT(*) AS total FROM dbo.Usuarios');
-    const isFirst = totalUsers.recordset[0].total === 0;
+    const totalUsers = await query('SELECT COUNT(*)::int AS total FROM "Usuarios"');
+    const isFirst = totalUsers.rows[0].total === 0;
 
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    const tx = new sql.Transaction(pool);
-    await tx.begin();
-    try {
-      const insUser = await new sql.Request(tx)
-        .input('nome', sql.NVarChar(120), nome)
-        .input('usuario', sql.NVarChar(60), usuario)
-        .input('email', sql.NVarChar(160), email)
-        .input('hash', sql.NVarChar(200), senhaHash)
-        .input('isAdmin', sql.Bit, isFirst ? 1 : 0)
-        .query(
-          `INSERT INTO dbo.Usuarios (Nome, Usuario, Email, SenhaHash, IsAdmin)
-           OUTPUT INSERTED.Id, INSERTED.Nome, INSERTED.Usuario, INSERTED.Email, INSERTED.IsAdmin
-           VALUES (@nome, @usuario, @email, @hash, @isAdmin)`
-        );
-      const user = insUser.recordset[0];
+    const user = await withTransaction(async (client) => {
+      const insUser = await client.query(
+        `INSERT INTO "Usuarios" ("Nome","Usuario","Email","SenhaHash","IsAdmin")
+         VALUES ($1,$2,$3,$4,$5)
+         RETURNING "Id","Nome","Usuario","Email","IsAdmin","Foto"`,
+        [nome, usuario, email, senhaHash, isFirst]
+      );
+      const u = insUser.rows[0];
 
-      await new sql.Request(tx)
-        .input('nome', sql.NVarChar(120), nome)
-        .input('usuarioId', sql.Int, user.Id)
-        .query(`INSERT INTO dbo.Jogadores (Nome, UsuarioId) VALUES (@nome, @usuarioId)`);
+      const insJog = await client.query(
+        `INSERT INTO "Jogadores" ("Nome","UsuarioId") VALUES ($1,$2) RETURNING "Id"`,
+        [nome, u.Id]
+      );
+      u.JogadorId = insJog.rows[0].Id;
+      return u;
+    });
 
-      await tx.commit();
-
-      const token = signToken(user);
-      return res.status(201).json({ token, user: publicUser(user) });
-    } catch (err) {
-      await tx.rollback();
-      throw err;
-    }
+    const token = signToken(user);
+    return res.status(201).json({ token, user: publicUser(user) });
   } catch (err) {
     console.error('[register]', err.message);
     return res.status(500).json({ error: 'Erro ao cadastrar usuário.' });
@@ -101,16 +83,16 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Informe usuário e senha.' });
     }
 
-    const pool = await getPool();
-    const result = await pool
-      .request()
-      .input('usuario', sql.NVarChar(60), usuario)
-      .query(
-        `SELECT Id, Nome, Usuario, Email, SenhaHash, IsAdmin, Ativo
-         FROM dbo.Usuarios WHERE Usuario = @usuario`
-      );
+    const result = await query(
+      `SELECT u."Id", u."Nome", u."Usuario", u."Email", u."SenhaHash", u."IsAdmin", u."Ativo", u."Foto",
+              j."Id" AS "JogadorId"
+       FROM "Usuarios" u
+       LEFT JOIN "Jogadores" j ON j."UsuarioId" = u."Id"
+       WHERE u."Usuario" = $1`,
+      [usuario]
+    );
 
-    const user = result.recordset[0];
+    const user = result.rows[0];
     if (!user || !user.Ativo) {
       return res.status(401).json({ error: 'Usuário ou senha inválidos.' });
     }
@@ -127,21 +109,29 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/auth/me
-router.get('/me', requireAuth, (req, res) => {
-  res.json({
-    user: {
-      id: req.user.id,
-      nome: req.user.nome,
-      usuario: req.user.usuario,
-      email: req.user.email,
-      isAdmin: !!req.user.isAdmin,
-    },
-  });
+// GET /api/auth/me -> busca fresca no banco (garante isAdmin/foto atualizados, não confia só no JWT)
+router.get('/me', requireAuth, async (req, res) => {
+  try {
+    const r = await query(
+      `SELECT u."Id", u."Nome", u."Usuario", u."Email", u."IsAdmin", u."Foto", j."Id" AS "JogadorId"
+       FROM "Usuarios" u
+       LEFT JOIN "Jogadores" j ON j."UsuarioId" = u."Id"
+       WHERE u."Id" = $1 AND u."Ativo" = true`,
+      [req.user.id]
+    );
+    if (r.rows.length === 0) return res.status(401).json({ error: 'Sessão inválida.' });
+    res.json({ user: publicUser(r.rows[0]) });
+  } catch (err) {
+    console.error('[auth:me]', err.message);
+    res.status(500).json({ error: 'Erro ao carregar sessão.' });
+  }
 });
 
 function publicUser(u) {
-  return { id: u.Id, nome: u.Nome, usuario: u.Usuario, email: u.Email, isAdmin: !!u.IsAdmin };
+  return {
+    id: u.Id, nome: u.Nome, usuario: u.Usuario, email: u.Email,
+    isAdmin: !!u.IsAdmin, foto: u.Foto || null, jogadorId: u.JogadorId || null,
+  };
 }
 
 module.exports = router;

@@ -1,38 +1,35 @@
 const express = require('express');
-const { sql, getPool } = require('../db');
+const { query, withTransaction } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Descobre o JogadorId vinculado a um usuário
-async function jogadorDoUsuario(pool, usuarioId) {
-  const r = await pool
-    .request()
-    .input('u', sql.Int, usuarioId)
-    .query('SELECT Id FROM dbo.Jogadores WHERE UsuarioId = @u');
-  return r.recordset[0] ? r.recordset[0].Id : null;
+async function jogadorDoUsuario(usuarioId) {
+  const r = await query('SELECT "Id" FROM "Jogadores" WHERE "UsuarioId" = $1', [usuarioId]);
+  return r.rows[0] ? r.rows[0].Id : null;
 }
 
 // Insere os times e participações de uma pelada dentro de uma transação já aberta.
 // times: [{ nome, vitorias, empates, derrotas }]  (a ordem define o índice)
 // participacoes: [{ jogadorId, timeIndex, gols, assistencias }]
-async function salvarTimesEParticipacoes(tx, peladaId, times, participacoes) {
+async function salvarTimesEParticipacoes(client, peladaId, times, participacoes) {
   const timeIdPorIndice = {};
 
   for (let i = 0; i < times.length; i++) {
     const t = times[i] || {};
-    const ins = await new sql.Request(tx)
-      .input('peladaId', sql.Int, peladaId)
-      .input('nome', sql.NVarChar(60), String(t.nome || `Time ${i + 1}`).slice(0, 60))
-      .input('vitorias', sql.Int, parseInt(t.vitorias, 10) || 0)
-      .input('empates', sql.Int, parseInt(t.empates, 10) || 0)
-      .input('derrotas', sql.Int, parseInt(t.derrotas, 10) || 0)
-      .query(
-        `INSERT INTO dbo.PeladaTimes (PeladaId, Nome, Vitorias, Empates, Derrotas)
-         OUTPUT INSERTED.Id
-         VALUES (@peladaId, @nome, @vitorias, @empates, @derrotas)`
-      );
-    timeIdPorIndice[i] = ins.recordset[0].Id;
+    const ins = await client.query(
+      `INSERT INTO "PeladaTimes" ("PeladaId","Nome","Vitorias","Empates","Derrotas")
+       VALUES ($1,$2,$3,$4,$5) RETURNING "Id"`,
+      [
+        peladaId,
+        String(t.nome || `Time ${i + 1}`).slice(0, 60),
+        parseInt(t.vitorias, 10) || 0,
+        parseInt(t.empates, 10) || 0,
+        parseInt(t.derrotas, 10) || 0,
+      ]
+    );
+    timeIdPorIndice[i] = ins.rows[0].Id;
   }
 
   const vistos = new Set();
@@ -47,31 +44,25 @@ async function salvarTimesEParticipacoes(tx, peladaId, times, participacoes) {
       if (timeIdPorIndice[idx] !== undefined) timeId = timeIdPorIndice[idx];
     }
 
-    await new sql.Request(tx)
-      .input('peladaId', sql.Int, peladaId)
-      .input('jogadorId', sql.Int, jogadorId)
-      .input('timeId', sql.Int, timeId)
-      .input('gols', sql.Int, parseInt(p.gols, 10) || 0)
-      .input('assist', sql.Int, parseInt(p.assistencias, 10) || 0)
-      .query(
-        `INSERT INTO dbo.PeladaParticipacoes (PeladaId, JogadorId, TimeId, Gols, Assistencias)
-         VALUES (@peladaId, @jogadorId, @timeId, @gols, @assist)`
-      );
+    await client.query(
+      `INSERT INTO "PeladaParticipacoes" ("PeladaId","JogadorId","TimeId","Gols","Assistencias")
+       VALUES ($1,$2,$3,$4,$5)`,
+      [peladaId, jogadorId, timeId, parseInt(p.gols, 10) || 0, parseInt(p.assistencias, 10) || 0]
+    );
   }
 }
 
 // GET /api/peladas  -> lista resumida
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const pool = await getPool();
-    const r = await pool.request().query(
-      `SELECT p.Id, p.DataPelada, p.Local, p.NumTimes, p.Observacao, p.Finalizada,
-              (SELECT COUNT(*) FROM dbo.PeladaParticipacoes pp WHERE pp.PeladaId = p.Id) AS QtdJogadores,
-              (SELECT ISNULL(SUM(Gols),0) FROM dbo.PeladaParticipacoes pp WHERE pp.PeladaId = p.Id) AS TotalGols
-       FROM dbo.Peladas p
-       ORDER BY p.DataPelada DESC, p.Id DESC`
+    const r = await query(
+      `SELECT p."Id", p."DataPelada", p."Local", p."NumTimes", p."Observacao", p."Finalizada",
+              (SELECT COUNT(*)::int FROM "PeladaParticipacoes" pp WHERE pp."PeladaId" = p."Id") AS "QtdJogadores",
+              (SELECT COALESCE(SUM(pp."Gols"),0)::int FROM "PeladaParticipacoes" pp WHERE pp."PeladaId" = p."Id") AS "TotalGols"
+       FROM "Peladas" p
+       ORDER BY p."DataPelada" DESC, p."Id" DESC`
     );
-    res.json(r.recordset);
+    res.json(r.rows);
   } catch (err) {
     console.error('[peladas:list]', err.message);
     res.status(500).json({ error: 'Erro ao listar peladas.' });
@@ -81,33 +72,30 @@ router.get('/', requireAuth, async (req, res) => {
 // GET /api/peladas/proxima -> próxima pelada agendada (futura, não finalizada) + confirmações
 router.get('/proxima', requireAuth, async (req, res) => {
   try {
-    const pool = await getPool();
-    const r = await pool.request().query(
-      `SELECT TOP 1 p.Id, p.DataPelada, p.Local, p.NumTimes
-       FROM dbo.Peladas p
-       WHERE p.Finalizada = 0 AND p.DataPelada >= CAST(GETDATE() AS DATE)
-       ORDER BY p.DataPelada ASC, p.Id ASC`
+    const r = await query(
+      `SELECT p."Id", p."DataPelada", p."Local", p."NumTimes"
+       FROM "Peladas" p
+       WHERE p."Finalizada" = false AND p."DataPelada" >= CURRENT_DATE
+       ORDER BY p."DataPelada" ASC, p."Id" ASC
+       LIMIT 1`
     );
-    if (r.recordset.length === 0) return res.json(null);
-    const pelada = r.recordset[0];
+    if (r.rows.length === 0) return res.json(null);
+    const pelada = r.rows[0];
 
-    const conf = await pool.request().input('id', sql.Int, pelada.Id)
-      .query('SELECT COUNT(*) AS n FROM dbo.PeladaPresencas WHERE PeladaId = @id');
-    const tot = await pool.request()
-      .query('SELECT COUNT(*) AS n FROM dbo.Jogadores WHERE Ativo = 1');
+    const conf = await query('SELECT COUNT(*)::int AS n FROM "PeladaPresencas" WHERE "PeladaId" = $1', [pelada.Id]);
+    const tot = await query('SELECT COUNT(*)::int AS n FROM "Jogadores" WHERE "Ativo" = true');
 
-    const jog = await jogadorDoUsuario(pool, req.user.id);
+    const jog = await jogadorDoUsuario(req.user.id);
     let confirmadoPorMim = false;
     if (jog) {
-      const m = await pool.request().input('id', sql.Int, pelada.Id).input('j', sql.Int, jog)
-        .query('SELECT 1 AS ok FROM dbo.PeladaPresencas WHERE PeladaId = @id AND JogadorId = @j');
-      confirmadoPorMim = m.recordset.length > 0;
+      const m = await query('SELECT 1 FROM "PeladaPresencas" WHERE "PeladaId" = $1 AND "JogadorId" = $2', [pelada.Id, jog]);
+      confirmadoPorMim = m.rows.length > 0;
     }
 
     res.json({
       ...pelada,
-      confirmados: conf.recordset[0].n,
-      totalJogadores: tot.recordset[0].n,
+      confirmados: conf.rows[0].n,
+      totalJogadores: tot.rows[0].n,
       confirmadoPorMim,
     });
   } catch (err) {
@@ -120,36 +108,27 @@ router.get('/proxima', requireAuth, async (req, res) => {
 router.get('/:id', requireAuth, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const pool = await getPool();
 
-    const pelada = await pool
-      .request()
-      .input('id', sql.Int, id)
-      .query('SELECT * FROM dbo.Peladas WHERE Id = @id');
-    if (pelada.recordset.length === 0) {
+    const pelada = await query('SELECT * FROM "Peladas" WHERE "Id" = $1', [id]);
+    if (pelada.rows.length === 0) {
       return res.status(404).json({ error: 'Pelada não encontrada.' });
     }
 
-    const times = await pool
-      .request()
-      .input('id', sql.Int, id)
-      .query('SELECT * FROM dbo.PeladaTimes WHERE PeladaId = @id ORDER BY Id');
+    const times = await query('SELECT * FROM "PeladaTimes" WHERE "PeladaId" = $1 ORDER BY "Id"', [id]);
 
-    const participacoes = await pool
-      .request()
-      .input('id', sql.Int, id)
-      .query(
-        `SELECT pp.Id, pp.JogadorId, pp.TimeId, pp.Gols, pp.Assistencias, j.Nome AS JogadorNome
-         FROM dbo.PeladaParticipacoes pp
-         JOIN dbo.Jogadores j ON j.Id = pp.JogadorId
-         WHERE pp.PeladaId = @id
-         ORDER BY j.Nome`
-      );
+    const participacoes = await query(
+      `SELECT pp."Id", pp."JogadorId", pp."TimeId", pp."Gols", pp."Assistencias", j."Nome" AS "JogadorNome"
+       FROM "PeladaParticipacoes" pp
+       JOIN "Jogadores" j ON j."Id" = pp."JogadorId"
+       WHERE pp."PeladaId" = $1
+       ORDER BY j."Nome"`,
+      [id]
+    );
 
     res.json({
-      pelada: pelada.recordset[0],
-      times: times.recordset,
-      participacoes: participacoes.recordset,
+      pelada: pelada.rows[0],
+      times: times.rows,
+      participacoes: participacoes.rows,
     });
   } catch (err) {
     console.error('[peladas:get]', err.message);
@@ -166,29 +145,19 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
   if (!dataPelada) return res.status(400).json({ error: 'Informe a data da pelada.' });
   if (times.length < 2) return res.status(400).json({ error: 'A pelada precisa de ao menos 2 times.' });
 
-  const pool = await getPool();
-  const tx = new sql.Transaction(pool);
   try {
-    await tx.begin();
-    const ins = await new sql.Request(tx)
-      .input('data', sql.Date, dataPelada)
-      .input('local', sql.NVarChar(160), local || null)
-      .input('numTimes', sql.Int, times.length)
-      .input('obs', sql.NVarChar(400), observacao || null)
-      .input('finalizada', sql.Bit, finalizada ? 1 : 0)
-      .input('criadoPor', sql.Int, req.user.id)
-      .query(
-        `INSERT INTO dbo.Peladas (DataPelada, Local, NumTimes, Observacao, Finalizada, CriadoPor)
-         OUTPUT INSERTED.Id
-         VALUES (@data, @local, @numTimes, @obs, @finalizada, @criadoPor)`
+    const peladaId = await withTransaction(async (client) => {
+      const ins = await client.query(
+        `INSERT INTO "Peladas" ("DataPelada","Local","NumTimes","Observacao","Finalizada","CriadoPor")
+         VALUES ($1,$2,$3,$4,$5,$6) RETURNING "Id"`,
+        [dataPelada, local || null, times.length, observacao || null, !!finalizada, req.user.id]
       );
-    const peladaId = ins.recordset[0].Id;
-
-    await salvarTimesEParticipacoes(tx, peladaId, times, participacoes);
-    await tx.commit();
+      const id = ins.rows[0].Id;
+      await salvarTimesEParticipacoes(client, id, times, participacoes);
+      return id;
+    });
     res.status(201).json({ id: peladaId });
   } catch (err) {
-    await tx.rollback().catch(() => {});
     console.error('[peladas:create]', err.message);
     res.status(500).json({ error: 'Erro ao salvar pelada.' });
   }
@@ -204,36 +173,23 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   if (!dataPelada) return res.status(400).json({ error: 'Informe a data da pelada.' });
   if (times.length < 2) return res.status(400).json({ error: 'A pelada precisa de ao menos 2 times.' });
 
-  const pool = await getPool();
-  const tx = new sql.Transaction(pool);
   try {
-    await tx.begin();
+    await withTransaction(async (client) => {
+      // Remove participações e times antigos (ordem importa por causa das FKs)
+      await client.query('DELETE FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [id]);
+      await client.query('DELETE FROM "PeladaTimes" WHERE "PeladaId" = $1', [id]);
 
-    // Remove participações e times antigos (ordem importa por causa das FKs)
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.PeladaParticipacoes WHERE PeladaId = @id');
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.PeladaTimes WHERE PeladaId = @id');
-
-    await new sql.Request(tx)
-      .input('id', sql.Int, id)
-      .input('data', sql.Date, dataPelada)
-      .input('local', sql.NVarChar(160), local || null)
-      .input('numTimes', sql.Int, times.length)
-      .input('obs', sql.NVarChar(400), observacao || null)
-      .input('finalizada', sql.Bit, finalizada ? 1 : 0)
-      .query(
-        `UPDATE dbo.Peladas
-         SET DataPelada=@data, Local=@local, NumTimes=@numTimes,
-             Observacao=@obs, Finalizada=@finalizada
-         WHERE Id=@id`
+      await client.query(
+        `UPDATE "Peladas"
+         SET "DataPelada"=$1, "Local"=$2, "NumTimes"=$3, "Observacao"=$4, "Finalizada"=$5
+         WHERE "Id"=$6`,
+        [dataPelada, local || null, times.length, observacao || null, !!finalizada, id]
       );
 
-    await salvarTimesEParticipacoes(tx, id, times, participacoes);
-    await tx.commit();
+      await salvarTimesEParticipacoes(client, id, times, participacoes);
+    });
     res.json({ id });
   } catch (err) {
-    await tx.rollback().catch(() => {});
     console.error('[peladas:update]', err.message);
     res.status(500).json({ error: 'Erro ao atualizar pelada.' });
   }
@@ -242,24 +198,16 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
 // DELETE /api/peladas/:id  (admin)
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const pool = await getPool();
-  const tx = new sql.Transaction(pool);
   try {
-    await tx.begin();
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.PeladaComentarios WHERE PeladaId = @id');
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.PeladaPresencas WHERE PeladaId = @id');
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.PeladaParticipacoes WHERE PeladaId = @id');
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.PeladaTimes WHERE PeladaId = @id');
-    await new sql.Request(tx).input('id', sql.Int, id)
-      .query('DELETE FROM dbo.Peladas WHERE Id = @id');
-    await tx.commit();
+    await withTransaction(async (client) => {
+      await client.query('DELETE FROM "PeladaComentarios" WHERE "PeladaId" = $1', [id]);
+      await client.query('DELETE FROM "PeladaPresencas" WHERE "PeladaId" = $1', [id]);
+      await client.query('DELETE FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [id]);
+      await client.query('DELETE FROM "PeladaTimes" WHERE "PeladaId" = $1', [id]);
+      await client.query('DELETE FROM "Peladas" WHERE "Id" = $1', [id]);
+    });
     res.json({ ok: true });
   } catch (err) {
-    await tx.rollback().catch(() => {});
     console.error('[peladas:delete]', err.message);
     res.status(500).json({ error: 'Erro ao excluir pelada.' });
   }
@@ -269,14 +217,13 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
 router.post('/:id/confirmar', requireAuth, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const pool = await getPool();
-    const jog = await jogadorDoUsuario(pool, req.user.id);
+    const jog = await jogadorDoUsuario(req.user.id);
     if (!jog) return res.status(400).json({ error: 'Seu usuário não tem jogador vinculado.' });
-    await pool.request().input('id', sql.Int, id).input('j', sql.Int, jog)
-      .query(
-        `IF NOT EXISTS (SELECT 1 FROM dbo.PeladaPresencas WHERE PeladaId = @id AND JogadorId = @j)
-         INSERT INTO dbo.PeladaPresencas (PeladaId, JogadorId) VALUES (@id, @j)`
-      );
+    await query(
+      `INSERT INTO "PeladaPresencas" ("PeladaId","JogadorId") VALUES ($1,$2)
+       ON CONFLICT ("PeladaId","JogadorId") DO NOTHING`,
+      [id, jog]
+    );
     res.json({ ok: true, confirmado: true });
   } catch (err) {
     console.error('[peladas:confirmar]', err.message);
@@ -288,11 +235,9 @@ router.post('/:id/confirmar', requireAuth, async (req, res) => {
 router.delete('/:id/confirmar', requireAuth, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const pool = await getPool();
-    const jog = await jogadorDoUsuario(pool, req.user.id);
+    const jog = await jogadorDoUsuario(req.user.id);
     if (jog) {
-      await pool.request().input('id', sql.Int, id).input('j', sql.Int, jog)
-        .query('DELETE FROM dbo.PeladaPresencas WHERE PeladaId = @id AND JogadorId = @j');
+      await query('DELETE FROM "PeladaPresencas" WHERE "PeladaId" = $1 AND "JogadorId" = $2', [id, jog]);
     }
     res.json({ ok: true, confirmado: false });
   } catch (err) {
@@ -305,14 +250,14 @@ router.delete('/:id/confirmar', requireAuth, async (req, res) => {
 router.get('/:id/comentarios', requireAuth, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const pool = await getPool();
-    const r = await pool.request().input('id', sql.Int, id).query(
-      `SELECT c.Id, c.Texto, c.CriadoEm, u.Nome AS AutorNome, u.Usuario AS AutorUsuario
-       FROM dbo.PeladaComentarios c
-       JOIN dbo.Usuarios u ON u.Id = c.UsuarioId
-       WHERE c.PeladaId = @id ORDER BY c.CriadoEm ASC`
+    const r = await query(
+      `SELECT c."Id", c."Texto", c."CriadoEm", u."Nome" AS "AutorNome", u."Usuario" AS "AutorUsuario"
+       FROM "PeladaComentarios" c
+       JOIN "Usuarios" u ON u."Id" = c."UsuarioId"
+       WHERE c."PeladaId" = $1 ORDER BY c."CriadoEm" ASC`,
+      [id]
     );
-    res.json(r.recordset);
+    res.json(r.rows);
   } catch (err) {
     console.error('[peladas:comentarios:list]', err.message);
     res.status(500).json({ error: 'Erro ao carregar comentários.' });
@@ -325,18 +270,13 @@ router.post('/:id/comentarios', requireAuth, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const texto = String(req.body.texto || '').trim();
     if (!texto) return res.status(400).json({ error: 'Escreva algo antes de enviar.' });
-    const pool = await getPool();
-    const r = await pool.request()
-      .input('id', sql.Int, id)
-      .input('uid', sql.Int, req.user.id)
-      .input('texto', sql.NVarChar(500), texto.slice(0, 500))
-      .query(
-        `INSERT INTO dbo.PeladaComentarios (PeladaId, UsuarioId, Texto)
-         OUTPUT INSERTED.Id, INSERTED.Texto, INSERTED.CriadoEm
-         VALUES (@id, @uid, @texto)`
-      );
+    const r = await query(
+      `INSERT INTO "PeladaComentarios" ("PeladaId","UsuarioId","Texto")
+       VALUES ($1,$2,$3) RETURNING "Id","Texto","CriadoEm"`,
+      [id, req.user.id, texto.slice(0, 500)]
+    );
     res.status(201).json({
-      ...r.recordset[0],
+      ...r.rows[0],
       AutorNome: req.user.nome,
       AutorUsuario: req.user.usuario,
     });

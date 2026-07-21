@@ -13,7 +13,7 @@ export default function Login() {
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
-  const [stats, setStats] = useState({ TotalPeladas: 0, TotalGols: 0, TotalJogadores: 0 });
+  const [stats, setStats] = useState({ TotalPeladas: 0, TotalJogadores: 0 });
 
   useEffect(() => {
     api.get('/stats/publico').then(setStats).catch(() => {});
@@ -77,7 +77,6 @@ export default function Login() {
 
           <div className="auth-stats">
             <div><div className="n lime">{stats.TotalPeladas}</div><div className="l">Peladas</div></div>
-            <div><div className="n orange">{stats.TotalGols}</div><div className="l">Gols</div></div>
             <div><div className="n navy">{stats.TotalJogadores}</div><div className="l">Jogadores</div></div>
           </div>
         </div>

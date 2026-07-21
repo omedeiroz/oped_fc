@@ -27,3 +27,29 @@ export function formatarDataLonga(iso) {
     weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC',
   });
 }
+
+// Lê um arquivo de imagem, recorta em quadrado (centro) e redimensiona,
+// devolvendo um data URL JPEG comprimido — pronto para enviar ao backend.
+export function redimensionarImagem(file, tamanho = 320, qualidade = 0.85) {
+  return new Promise((resolve, reject) => {
+    const leitor = new FileReader();
+    leitor.onerror = () => reject(new Error('Não foi possível ler o arquivo.'));
+    leitor.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Arquivo não é uma imagem válida.'));
+      img.onload = () => {
+        const lado = Math.min(img.width, img.height);
+        const sx = (img.width - lado) / 2;
+        const sy = (img.height - lado) / 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = tamanho;
+        canvas.height = tamanho;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, lado, lado, 0, 0, tamanho, tamanho);
+        resolve(canvas.toDataURL('image/jpeg', qualidade));
+      };
+      img.src = leitor.result;
+    };
+    leitor.readAsDataURL(file);
+  });
+}

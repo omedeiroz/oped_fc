@@ -142,8 +142,39 @@ select.inp option { background: var(--surface); color: var(--text); }
 .tab.active { color: var(--text); border-bottom-color: var(--accent-orange); }
 
 /* ===================== Avatar ===================== */
-.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 12px var(--font); flex-shrink: 0; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 12px var(--font); flex-shrink: 0; overflow: hidden; }
 .avatar.lg { width: 46px; height: 46px; font-size: 16px; }
+.avatar.xl { width: 88px; height: 88px; font-size: 30px; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ===================== Perfil ===================== */
+.profile-head { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-bottom: 8px; }
+.profile-photo { position: relative; }
+.profile-photo label {
+  position: absolute; bottom: -4px; right: -4px; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-orange); color: #fff; display: grid; place-items: center; cursor: pointer;
+  font-size: 13px; border: 2px solid var(--bg); transition: filter 0.15s;
+}
+.profile-photo label:hover { filter: brightness(1.08); }
+.profile-name { font: 900 22px var(--font-cond); text-transform: uppercase; }
+.profile-user { color: var(--muted); font-weight: 600; font-size: 13px; }
+.profile-stats { display: flex; gap: 26px; margin-top: 10px; flex-wrap: wrap; }
+.profile-stats .n { font: 900 22px var(--font-cond); }
+.profile-stats .n.orange { color: var(--accent-orange); }
+.profile-stats .n.lime { color: var(--accent-lime); }
+.profile-stats .l { font: 600 10px var(--font); text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+.hist-row { display: flex; align-items: center; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.hist-row:last-child { border-bottom: none; }
+.hist-row:hover .ht { color: var(--accent-orange); }
+.hist-row .hd { font: 800 18px var(--font-cond); color: var(--text); width: 64px; flex-shrink: 0; }
+.hist-row .hd small { display: block; font: 600 10px var(--font); color: var(--muted); text-transform: uppercase; }
+.hist-row .hi { flex: 1; min-width: 0; }
+.hist-row .ht { font: 700 14px var(--font); transition: color 0.15s; }
+.hist-row .hs { font: 600 12px var(--font); color: var(--muted); margin-top: 2px; }
+.hist-row .hg { display: flex; gap: 10px; align-items: center; font: 700 13px var(--font); white-space: nowrap; }
+.hist-row .hg .g { color: var(--accent-orange); }
+.hist-row .hg .a { color: var(--muted); }
 
 /* ===================== Ranking ===================== */
 .head-stats { display: flex; gap: 24px; }

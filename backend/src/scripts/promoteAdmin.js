@@ -1,23 +1,19 @@
-// Promove um usuário a administrador pelo email.
-// Uso: node src/scripts/promoteAdmin.js email@dominio.com
-const { sql, getPool } = require('../db');
+// Promove um usuário a administrador pelo nome de usuário (login).
+// Uso: node src/scripts/promoteAdmin.js arthur.pereira
+const { pool } = require('../db');
 
 (async () => {
-  const email = (process.argv[2] || '').trim().toLowerCase();
-  if (!email) {
-    console.error('Uso: node src/scripts/promoteAdmin.js email@dominio.com');
+  const usuario = (process.argv[2] || '').trim().toLowerCase();
+  if (!usuario) {
+    console.error('Uso: node src/scripts/promoteAdmin.js nome.usuario');
     process.exit(1);
   }
   try {
-    const pool = await getPool();
-    const r = await pool
-      .request()
-      .input('email', sql.NVarChar(160), email)
-      .query('UPDATE dbo.Usuarios SET IsAdmin = 1 WHERE Email = @email');
-    if (r.rowsAffected[0] > 0) {
-      console.log(`✅ ${email} agora é administrador.`);
+    const r = await pool.query('UPDATE "Usuarios" SET "IsAdmin" = true WHERE "Usuario" = $1', [usuario]);
+    if (r.rowCount > 0) {
+      console.log(`✅ ${usuario} agora é administrador.`);
     } else {
-      console.log(`⚠️  Nenhum usuário encontrado com o email ${email}.`);
+      console.log(`⚠️  Nenhum usuário encontrado com o login ${usuario}.`);
     }
     process.exit(0);
   } catch (err) {

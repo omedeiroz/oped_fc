@@ -1,5 +1,5 @@
 const express = require('express');
-const { sql, getPool } = require('../db');
+const { query } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
@@ -7,15 +7,13 @@ const router = express.Router();
 // GET /api/jogadores  -> lista de jogadores ativos (para sugerir ao montar pelada)
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const pool = await getPool();
-    const r = await pool.request().query(
-      `SELECT j.Id, j.Nome, j.UsuarioId,
-              CAST(CASE WHEN j.UsuarioId IS NULL THEN 0 ELSE 1 END AS BIT) AS TemLogin
-       FROM dbo.Jogadores j
-       WHERE j.Ativo = 1
-       ORDER BY j.Nome`
+    const r = await query(
+      `SELECT j."Id", j."Nome", j."UsuarioId", (j."UsuarioId" IS NOT NULL) AS "TemLogin"
+       FROM "Jogadores" j
+       WHERE j."Ativo" = true
+       ORDER BY j."Nome"`
     );
-    res.json(r.recordset);
+    res.json(r.rows);
   } catch (err) {
     console.error('[jogadores:list]', err.message);
     res.status(500).json({ error: 'Erro ao listar jogadores.' });
@@ -28,20 +26,37 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
     const nome = String(req.body.nome || '').trim();
     if (!nome) return res.status(400).json({ error: 'Informe o nome do jogador.' });
 
-    const pool = await getPool();
-    const r = await pool
-      .request()
-      .input('nome', sql.NVarChar(120), nome)
-      .query(
-        `INSERT INTO dbo.Jogadores (Nome)
-         OUTPUT INSERTED.Id, INSERTED.Nome, INSERTED.UsuarioId,
-                CAST(0 AS BIT) AS TemLogin
-         VALUES (@nome)`
-      );
-    res.status(201).json(r.recordset[0]);
+    const r = await query(
+      `INSERT INTO "Jogadores" ("Nome") VALUES ($1)
+       RETURNING "Id","Nome","UsuarioId", false AS "TemLogin"`,
+      [nome]
+    );
+    res.status(201).json(r.rows[0]);
   } catch (err) {
     console.error('[jogadores:create]', err.message);
     res.status(500).json({ error: 'Erro ao criar jogador.' });
+  }
+});
+
+// GET /api/jogadores/:id/historico -> peladas que o jogador participou, mais recente primeiro
+router.get('/:id/historico', requireAuth, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const r = await query(
+      `SELECT p."Id" AS "PeladaId", p."DataPelada", p."Local", p."Finalizada",
+              t."Nome" AS "TimeNome", t."Vitorias", t."Empates", t."Derrotas",
+              pp."Gols", pp."Assistencias"
+       FROM "PeladaParticipacoes" pp
+       JOIN "Peladas" p ON p."Id" = pp."PeladaId"
+       LEFT JOIN "PeladaTimes" t ON t."Id" = pp."TimeId"
+       WHERE pp."JogadorId" = $1
+       ORDER BY p."DataPelada" DESC, p."Id" DESC`,
+      [id]
+    );
+    res.json(r.rows);
+  } catch (err) {
+    console.error('[jogadores:historico]', err.message);
+    res.status(500).json({ error: 'Erro ao buscar histórico.' });
   }
 });
 
@@ -49,11 +64,7 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const pool = await getPool();
-    await pool
-      .request()
-      .input('id', sql.Int, id)
-      .query('UPDATE dbo.Jogadores SET Ativo = 0 WHERE Id = @id');
+    await query('UPDATE "Jogadores" SET "Ativo" = false WHERE "Id" = $1', [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error('[jogadores:delete]', err.message);

@@ -1,13 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
-const { getPool } = require('./db');
+const { pool } = require('./db');
 
 const app = express();
+// Aceita qualquer subdomínio *.vercel.app (produção + previews automáticos)
+const VERCEL_ORIGIN = /^https:\/\/[a-z0-9-]+\.vercel\.app$/;
+
 app.use(cors({
   origin(origin, callback) {
-    // Sem Origin (curl, apps nativos) ou dentro da lista liberada
-    if (!origin || config.corsOrigins.includes(origin)) return callback(null, true);
+    // Sem Origin (curl, apps nativos), na lista liberada, ou é um deploy da Vercel
+    if (!origin || config.corsOrigins.includes(origin) || VERCEL_ORIGIN.test(origin)) {
+      return callback(null, true);
+    }
     callback(new Error(`Origem não permitida: ${origin}`));
   },
 }));
@@ -22,8 +27,7 @@ app.use('/api/stats', require('./routes/stats'));
 
 app.get('/api/health', async (req, res) => {
   try {
-    const pool = await getPool();
-    await pool.request().query('SELECT 1 AS ok');
+    await pool.query('SELECT 1 AS ok');
     res.json({ status: 'ok', db: 'conectado' });
   } catch (err) {
     res.status(500).json({ status: 'erro', db: err.message });
@@ -36,7 +40,7 @@ app.listen(config.port, () => {
   console.log(`\n🟢 Pelada OPED FC - API rodando em http://localhost:${config.port}`);
   console.log(`   CORS liberado para: ${config.corsOrigins.join(', ')}`);
   // Aquece a conexão com o banco
-  getPool()
+  pool.query('SELECT 1')
     .then(() => console.log('   Banco: conectado ✅'))
     .catch((err) => console.error('   Banco: FALHA ❌\n', err.message));
 });

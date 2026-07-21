@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
+import { iniciais, corDoNome } from '../utils';
 
 function lerTema() {
   return document.documentElement.getAttribute('data-theme') || 'light';
@@ -34,6 +35,7 @@ export default function Layout() {
           <nav className="nav">
             <NavLink to="/" end>Ranking</NavLink>
             <NavLink to="/peladas">Peladas</NavLink>
+            <NavLink to="/perfil">Perfil</NavLink>
             {user?.isAdmin && <NavLink to="/admin/usuarios">Usuários</NavLink>}
           </nav>
           <span className="spacer" />
@@ -41,6 +43,9 @@ export default function Layout() {
             <button className="theme-toggle" onClick={alternarTema} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
               {tema === 'dark' ? '☀️' : '🌙'}
             </button>
+            <NavLink to="/perfil" className="avatar sm" style={{ background: corDoNome(user?.nome) }}>
+              {user?.foto ? <img src={user.foto} alt="" /> : iniciais(user?.nome)}
+            </NavLink>
             <span className="who">{user?.nome?.split(' ')[0]}</span>
             {user?.isAdmin && <span className="tag-admin">admin</span>}
             <button className="txt-muted" style={{ color: 'rgba(255,255,255,0.7)' }} onClick={sair}>Sair</button>
