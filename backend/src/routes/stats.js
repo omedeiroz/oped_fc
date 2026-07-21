@@ -19,21 +19,24 @@ router.get('/publico', async (req, res) => {
   }
 });
 
-// GET /api/stats  -> ranking consolidado por jogador
+// GET /api/stats  -> ranking consolidado por jogador (todos os jogadores ativos,
+// mesmo sem nenhuma pelada — aparecem zerados e ficam no fim da ordenação)
 // Cada linha: Jogos, Gols, Assistencias, Participacoes (G+A), Vitorias (do time em que jogou)
 router.get('/', requireAuth, async (req, res) => {
   try {
     const r = await query(
-      `SELECT j."Id", j."Nome",
+      `SELECT j."Id", j."Nome", u."Foto",
               COUNT(DISTINCT pp."PeladaId")::int      AS "Jogos",
               COALESCE(SUM(pp."Gols"), 0)::int         AS "Gols",
               COALESCE(SUM(pp."Assistencias"), 0)::int AS "Assistencias",
               (COALESCE(SUM(pp."Gols"), 0) + COALESCE(SUM(pp."Assistencias"), 0))::int AS "Participacoes",
               COALESCE(SUM(t."Vitorias"), 0)::int      AS "Vitorias"
        FROM "Jogadores" j
-       JOIN "PeladaParticipacoes" pp ON pp."JogadorId" = j."Id"
+       LEFT JOIN "Usuarios" u ON u."Id" = j."UsuarioId"
+       LEFT JOIN "PeladaParticipacoes" pp ON pp."JogadorId" = j."Id"
        LEFT JOIN "PeladaTimes" t ON t."Id" = pp."TimeId"
-       GROUP BY j."Id", j."Nome"
+       WHERE j."Ativo" = true
+       GROUP BY j."Id", j."Nome", u."Foto"
        ORDER BY "Gols" DESC, "Assistencias" DESC, j."Nome"`
     );
     res.json(r.rows);

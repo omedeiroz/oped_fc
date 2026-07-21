@@ -59,10 +59,13 @@ export default function Dashboard() {
           <div className="rank-list">
             {ranking.map((j, i) => {
               const sou = user?.nome && j.Nome === user.nome;
+              const destaque = i === 0 && j[ordem] > 0;
               return (
-                <div className={`rank-row ${i === 0 ? 'top' : ''} ${sou ? 'me' : ''}`} key={j.Id}>
+                <div className={`rank-row ${destaque ? 'top' : ''} ${sou ? 'me' : ''}`} key={j.Id}>
                   <span className="pos">{i + 1}</span>
-                  <span className="avatar" style={{ background: corDoNome(j.Nome) }}>{iniciais(j.Nome)}</span>
+                  <span className="avatar" style={{ background: corDoNome(j.Nome) }}>
+                    {j.Foto ? <img src={j.Foto} alt="" /> : iniciais(j.Nome)}
+                  </span>
                   <span className="nm">
                     {j.Nome}
                     <span className="sub" style={{ display: 'block' }}>{j.Jogos} jogos · {j.Gols}G · {j.Assistencias}A</span>
