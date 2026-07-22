@@ -10,6 +10,8 @@ const ORDENACOES = [
   { key: 'Vitorias', label: '🏆 Vitórias' },
   { key: 'Jogos', label: '📅 Presença' },
   { key: 'NotaMedia', label: '⭐ Nota' },
+  { key: 'Mvps', label: '🥇 MVP' },
+  { key: 'Lvps', label: '💩 LVP' },
 ];
 
 export default function Dashboard() {
@@ -64,6 +66,10 @@ export default function Dashboard() {
               const sou = user?.jogadorId === j.Id;
               const destaque = i === 0 && j[ordem] > 0;
               const ehNota = ordem === 'NotaMedia';
+              const ehMvpOuLvp = ordem === 'Mvps' || ordem === 'Lvps';
+              const sub = ehMvpOuLvp
+                ? `⭐ nota média ${j.NotaMedia != null ? j.NotaMedia.toFixed(1) : '—'}`
+                : `${j.Jogos} jogos · ${j.Gols}G · ${j.Assistencias}A`;
               return (
                 <div
                   className={`rank-row ${destaque ? 'top' : ''} ${sou ? 'me' : ''}`}
@@ -77,11 +83,7 @@ export default function Dashboard() {
                   </span>
                   <span className="nm">
                     {j.Nome}
-                    <span className="sub" style={{ display: 'block' }}>
-                      {ehNota
-                        ? `⭐ ${j.Mvps} MVP · 👎 ${j.Lvps} LVP`
-                        : `${j.Jogos} jogos · ${j.Gols}G · ${j.Assistencias}A`}
-                    </span>
+                    <span className="sub" style={{ display: 'block' }}>{sub}</span>
                   </span>
                   <span className="pts">{ehNota ? (j.NotaMedia != null ? j.NotaMedia.toFixed(1) : '—') : j[ordem]}</span>
                 </div>
