@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 import { formatarData } from '../utils';
+import { EstrelasView } from '../components/Estrelas.jsx';
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -18,18 +19,38 @@ export default function PeladaDetalhe() {
   const [dados, setDados] = useState(null);
   const [comentarios, setComentarios] = useState([]);
   const [novoComentario, setNovoComentario] = useState('');
+  const [votacao, setVotacao] = useState(null);
   const [erro, setErro] = useState('');
+  const [finalizando, setFinalizando] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [d, c] = await Promise.all([api.get(`/peladas/${id}`), api.get(`/peladas/${id}/comentarios`)]);
-        setDados(d); setComentarios(c);
-      } catch (err) {
-        setErro(err.message);
+  async function carregar() {
+    try {
+      const [d, c] = await Promise.all([api.get(`/peladas/${id}`), api.get(`/peladas/${id}/comentarios`)]);
+      setDados(d); setComentarios(c);
+      if (d.pelada.Finalizada) {
+        setVotacao(await api.get(`/peladas/${id}/votacao`));
+      } else {
+        setVotacao(null);
       }
-    })();
-  }, [id]);
+    } catch (err) {
+      setErro(err.message);
+    }
+  }
+
+  useEffect(() => { carregar(); }, [id]);
+
+  async function finalizar() {
+    if (!window.confirm('Finalizar esta pelada? Isso abre a votação de MVP/LVP para os participantes.')) return;
+    setFinalizando(true);
+    try {
+      await api.post(`/peladas/${id}/finalizar`);
+      await carregar();
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setFinalizando(false);
+    }
+  }
 
   const calc = useMemo(() => {
     if (!dados) return null;
@@ -78,6 +99,11 @@ export default function PeladaDetalhe() {
         <Link to="/peladas" className="txt-muted">← Peladas</Link>
         {user?.isAdmin && (
           <div className="row">
+            {!pelada.Finalizada && (
+              <button className="btn btn-lime btn-sm" onClick={finalizar} disabled={finalizando}>
+                {finalizando ? 'Finalizando…' : 'Finalizar pelada →'}
+              </button>
+            )}
             <Link to={`/peladas/${id}/editar`} className="btn btn-outline btn-sm">Editar</Link>
             <button className="btn btn-danger btn-sm" onClick={excluir}>Excluir</button>
           </div>
@@ -96,6 +122,42 @@ export default function PeladaDetalhe() {
         <div className="mvp-pill">🏅 MVP: {calc.mvp.JogadorNome} · {calc.mvp.Gols}G {calc.mvp.Assistencias}A</div>
       )}
 
+      {votacao && votacao.completo && (votacao.mvp || votacao.lvp) && (
+        <div className="mvplvp-grid">
+          {votacao.mvp && (
+            <div className="mvplvp-card mvp">
+              <div>
+                <div className="rotulo">⭐ MVP da galera</div>
+                <div className="nome">{votacao.mvp.nome}</div>
+                <EstrelasView valor={votacao.mvp.media} tamanho={16} />
+              </div>
+            </div>
+          )}
+          {votacao.lvp && votacao.lvp.jogadorId !== votacao.mvp?.jogadorId && (
+            <div className="mvplvp-card lvp">
+              <div>
+                <div className="rotulo">👎 LVP da galera</div>
+                <div className="nome">{votacao.lvp.nome}</div>
+                <EstrelasView valor={votacao.lvp.media} tamanho={16} />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {votacao && !votacao.completo && (
+        <div className="next-banner">
+          <span className="bell">⭐</span>
+          <div className="info">
+            <div className="t">Votação de MVP/LVP em andamento</div>
+            <div className="s">{votacao.recebidos} de {votacao.esperado} votos recebidos</div>
+          </div>
+          {votacao.podeVotar && (
+            <Link to={`/peladas/${id}/votar`} className="btn btn-lime btn-sm">Avaliar jogadores →</Link>
+          )}
+        </div>
+      )}
+
       {pelada.Observacao && <div className="card" style={{ marginBottom: 20 }}><p style={{ margin: 0 }}>{pelada.Observacao}</p></div>}
 
       <div className="team-grid">
@@ -109,7 +171,15 @@ export default function PeladaDetalhe() {
               {jogadores.length === 0 && <div className="mini">Sem jogadores</div>}
               {jogadores.map((p) => (
                 <div className="team-line" key={p.Id}>
-                  <span className="n">{p.JogadorNome}</span>
+                  <Link
+                    to={user?.jogadorId === p.JogadorId ? '/perfil' : `/jogador/${p.JogadorId}`}
+                    className="n"
+                    style={{ textDecoration: 'underline', textDecorationColor: 'transparent' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = 'currentcolor'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = 'transparent'; }}
+                  >
+                    {p.JogadorNome}
+                  </Link>
                   <span>
                     {p.Gols > 0 && <span className="g">⚽ {p.Gols} </span>}
                     {p.Assistencias > 0 && <span className="a">🅰️ {p.Assistencias}</span>}

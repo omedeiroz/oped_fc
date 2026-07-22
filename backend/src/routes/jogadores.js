@@ -38,6 +38,26 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// GET /api/jogadores/:id -> dados públicos do jogador (para ver o perfil de outros)
+router.get('/:id', requireAuth, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const r = await query(
+      `SELECT j."Id", j."Nome", u."Usuario", u."Foto"
+       FROM "Jogadores" j
+       LEFT JOIN "Usuarios" u ON u."Id" = j."UsuarioId"
+       WHERE j."Id" = $1`,
+      [id]
+    );
+    if (r.rows.length === 0) return res.status(404).json({ error: 'Jogador não encontrado.' });
+    const j = r.rows[0];
+    res.json({ jogadorId: j.Id, nome: j.Nome, usuario: j.Usuario || null, foto: j.Foto || null });
+  } catch (err) {
+    console.error('[jogadores:get]', err.message);
+    res.status(500).json({ error: 'Erro ao buscar jogador.' });
+  }
+});
+
 // GET /api/jogadores/:id/historico -> peladas que o jogador participou, mais recente primeiro
 router.get('/:id/historico', requireAuth, async (req, res) => {
   try {

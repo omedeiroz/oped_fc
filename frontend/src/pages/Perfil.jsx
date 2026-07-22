@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 import { iniciais, corDoNome, redimensionarImagem } from '../utils';
@@ -11,20 +11,45 @@ function dataCurta(iso) {
 }
 
 export default function Perfil() {
+  const { id } = useParams(); // presente = vendo o perfil de outra pessoa
   const { user, atualizarFoto } = useAuth();
   const navigate = useNavigate();
+  const ehOutro = Boolean(id);
+
+  const [pessoa, setPessoa] = useState(null); // { jogadorId, nome, usuario, foto }
   const [historico, setHistorico] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
 
   useEffect(() => {
-    if (!user?.jogadorId) { setCarregando(false); return; }
-    api.get(`/jogadores/${user.jogadorId}/historico`)
-      .then(setHistorico)
-      .catch((err) => setErro(err.message))
-      .finally(() => setCarregando(false));
-  }, [user?.jogadorId]);
+    setCarregando(true);
+    setErro('');
+
+    async function carregar() {
+      try {
+        let jogadorId;
+        if (ehOutro) {
+          const j = await api.get(`/jogadores/${id}`);
+          setPessoa({ jogadorId: j.jogadorId, nome: j.nome, usuario: j.usuario, foto: j.foto });
+          jogadorId = j.jogadorId;
+        } else {
+          setPessoa({ jogadorId: user?.jogadorId, nome: user?.nome, usuario: user?.usuario, foto: user?.foto });
+          jogadorId = user?.jogadorId;
+        }
+        if (jogadorId) {
+          setHistorico(await api.get(`/jogadores/${jogadorId}/historico`));
+        } else {
+          setHistorico([]);
+        }
+      } catch (err) {
+        setErro(err.message);
+      } finally {
+        setCarregando(false);
+      }
+    }
+    if (ehOutro || user) carregar();
+  }, [ehOutro, id, user]);
 
   const totais = useMemo(() => historico.reduce((acc, h) => ({
     jogos: acc.jogos + 1,
@@ -43,6 +68,7 @@ export default function Perfil() {
       const dataUrl = await redimensionarImagem(file, 320, 0.85);
       const r = await api.put('/usuarios/me/foto', { foto: dataUrl });
       atualizarFoto(r.foto);
+      setPessoa((prev) => (prev ? { ...prev, foto: r.foto } : prev));
     } catch (err) {
       setErro(err.message);
     } finally {
@@ -50,23 +76,30 @@ export default function Perfil() {
     }
   }
 
-  if (!user) return null;
+  if (!pessoa && carregando) return <div className="loading">Carregando…</div>;
+  if (!pessoa) return null;
 
   return (
     <div>
+      {ehOutro && <button className="txt-muted" onClick={() => navigate(-1)} style={{ marginBottom: 14 }}>← Voltar</button>}
+
       <div className="profile-head">
         <div className="profile-photo">
-          <div className="avatar xl" style={{ background: corDoNome(user.nome) }}>
-            {user.foto ? <img src={user.foto} alt={user.nome} /> : iniciais(user.nome)}
+          <div className="avatar xl" style={{ background: corDoNome(pessoa.nome) }}>
+            {pessoa.foto ? <img src={pessoa.foto} alt={pessoa.nome} /> : iniciais(pessoa.nome)}
           </div>
-          <label htmlFor="foto-input" title={enviando ? 'Enviando…' : 'Alterar foto'}>
-            {enviando ? '…' : '✎'}
-          </label>
-          <input id="foto-input" type="file" accept="image/png,image/jpeg,image/webp" style={{ display: 'none' }} onChange={trocarFoto} disabled={enviando} />
+          {!ehOutro && (
+            <>
+              <label htmlFor="foto-input" title={enviando ? 'Enviando…' : 'Alterar foto'}>
+                {enviando ? '…' : '✎'}
+              </label>
+              <input id="foto-input" type="file" accept="image/png,image/jpeg,image/webp" style={{ display: 'none' }} onChange={trocarFoto} disabled={enviando} />
+            </>
+          )}
         </div>
         <div>
-          <div className="profile-name">{user.nome}</div>
-          <div className="profile-user">@{user.usuario}</div>
+          <div className="profile-name">{pessoa.nome}</div>
+          {pessoa.usuario && <div className="profile-user">@{pessoa.usuario}</div>}
           <div className="profile-stats">
             <div><div className="n">{totais.jogos}</div><div className="l">Jogos</div></div>
             <div><div className="n orange">{totais.gols}</div><div className="l">Gols</div></div>
@@ -80,12 +113,12 @@ export default function Perfil() {
 
       <h1 className="page-title" style={{ fontSize: 18, marginTop: 30, marginBottom: 14 }}>Histórico de peladas</h1>
 
-      {!user.jogadorId ? (
-        <div className="empty"><div className="big">🙈</div>Nenhum jogador vinculado à sua conta.</div>
+      {!pessoa.jogadorId ? (
+        <div className="empty"><div className="big">🙈</div>Nenhum jogador vinculado a essa conta.</div>
       ) : carregando ? (
         <div className="loading">Carregando…</div>
       ) : historico.length === 0 ? (
-        <div className="empty"><div className="big">⚽</div>Você ainda não participou de nenhuma pelada.</div>
+        <div className="empty"><div className="big">⚽</div>{ehOutro ? 'Ainda não participou de nenhuma pelada.' : 'Você ainda não participou de nenhuma pelada.'}</div>
       ) : (
         <div className="card">
           {historico.map((h) => {

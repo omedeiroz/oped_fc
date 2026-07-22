@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 import { iniciais, corDoNome } from '../utils';
@@ -8,10 +9,12 @@ const ORDENACOES = [
   { key: 'Assistencias', label: '🅰️ Garçons' },
   { key: 'Vitorias', label: '🏆 Vitórias' },
   { key: 'Jogos', label: '📅 Presença' },
+  { key: 'NotaMedia', label: '⭐ Nota' },
 ];
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState([]);
   const [resumo, setResumo] = useState(null);
   const [ordem, setOrdem] = useState('Gols');
@@ -31,10 +34,10 @@ export default function Dashboard() {
     })();
   }, []);
 
-  const ranking = useMemo(
-    () => [...stats].sort((a, b) => b[ordem] - a[ordem] || b.Gols - a.Gols || a.Nome.localeCompare(b.Nome)),
-    [stats, ordem]
-  );
+  const ranking = useMemo(() => {
+    const valor = (j) => (j[ordem] == null ? -1 : j[ordem]);
+    return [...stats].sort((a, b) => valor(b) - valor(a) || b.Gols - a.Gols || a.Nome.localeCompare(b.Nome));
+  }, [stats, ordem]);
 
   return (
     <div>
@@ -58,19 +61,29 @@ export default function Dashboard() {
         ) : (
           <div className="rank-list">
             {ranking.map((j, i) => {
-              const sou = user?.nome && j.Nome === user.nome;
+              const sou = user?.jogadorId === j.Id;
               const destaque = i === 0 && j[ordem] > 0;
+              const ehNota = ordem === 'NotaMedia';
               return (
-                <div className={`rank-row ${destaque ? 'top' : ''} ${sou ? 'me' : ''}`} key={j.Id}>
+                <div
+                  className={`rank-row ${destaque ? 'top' : ''} ${sou ? 'me' : ''}`}
+                  key={j.Id}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate(sou ? '/perfil' : `/jogador/${j.Id}`)}
+                >
                   <span className="pos">{i + 1}</span>
                   <span className="avatar" style={{ background: corDoNome(j.Nome) }}>
                     {j.Foto ? <img src={j.Foto} alt="" /> : iniciais(j.Nome)}
                   </span>
                   <span className="nm">
                     {j.Nome}
-                    <span className="sub" style={{ display: 'block' }}>{j.Jogos} jogos · {j.Gols}G · {j.Assistencias}A</span>
+                    <span className="sub" style={{ display: 'block' }}>
+                      {ehNota
+                        ? `⭐ ${j.Mvps} MVP · 👎 ${j.Lvps} LVP`
+                        : `${j.Jogos} jogos · ${j.Gols}G · ${j.Assistencias}A`}
+                    </span>
                   </span>
-                  <span className="pts">{j[ordem]}</span>
+                  <span className="pts">{ehNota ? (j.NotaMedia != null ? j.NotaMedia.toFixed(1) : '—') : j[ordem]}</span>
                 </div>
               );
             })}

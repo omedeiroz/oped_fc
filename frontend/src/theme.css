@@ -274,6 +274,32 @@ select.inp option { background: var(--surface); color: var(--text); }
 :root[data-theme="dark"] .auth-stats .n.navy { color: var(--text); }
 .auth-stats .l { font: 600 9px var(--font); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-top: 2px; }
 
+/* ===================== Estrelas (MVP/LVP) ===================== */
+.estrelas { display: inline-flex; gap: 4px; }
+.estrela-wrap { position: relative; display: inline-block; line-height: 1; }
+.estrela-fundo { color: var(--border); position: absolute; inset: 0; }
+.estrela-preenchida { color: var(--accent-orange); position: absolute; inset: 0; overflow: hidden; white-space: nowrap; }
+.estrela-hit { position: absolute; top: 0; bottom: 0; width: 50%; background: transparent; border: none; cursor: pointer; padding: 0; }
+.estrela-hit.esquerda { left: 0; }
+.estrela-hit.direita { right: 0; }
+
+.votar-linha { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.votar-linha:last-child { border-bottom: none; }
+.votar-linha .nm { flex: 1; font: 700 14px var(--font); }
+.votar-linha .valor-nota { font: 800 15px var(--font-cond); color: var(--accent-orange); width: 34px; text-align: right; }
+
+.mvplvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.mvplvp-card { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow); }
+.mvplvp-card.mvp { border-color: var(--accent-orange); }
+.mvplvp-card.lvp { border-color: var(--muted); opacity: 0.9; }
+.mvplvp-card .rotulo { font: 700 10px var(--font); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.mvplvp-card .nome { font: 700 14px var(--font); margin: 2px 0 4px; }
+
+.pendente-card { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--accent-orange); border-radius: var(--radius-card); padding: 14px 18px; margin-bottom: 12px; cursor: pointer; }
+.pendente-card .info { flex: 1; }
+.pendente-card .t { font: 700 14px var(--font); }
+.pendente-card .s { font: 600 12px var(--font); color: var(--muted); margin-top: 2px; }
+
 /* ===================== Diversos ===================== */
 .alert { padding: 12px 14px; border-radius: var(--radius); margin-bottom: 16px; font: 600 13px var(--font); }
 .alert-error { background: rgba(221,51,51,0.1); border: 1px solid #e88; color: #c22; }

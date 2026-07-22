@@ -77,3 +77,18 @@ CREATE TABLE IF NOT EXISTS "PeladaPresencas" (
     "CriadoEm"  TIMESTAMP NOT NULL DEFAULT NOW(),
     CONSTRAINT "UQ_Presenca" UNIQUE ("PeladaId", "JogadorId")
 );
+
+-- Avaliação de 0.5 a 5 estrelas (MVP/LVP): cada jogador avalia os demais
+-- participantes de uma pelada finalizada, exceto a si mesmo.
+CREATE TABLE IF NOT EXISTS "PeladaVotos" (
+    "Id"                SERIAL PRIMARY KEY,
+    "PeladaId"          INT NOT NULL REFERENCES "Peladas"("Id"),
+    "VotanteJogadorId"  INT NOT NULL REFERENCES "Jogadores"("Id"),
+    "AvaliadoJogadorId" INT NOT NULL REFERENCES "Jogadores"("Id"),
+    "Nota"              NUMERIC(2,1) NOT NULL,
+    "CriadoEm"          TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT "UQ_Voto" UNIQUE ("PeladaId", "VotanteJogadorId", "AvaliadoJogadorId"),
+    CONSTRAINT "CK_Voto_NaoSelf" CHECK ("VotanteJogadorId" <> "AvaliadoJogadorId"),
+    CONSTRAINT "CK_Voto_Nota" CHECK ("Nota" IN (0.5,1,1.5,2,2.5,3,3.5,4,4.5,5))
+);
+CREATE INDEX IF NOT EXISTS "IX_Voto_PeladaId" ON "PeladaVotos"("PeladaId");

@@ -19,14 +19,17 @@ export default function Peladas() {
   const navigate = useNavigate();
   const [peladas, setPeladas] = useState([]);
   const [proxima, setProxima] = useState(null);
+  const [pendentes, setPendentes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
 
   useEffect(() => {
     (async () => {
       try {
-        const [p, prox] = await Promise.all([api.get('/peladas'), api.get('/peladas/proxima')]);
-        setPeladas(p); setProxima(prox);
+        const [p, prox, pend] = await Promise.all([
+          api.get('/peladas'), api.get('/peladas/proxima'), api.get('/peladas/pendentes-votacao'),
+        ]);
+        setPeladas(p); setProxima(prox); setPendentes(pend);
       } catch (err) {
         setErro(err.message);
       } finally {
@@ -69,6 +72,21 @@ export default function Peladas() {
           <button className={proxima.confirmadoPorMim ? 'btn btn-outline btn-sm' : 'btn btn-lime btn-sm'} onClick={toggleConfirmar}>
             {proxima.confirmadoPorMim ? '✓ Confirmado' : 'Confirmar presença'}
           </button>
+        </div>
+      )}
+
+      {pendentes.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          {pendentes.map((p) => (
+            <div className="pendente-card" key={p.Id} onClick={() => navigate(`/peladas/${p.Id}/votar`)}>
+              <span style={{ fontSize: 22 }}>⭐</span>
+              <div className="info">
+                <div className="t">Avalie a pelada de {dataLonga(p.DataPelada)}</div>
+                <div className="s">{p.Local || 'Pelada'} · faltam {p.faltam} avaliações suas</div>
+              </div>
+              <span className="btn btn-lime btn-sm">Avaliar →</span>
+            </div>
+          ))}
         </div>
       )}
 

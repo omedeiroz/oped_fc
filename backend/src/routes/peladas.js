@@ -1,6 +1,7 @@
 const express = require('express');
 const { query, withTransaction } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { calcularResultado, NOTAS_VALIDAS } = require('../services/votacao');
 
 const router = express.Router();
 
@@ -104,6 +105,44 @@ router.get('/proxima', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/peladas/pendentes-votacao -> peladas finalizadas onde participei e ainda faltam votos meus
+router.get('/pendentes-votacao', requireAuth, async (req, res) => {
+  try {
+    const meuJogador = await jogadorDoUsuario(req.user.id);
+    if (!meuJogador) return res.json([]);
+
+    const r = await query(
+      `SELECT p."Id", p."DataPelada", p."Local"
+       FROM "Peladas" p
+       JOIN "PeladaParticipacoes" pp ON pp."PeladaId" = p."Id" AND pp."JogadorId" = $1
+       WHERE p."Finalizada" = true
+       ORDER BY p."DataPelada" DESC`,
+      [meuJogador]
+    );
+
+    const pendentes = [];
+    for (const p of r.rows) {
+      const outros = await query(
+        `SELECT pp."JogadorId" AS "Id" FROM "PeladaParticipacoes" pp WHERE pp."PeladaId" = $1 AND pp."JogadorId" <> $2`,
+        [p.Id, meuJogador]
+      );
+      if (outros.rows.length === 0) continue;
+
+      const meusVotos = await query(
+        `SELECT "AvaliadoJogadorId" FROM "PeladaVotos" WHERE "PeladaId" = $1 AND "VotanteJogadorId" = $2`,
+        [p.Id, meuJogador]
+      );
+      const jaVotei = new Set(meusVotos.rows.map((v) => v.AvaliadoJogadorId));
+      const faltam = outros.rows.filter((o) => !jaVotei.has(o.Id)).length;
+      if (faltam > 0) pendentes.push({ ...p, faltam });
+    }
+    res.json(pendentes);
+  } catch (err) {
+    console.error('[peladas:pendentes-votacao]', err.message);
+    res.status(500).json({ error: 'Erro ao buscar peladas pendentes de votação.' });
+  }
+});
+
 // GET /api/peladas/:id -> detalhe completo
 router.get('/:id', requireAuth, async (req, res) => {
   try {
@@ -200,6 +239,7 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
   try {
     await withTransaction(async (client) => {
+      await client.query('DELETE FROM "PeladaVotos" WHERE "PeladaId" = $1', [id]);
       await client.query('DELETE FROM "PeladaComentarios" WHERE "PeladaId" = $1', [id]);
       await client.query('DELETE FROM "PeladaPresencas" WHERE "PeladaId" = $1', [id]);
       await client.query('DELETE FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [id]);
@@ -283,6 +323,127 @@ router.post('/:id/comentarios', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('[peladas:comentarios:create]', err.message);
     res.status(500).json({ error: 'Erro ao enviar comentário.' });
+  }
+});
+
+// POST /api/peladas/:id/finalizar  (admin) -> fecha a pelada e abre a votação MVP/LVP
+router.post('/:id/finalizar', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const r = await query(
+      `UPDATE "Peladas" SET "Finalizada" = true WHERE "Id" = $1 RETURNING "Id"`,
+      [id]
+    );
+    if (r.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[peladas:finalizar]', err.message);
+    res.status(500).json({ error: 'Erro ao finalizar pelada.' });
+  }
+});
+
+// GET /api/peladas/:id/votacao -> estado da votação MVP/LVP (para a tela de votar + resultado)
+router.get('/:id/votacao', requireAuth, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const pelada = await query('SELECT "Id","Finalizada" FROM "Peladas" WHERE "Id" = $1', [id]);
+    if (pelada.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+    if (!pelada.rows[0].Finalizada) {
+      return res.status(400).json({ error: 'Essa pelada ainda não foi finalizada.' });
+    }
+
+    const meuJogador = await jogadorDoUsuario(req.user.id);
+
+    const participantesRes = await query(
+      `SELECT j."Id", j."Nome", u."Foto"
+       FROM "PeladaParticipacoes" pp
+       JOIN "Jogadores" j ON j."Id" = pp."JogadorId"
+       LEFT JOIN "Usuarios" u ON u."Id" = j."UsuarioId"
+       WHERE pp."PeladaId" = $1
+       ORDER BY j."Nome"`,
+      [id]
+    );
+
+    let meusVotos = {};
+    if (meuJogador) {
+      const mv = await query(
+        `SELECT "AvaliadoJogadorId","Nota" FROM "PeladaVotos" WHERE "PeladaId" = $1 AND "VotanteJogadorId" = $2`,
+        [id, meuJogador]
+      );
+      mv.rows.forEach((v) => { meusVotos[v.AvaliadoJogadorId] = Number(v.Nota); });
+    }
+
+    const podeVotar = !!meuJogador && participantesRes.rows.some((p) => p.Id === meuJogador);
+    const outros = participantesRes.rows
+      .filter((p) => p.Id !== meuJogador)
+      .map((p) => ({ jogadorId: p.Id, nome: p.Nome, foto: p.Foto || null, nota: meusVotos[p.Id] ?? null }));
+
+    const resultado = await calcularResultado(id);
+
+    res.json({
+      podeVotar,
+      participantes: outros,
+      completo: resultado.completo,
+      recebidos: resultado.recebidos,
+      esperado: resultado.esperado,
+      mvp: resultado.mvp,
+      lvp: resultado.lvp,
+      medias: resultado.medias,
+    });
+  } catch (err) {
+    console.error('[peladas:votacao:get]', err.message);
+    res.status(500).json({ error: 'Erro ao carregar votação.' });
+  }
+});
+
+// POST /api/peladas/:id/votos { votos: [{ avaliadoJogadorId, nota }] } -> registra/atualiza meus votos
+router.post('/:id/votos', requireAuth, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const votos = Array.isArray(req.body.votos) ? req.body.votos : [];
+
+    const pelada = await query('SELECT "Finalizada" FROM "Peladas" WHERE "Id" = $1', [id]);
+    if (pelada.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+    if (!pelada.rows[0].Finalizada) {
+      return res.status(400).json({ error: 'Essa pelada ainda não foi finalizada.' });
+    }
+
+    const meuJogador = await jogadorDoUsuario(req.user.id);
+    if (!meuJogador) return res.status(400).json({ error: 'Seu usuário não tem jogador vinculado.' });
+
+    const participantes = await query('SELECT "JogadorId" FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [id]);
+    const idsValidos = new Set(participantes.rows.map((p) => p.JogadorId));
+    if (!idsValidos.has(meuJogador)) {
+      return res.status(403).json({ error: 'Você não participou dessa pelada.' });
+    }
+    if (votos.length === 0) {
+      return res.status(400).json({ error: 'Envie ao menos uma avaliação.' });
+    }
+
+    for (const v of votos) {
+      const alvo = parseInt(v.avaliadoJogadorId, 10);
+      const nota = Number(v.nota);
+      if (alvo === meuJogador) return res.status(400).json({ error: 'Você não pode votar em si mesmo.' });
+      if (!idsValidos.has(alvo)) return res.status(400).json({ error: 'Jogador avaliado não participou dessa pelada.' });
+      if (!NOTAS_VALIDAS.has(nota)) return res.status(400).json({ error: 'Nota inválida (use de 0.5 a 5, em passos de 0.5).' });
+    }
+
+    await withTransaction(async (client) => {
+      for (const v of votos) {
+        await client.query(
+          `INSERT INTO "PeladaVotos" ("PeladaId","VotanteJogadorId","AvaliadoJogadorId","Nota")
+           VALUES ($1,$2,$3,$4)
+           ON CONFLICT ("PeladaId","VotanteJogadorId","AvaliadoJogadorId")
+           DO UPDATE SET "Nota" = EXCLUDED."Nota"`,
+          [id, meuJogador, parseInt(v.avaliadoJogadorId, 10), Number(v.nota)]
+        );
+      }
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[peladas:votos:create]', err.message);
+    res.status(500).json({ error: 'Erro ao registrar votos.' });
   }
 });
 

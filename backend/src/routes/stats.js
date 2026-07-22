@@ -1,6 +1,7 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { calcularRankingVotos } = require('../services/votacao');
 
 const router = express.Router();
 
@@ -39,7 +40,19 @@ router.get('/', requireAuth, async (req, res) => {
        GROUP BY j."Id", j."Nome", u."Foto"
        ORDER BY "Gols" DESC, "Assistencias" DESC, j."Nome"`
     );
-    res.json(r.rows);
+
+    const rankingVotos = await calcularRankingVotos();
+    const linhas = r.rows.map((linha) => {
+      const v = rankingVotos[linha.Id];
+      return {
+        ...linha,
+        NotaMedia: v ? v.notaMedia : null,
+        Mvps: v ? v.mvps : 0,
+        Lvps: v ? v.lvps : 0,
+      };
+    });
+
+    res.json(linhas);
   } catch (err) {
     console.error('[stats]', err.message);
     res.status(500).json({ error: 'Erro ao calcular estatísticas.' });
