@@ -58,12 +58,7 @@ export default function PeladaDetalhe() {
     const golsPorTime = times.map((t) => participacoes.filter((p) => p.TimeId === t.Id).reduce((s, p) => s + p.Gols, 0));
     const maxVit = Math.max(-1, ...times.map((t) => t.Vitorias));
     const vencedores = times.filter((t) => t.Vitorias === maxVit && maxVit > 0).map((t) => t.Id);
-    let mvp = null;
-    for (const p of participacoes) {
-      const score = p.Gols + p.Assistencias;
-      if (score > 0 && (!mvp || score > mvp.score)) mvp = { ...p, score };
-    }
-    return { golsPorTime, vencedores, mvp };
+    return { golsPorTime, vencedores };
   }, [dados]);
 
   async function excluir() {
@@ -116,10 +111,6 @@ export default function PeladaDetalhe() {
           <span className="sc">{calc.golsPorTime[0]} – {calc.golsPorTime[1]}</span>
           <span className="tn b">{times[1].Nome}</span>
         </div>
-      )}
-
-      {calc.mvp && (
-        <div className="mvp-pill">🏅 MVP: {calc.mvp.JogadorNome} · {calc.mvp.Gols}G {calc.mvp.Assistencias}A</div>
       )}
 
       {votacao && votacao.completo && (votacao.mvp || votacao.lvp) && (

@@ -215,7 +215,6 @@ select.inp option { background: var(--surface); color: var(--text); }
 .placar .tn.a { color: var(--text); }
 .placar .tn.b { color: var(--muted); }
 .placar .sc { font: 900 44px var(--font-cond); color: var(--accent-orange); }
-.mvp-pill { display: flex; align-items: center; gap: 8px; background: var(--accent-lime); color: var(--accent-on); border-radius: var(--radius-pill); padding: 8px 16px; font: 700 13px var(--font); width: fit-content; margin: 0 auto 26px; }
 .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 24px; }
 .team-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow); }
 .team-card.win { border-top: 3px solid var(--accent-orange); }
