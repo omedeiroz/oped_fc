@@ -243,6 +243,7 @@ select.inp option { background: var(--surface); color: var(--text); }
 .chip { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-lime); color: var(--accent-on); border-radius: var(--radius-pill); padding: 6px 14px; font: 700 12px var(--font); }
 .chip .x { cursor: pointer; font-weight: 800; }
 .chip .x:hover { opacity: 0.6; }
+.wizard-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .preview-teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 .preview-team { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
 .preview-team .pt { font: 700 13px var(--font); margin-bottom: 6px; }
@@ -283,9 +284,11 @@ select.inp option { background: var(--surface); color: var(--text); }
 .estrela-hit.esquerda { left: 0; }
 .estrela-hit.direita { right: 0; }
 
-.votar-linha { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.votar-linha { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .votar-linha:last-child { border-bottom: none; }
-.votar-linha .nm { flex: 1; font: 700 14px var(--font); }
+.votar-quem { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.votar-quem .nm { font: 700 14px var(--font); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.votar-nota-grupo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .votar-linha .valor-nota { font: 800 15px var(--font-cond); color: var(--accent-orange); width: 34px; text-align: right; }
 
 .mvplvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
@@ -314,7 +317,56 @@ select.inp option { background: var(--surface); color: var(--text); }
 .spark i { width: 4px; background: var(--border); border-radius: 1px; display: block; }
 .spark i.hi { background: var(--accent-orange); }
 
-@media (max-width: 620px) {
+/* ===================== Responsivo ===================== */
+@media (max-width: 760px) {
+  .topbar-inner { flex-wrap: wrap; padding: 12px 16px; row-gap: 10px; column-gap: 12px; }
+  .brand { order: 1; }
+  .spacer { display: none; }
+  .userbox { order: 2; margin-left: auto; gap: 10px; }
+  .userbox .who { display: none; }
+  .nav { order: 3; width: 100%; margin-left: 0; gap: 6px 16px; }
+
+  .container { padding: 22px 16px 60px; }
+  h1 { font-size: 24px; }
+
+  .diag-header { padding: 20px 18px 32px; }
+  .diag-title { font-size: 24px; }
+
+  .auth-wrap { padding: 12px; }
+  .auth-head { padding: 26px 22px 36px; }
+  .auth-head .t { font-size: 22px; }
+  .auth-body { padding: 18px 22px 22px; }
+  .auth-stats { gap: 16px; }
+
+  .wizard-cols { grid-template-columns: 1fr; gap: 26px; }
+
+  .placar { gap: 10px; flex-wrap: wrap; }
+  .placar .sc { font-size: 34px; }
+  .placar .tn { font-size: 13px; }
+
+  .rank-row { padding: 10px 12px; gap: 10px; }
+  .rank-row .pts { font-size: 16px; }
+
+  .votar-linha { flex-wrap: wrap; gap: 10px 14px; }
+  .votar-quem { flex-basis: 100%; }
+  .votar-quem .nm { white-space: normal; }
+
+  .profile-head { gap: 16px; }
+  .profile-name { font-size: 19px; }
+
+  .team-grid, .mvplvp-grid, .preview-teams { grid-template-columns: 1fr; }
+
+  .comment-form { flex-wrap: wrap; }
+
   .pelada-grid { grid-template-columns: 1fr; }
-  .head-stats { display: none; }
+
+  .user-line { flex-wrap: wrap; gap: 8px 0; }
+  .user-line .info { flex-basis: 100%; }
+}
+
+@media (max-width: 420px) {
+  .nav { gap: 6px 12px; }
+  .nav a { font-size: 12px; }
+  .brand .txt { font-size: 14px; }
+  .estrelas { gap: 2px; }
 }

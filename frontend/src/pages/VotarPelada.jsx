@@ -76,12 +76,16 @@ export default function VotarPelada() {
           <p style={{ marginBottom: 18 }}>Avalie cada jogador de 0.5 a 5 estrelas. Clique na metade esquerda da estrela para meia nota.</p>
           {dados.participantes.map((p) => (
             <div className="votar-linha" key={p.jogadorId}>
-              <span className="avatar sm" style={{ background: corDoNome(p.nome) }}>
-                {p.foto ? <img src={p.foto} alt="" /> : iniciais(p.nome)}
+              <span className="votar-quem">
+                <span className="avatar sm" style={{ background: corDoNome(p.nome) }}>
+                  {p.foto ? <img src={p.foto} alt="" /> : iniciais(p.nome)}
+                </span>
+                <span className="nm">{p.nome}</span>
               </span>
-              <span className="nm">{p.nome}</span>
-              <EstrelaInput valor={notas[p.jogadorId] || 0} onChange={(n) => definirNota(p.jogadorId, n)} />
-              <span className="valor-nota">{notas[p.jogadorId] ? notas[p.jogadorId].toFixed(1) : '—'}</span>
+              <span className="votar-nota-grupo">
+                <EstrelaInput valor={notas[p.jogadorId] || 0} onChange={(n) => definirNota(p.jogadorId, n)} tamanho={34} />
+                <span className="valor-nota">{notas[p.jogadorId] ? notas[p.jogadorId].toFixed(1) : '—'}</span>
+              </span>
             </div>
           ))}
           <button className="btn" style={{ marginTop: 20 }} disabled={!todasPreenchidas || enviando} onClick={enviar}>

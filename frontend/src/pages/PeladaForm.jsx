@@ -187,7 +187,7 @@ export default function PeladaForm() {
 
       {/* ETAPA 2 — Jogadores */}
       {step === 1 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+        <div className="wizard-cols">
           <div>
             <div className="eyebrow">Adicionar jogadores ({selecionados.length})</div>
             <select className="inp" value={selectValue} onChange={(e) => addJogador(e.target.value)} style={{ marginBottom: 16 }}>
