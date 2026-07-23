@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS "Peladas" (
     "NumTimes"   INT NOT NULL DEFAULT 2,
     "Observacao" VARCHAR(400),
     "Finalizada" BOOLEAN NOT NULL DEFAULT FALSE,
+    "EstatisticasIniciadas" BOOLEAN NOT NULL DEFAULT FALSE,
     "CriadoPor"  INT REFERENCES "Usuarios"("Id"),
     "CriadoEm"   TIMESTAMP NOT NULL DEFAULT NOW()
 );

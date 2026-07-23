@@ -57,7 +57,7 @@ async function salvarTimesEParticipacoes(client, peladaId, times, participacoes)
 router.get('/', requireAuth, async (req, res) => {
   try {
     const r = await query(
-      `SELECT p."Id", p."DataPelada", p."Local", p."NumTimes", p."Observacao", p."Finalizada",
+      `SELECT p."Id", p."DataPelada", p."Local", p."NumTimes", p."Observacao", p."Finalizada", p."EstatisticasIniciadas",
               (SELECT COUNT(*)::int FROM "PeladaParticipacoes" pp WHERE pp."PeladaId" = p."Id") AS "QtdJogadores",
               (SELECT COALESCE(SUM(pp."Gols"),0)::int FROM "PeladaParticipacoes" pp WHERE pp."PeladaId" = p."Id") AS "TotalGols"
        FROM "Peladas" p
@@ -175,9 +175,10 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/peladas  (admin) -> cria pelada completa
+// POST /api/peladas  (admin) -> Parte 1: cria a pelada com data/local/times/jogadores.
+// Sem estatísticas ainda (gols/assistências/V-E-D ficam zerados até a Parte 2).
 router.post('/', requireAuth, requireAdmin, async (req, res) => {
-  const { dataPelada, local, observacao, finalizada } = req.body;
+  const { dataPelada, local, observacao } = req.body;
   const times = Array.isArray(req.body.times) ? req.body.times : [];
   const participacoes = Array.isArray(req.body.participacoes) ? req.body.participacoes : [];
 
@@ -187,9 +188,9 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
   try {
     const peladaId = await withTransaction(async (client) => {
       const ins = await client.query(
-        `INSERT INTO "Peladas" ("DataPelada","Local","NumTimes","Observacao","Finalizada","CriadoPor")
-         VALUES ($1,$2,$3,$4,$5,$6) RETURNING "Id"`,
-        [dataPelada, local || null, times.length, observacao || null, !!finalizada, req.user.id]
+        `INSERT INTO "Peladas" ("DataPelada","Local","NumTimes","Observacao","CriadoPor")
+         VALUES ($1,$2,$3,$4,$5) RETURNING "Id"`,
+        [dataPelada, local || null, times.length, observacao || null, req.user.id]
       );
       const id = ins.rows[0].Id;
       await salvarTimesEParticipacoes(client, id, times, participacoes);
@@ -202,10 +203,12 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/peladas/:id  (admin) -> substitui dados/times/participações
+// PUT /api/peladas/:id  (admin) -> Parte 1: edita dados/times/jogadores (permite re-sortear).
+// Bloqueado assim que a Parte 2 (estatísticas) já foi iniciada, pra não embaralhar
+// jogadores que já têm gols/assistências registrados.
 router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { dataPelada, local, observacao, finalizada } = req.body;
+  const { dataPelada, local, observacao } = req.body;
   const times = Array.isArray(req.body.times) ? req.body.times : [];
   const participacoes = Array.isArray(req.body.participacoes) ? req.body.participacoes : [];
 
@@ -213,6 +216,14 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   if (times.length < 2) return res.status(400).json({ error: 'A pelada precisa de ao menos 2 times.' });
 
   try {
+    const atual = await query('SELECT "EstatisticasIniciadas" FROM "Peladas" WHERE "Id" = $1', [id]);
+    if (atual.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+    if (atual.rows[0].EstatisticasIniciadas) {
+      return res.status(400).json({
+        error: 'Não é possível reorganizar os times: as estatísticas dessa pelada já começaram a ser preenchidas.',
+      });
+    }
+
     await withTransaction(async (client) => {
       // Remove participações e times antigos (ordem importa por causa das FKs)
       await client.query('DELETE FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [id]);
@@ -220,9 +231,9 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
 
       await client.query(
         `UPDATE "Peladas"
-         SET "DataPelada"=$1, "Local"=$2, "NumTimes"=$3, "Observacao"=$4, "Finalizada"=$5
-         WHERE "Id"=$6`,
-        [dataPelada, local || null, times.length, observacao || null, !!finalizada, id]
+         SET "DataPelada"=$1, "Local"=$2, "NumTimes"=$3, "Observacao"=$4
+         WHERE "Id"=$5`,
+        [dataPelada, local || null, times.length, observacao || null, id]
       );
 
       await salvarTimesEParticipacoes(client, id, times, participacoes);
@@ -231,6 +242,47 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('[peladas:update]', err.message);
     res.status(500).json({ error: 'Erro ao atualizar pelada.' });
+  }
+});
+
+// PUT /api/peladas/:id/estatisticas  (admin) -> Parte 2: gols/assistências por jogador
+// e vitórias/empates/derrotas por time. Não mexe na composição dos times.
+router.put('/:id/estatisticas', requireAuth, requireAdmin, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const times = Array.isArray(req.body.times) ? req.body.times : [];
+  const participacoes = Array.isArray(req.body.participacoes) ? req.body.participacoes : [];
+
+  try {
+    const pelada = await query('SELECT "Id" FROM "Peladas" WHERE "Id" = $1', [id]);
+    if (pelada.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+
+    const timesValidos = new Set((await query('SELECT "Id" FROM "PeladaTimes" WHERE "PeladaId" = $1', [id])).rows.map((t) => t.Id));
+    const partValidas = new Set((await query('SELECT "Id" FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [id])).rows.map((p) => p.Id));
+
+    await withTransaction(async (client) => {
+      for (const t of times) {
+        const timeId = parseInt(t.id, 10);
+        if (!timesValidos.has(timeId)) continue;
+        await client.query(
+          `UPDATE "PeladaTimes" SET "Vitorias"=$1, "Empates"=$2, "Derrotas"=$3 WHERE "Id"=$4`,
+          [parseInt(t.vitorias, 10) || 0, parseInt(t.empates, 10) || 0, parseInt(t.derrotas, 10) || 0, timeId]
+        );
+      }
+      for (const p of participacoes) {
+        const partId = parseInt(p.id, 10);
+        if (!partValidas.has(partId)) continue;
+        await client.query(
+          `UPDATE "PeladaParticipacoes" SET "Gols"=$1, "Assistencias"=$2 WHERE "Id"=$3`,
+          [parseInt(p.gols, 10) || 0, parseInt(p.assistencias, 10) || 0, partId]
+        );
+      }
+      await client.query('UPDATE "Peladas" SET "EstatisticasIniciadas" = true WHERE "Id" = $1', [id]);
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[peladas:estatisticas]', err.message);
+    res.status(500).json({ error: 'Erro ao salvar estatísticas.' });
   }
 });
 
@@ -326,15 +378,17 @@ router.post('/:id/comentarios', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/peladas/:id/finalizar  (admin) -> fecha a pelada e abre a votação MVP/LVP
+// POST /api/peladas/:id/finalizar  (admin) -> Parte 3: fecha a pelada e abre a votação MVP/LVP.
+// Exige que a Parte 2 (estatísticas) já tenha sido preenchida.
 router.post('/:id/finalizar', requireAuth, requireAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const r = await query(
-      `UPDATE "Peladas" SET "Finalizada" = true WHERE "Id" = $1 RETURNING "Id"`,
-      [id]
-    );
-    if (r.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+    const atual = await query('SELECT "EstatisticasIniciadas" FROM "Peladas" WHERE "Id" = $1', [id]);
+    if (atual.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
+    if (!atual.rows[0].EstatisticasIniciadas) {
+      return res.status(400).json({ error: 'Adicione as estatísticas da pelada antes de finalizar.' });
+    }
+    await query(`UPDATE "Peladas" SET "Finalizada" = true WHERE "Id" = $1`, [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error('[peladas:finalizar]', err.message);

@@ -9,6 +9,7 @@ import PeladaForm from './pages/PeladaForm.jsx';
 import AdminUsuarios from './pages/AdminUsuarios.jsx';
 import Perfil from './pages/Perfil.jsx';
 import VotarPelada from './pages/VotarPelada.jsx';
+import PeladaEstatisticas from './pages/PeladaEstatisticas.jsx';
 
 function Protected({ children, adminOnly }) {
   const { user, loading } = useAuth();
@@ -46,6 +47,10 @@ export default function App() {
         <Route
           path="/peladas/:id/editar"
           element={<Protected adminOnly><PeladaForm /></Protected>}
+        />
+        <Route
+          path="/peladas/:id/estatisticas"
+          element={<Protected adminOnly><PeladaEstatisticas /></Protected>}
         />
         <Route
           path="/admin/usuarios"

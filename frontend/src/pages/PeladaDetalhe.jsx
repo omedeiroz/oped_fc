@@ -94,12 +94,19 @@ export default function PeladaDetalhe() {
         <Link to="/peladas" className="txt-muted">← Peladas</Link>
         {user?.isAdmin && (
           <div className="row">
+            {!pelada.Finalizada && !pelada.EstatisticasIniciadas && (
+              <Link to={`/peladas/${id}/editar`} className="btn btn-outline btn-sm">Editar times</Link>
+            )}
             {!pelada.Finalizada && (
+              <Link to={`/peladas/${id}/estatisticas`} className="btn btn-outline btn-sm">
+                {pelada.EstatisticasIniciadas ? 'Editar estatísticas' : 'Adicionar estatísticas'}
+              </Link>
+            )}
+            {!pelada.Finalizada && pelada.EstatisticasIniciadas && (
               <button className="btn btn-lime btn-sm" onClick={finalizar} disabled={finalizando}>
                 {finalizando ? 'Finalizando…' : 'Finalizar pelada →'}
               </button>
             )}
-            <Link to={`/peladas/${id}/editar`} className="btn btn-outline btn-sm">Editar</Link>
             <button className="btn btn-danger btn-sm" onClick={excluir}>Excluir</button>
           </div>
         )}
