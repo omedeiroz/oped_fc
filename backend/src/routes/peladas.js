@@ -164,10 +164,13 @@ router.get('/:id', requireAuth, async (req, res) => {
       [id]
     );
 
+    const presencas = await query('SELECT "JogadorId" FROM "PeladaPresencas" WHERE "PeladaId" = $1', [id]);
+
     res.json({
       pelada: pelada.rows[0],
       times: times.rows,
       participacoes: participacoes.rows,
+      confirmados: presencas.rows.map((p) => p.JogadorId),
     });
   } catch (err) {
     console.error('[peladas:get]', err.message);

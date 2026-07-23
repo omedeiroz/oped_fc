@@ -82,6 +82,7 @@ export default function PeladaDetalhe() {
 
   const { pelada, times, participacoes } = dados;
   const doisTimes = times.length === 2;
+  const confirmados = new Set(dados.confirmados || []);
 
   return (
     <div>
@@ -169,15 +170,18 @@ export default function PeladaDetalhe() {
               {jogadores.length === 0 && <div className="mini">Sem jogadores</div>}
               {jogadores.map((p) => (
                 <div className="team-line" key={p.Id}>
-                  <Link
-                    to={user?.jogadorId === p.JogadorId ? '/perfil' : `/jogador/${p.JogadorId}`}
-                    className="n"
-                    style={{ textDecoration: 'underline', textDecorationColor: 'transparent' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = 'currentcolor'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = 'transparent'; }}
-                  >
-                    {p.JogadorNome}
-                  </Link>
+                  <span className="row" style={{ gap: 6 }}>
+                    <Link
+                      to={user?.jogadorId === p.JogadorId ? '/perfil' : `/jogador/${p.JogadorId}`}
+                      className="n"
+                      style={{ textDecoration: 'underline', textDecorationColor: 'transparent' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = 'currentcolor'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = 'transparent'; }}
+                    >
+                      {p.JogadorNome}
+                    </Link>
+                    {confirmados.has(p.JogadorId) && <span className="dot-confirmado" title="Confirmou presença" />}
+                  </span>
                   <span>
                     {p.Gols > 0 && <span className="g">⚽ {p.Gols} </span>}
                     {p.Assistencias > 0 && <span className="a">🅰️ {p.Assistencias}</span>}

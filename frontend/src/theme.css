@@ -236,6 +236,7 @@ select.inp option { background: var(--surface); color: var(--text); }
 .team-line .n { font: 600 13px var(--font); }
 .team-line .g { font: 700 12px var(--font); color: var(--accent-orange); }
 .team-line .a { font: 700 12px var(--font); color: var(--muted); }
+.dot-confirmado { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-lime); flex-shrink: 0; box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-lime) 25%, transparent); }
 .select-time { width: auto; max-width: 140px; flex-shrink: 0; padding: 6px 8px; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; }
 
 .comments .ct { font: 800 13px var(--font-cond); text-transform: uppercase; margin-bottom: 14px; }
