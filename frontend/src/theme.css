@@ -236,6 +236,7 @@ select.inp option { background: var(--surface); color: var(--text); }
 .team-line .n { font: 600 13px var(--font); }
 .team-line .g { font: 700 12px var(--font); color: var(--accent-orange); }
 .team-line .a { font: 700 12px var(--font); color: var(--muted); }
+.select-time { width: auto; max-width: 140px; flex-shrink: 0; padding: 6px 8px; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; }
 
 .comments .ct { font: 800 13px var(--font-cond); text-transform: uppercase; margin-bottom: 14px; }
 .comment { background: var(--bg); border-radius: var(--radius); padding: 9px 12px; margin-bottom: 10px; font: 500 13px var(--font); }
@@ -385,6 +386,9 @@ select.inp option { background: var(--surface); color: var(--text); }
 
   .player-stats-row .n { flex-basis: 100%; }
   .stats-row { gap: 12px 18px; }
+
+  .team-line { flex-wrap: wrap; gap: 6px 0; }
+  .select-time { max-width: none; flex-basis: 100%; }
 }
 
 @media (max-width: 420px) {

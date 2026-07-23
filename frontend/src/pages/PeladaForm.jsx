@@ -276,7 +276,16 @@ export default function PeladaForm() {
                   <input className="inp" value={t.nome} onChange={(e) => alterarTime(idx, 'nome', e.target.value)} style={{ fontWeight: 700, marginBottom: 12 }} />
                   {jogadores.length === 0 && <div className="mini">Nenhum jogador neste time</div>}
                   {jogadores.map((s) => (
-                    <div className="team-line" key={s.jogadorId}><span className="n">{s.nome}</span></div>
+                    <div className="team-line" key={s.jogadorId}>
+                      <span className="n">{s.nome}</span>
+                      <select
+                        className="inp select-time"
+                        value={idx}
+                        onChange={(e) => alterarSelecionado(s.jogadorId, 'timeIndex', parseInt(e.target.value, 10))}
+                      >
+                        {times.map((t2, i2) => <option key={i2} value={i2}>{t2.nome}</option>)}
+                      </select>
+                    </div>
                   ))}
                 </div>
               );
@@ -291,7 +300,7 @@ export default function PeladaForm() {
               {selecionados.filter((s) => s.timeIndex == null).map((s) => (
                 <div className="team-line" key={s.jogadorId}>
                   <span className="n">{s.nome}</span>
-                  <select className="inp" style={{ width: 150 }} value="" onChange={(e) => alterarSelecionado(s.jogadorId, 'timeIndex', parseInt(e.target.value, 10))}>
+                  <select className="inp select-time" value="" onChange={(e) => alterarSelecionado(s.jogadorId, 'timeIndex', parseInt(e.target.value, 10))}>
                     <option value="">Escolher time…</option>
                     {times.map((t, i) => <option key={i} value={i}>{t.nome}</option>)}
                   </select>
