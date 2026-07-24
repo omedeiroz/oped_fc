@@ -69,9 +69,13 @@ export default function Peladas() {
             <div className="t">Próxima: {dataLonga(proxima.DataPelada)}</div>
             <div className="s">{proxima.Local || 'Local a definir'} · {proxima.confirmados} confirmados</div>
           </div>
-          <button className={proxima.confirmadoPorMim ? 'btn btn-outline btn-sm' : 'btn btn-lime btn-sm'} onClick={toggleConfirmar}>
-            {proxima.confirmadoPorMim ? '✓ Confirmado' : 'Confirmar presença'}
-          </button>
+          {proxima.souConvocado ? (
+            <button className={proxima.confirmadoPorMim ? 'btn btn-outline btn-sm' : 'btn btn-lime btn-sm'} onClick={toggleConfirmar}>
+              {proxima.confirmadoPorMim ? '✓ Confirmado' : 'Confirmar presença'}
+            </button>
+          ) : (
+            <span className="mini">Você não foi convocado para essa pelada.</span>
+          )}
         </div>
       )}
 

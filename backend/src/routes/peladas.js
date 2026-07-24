@@ -84,11 +84,14 @@ router.get('/proxima', requireAuth, async (req, res) => {
     const pelada = r.rows[0];
 
     const conf = await query('SELECT COUNT(*)::int AS n FROM "PeladaPresencas" WHERE "PeladaId" = $1', [pelada.Id]);
-    const tot = await query('SELECT COUNT(*)::int AS n FROM "Jogadores" WHERE "Ativo" = true');
+    const tot = await query('SELECT COUNT(*)::int AS n FROM "PeladaParticipacoes" WHERE "PeladaId" = $1', [pelada.Id]);
 
     const jog = await jogadorDoUsuario(req.user.id);
     let confirmadoPorMim = false;
+    let souConvocado = false;
     if (jog) {
+      const p = await query('SELECT 1 FROM "PeladaParticipacoes" WHERE "PeladaId" = $1 AND "JogadorId" = $2', [pelada.Id, jog]);
+      souConvocado = p.rows.length > 0;
       const m = await query('SELECT 1 FROM "PeladaPresencas" WHERE "PeladaId" = $1 AND "JogadorId" = $2', [pelada.Id, jog]);
       confirmadoPorMim = m.rows.length > 0;
     }
@@ -98,6 +101,7 @@ router.get('/proxima', requireAuth, async (req, res) => {
       confirmados: conf.rows[0].n,
       totalJogadores: tot.rows[0].n,
       confirmadoPorMim,
+      souConvocado,
     });
   } catch (err) {
     console.error('[peladas:proxima]', err.message);
@@ -314,6 +318,15 @@ router.post('/:id/confirmar', requireAuth, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     const jog = await jogadorDoUsuario(req.user.id);
     if (!jog) return res.status(400).json({ error: 'Seu usuário não tem jogador vinculado.' });
+
+    const participa = await query(
+      'SELECT 1 FROM "PeladaParticipacoes" WHERE "PeladaId" = $1 AND "JogadorId" = $2',
+      [id, jog]
+    );
+    if (participa.rows.length === 0) {
+      return res.status(403).json({ error: 'Você não foi convocado para essa pelada.' });
+    }
+
     await query(
       `INSERT INTO "PeladaPresencas" ("PeladaId","JogadorId") VALUES ($1,$2)
        ON CONFLICT ("PeladaId","JogadorId") DO NOTHING`,
