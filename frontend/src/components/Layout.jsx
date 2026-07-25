@@ -37,9 +37,11 @@ export default function Layout() {
             <NavLink to="/peladas">Peladas</NavLink>
             <NavLink to="/perfil">Perfil</NavLink>
             {user?.isAdmin && <NavLink to="/admin/usuarios">Usuários</NavLink>}
+            {user?.isBetAdmin && <NavLink to="/admin/apostas">Apostas</NavLink>}
           </nav>
           <span className="spacer" />
           <div className="userbox">
+            <span className="saldo-fichas" title="Suas fichas de aposta">💰 {user?.saldoFichas ?? 0}</span>
             <button className="theme-toggle" onClick={alternarTema} title={tema === 'dark' ? 'Modo claro' : 'Modo escuro'}>
               {tema === 'dark' ? '☀️' : '🌙'}
             </button>

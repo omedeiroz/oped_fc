@@ -1,6 +1,7 @@
 const express = require('express');
 const { query } = require('../db');
-const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { requireAuth, requireAdmin, requireBetAdmin } = require('../middleware/auth');
+const { TIERS_VALIDOS } = require('../services/apostas');
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
 router.get('/', requireAuth, async (req, res) => {
   try {
     const r = await query(
-      `SELECT j."Id", j."Nome", j."UsuarioId", (j."UsuarioId" IS NOT NULL) AS "TemLogin"
+      `SELECT j."Id", j."Nome", j."UsuarioId", j."Tier", (j."UsuarioId" IS NOT NULL) AS "TemLogin"
        FROM "Jogadores" j
        WHERE j."Ativo" = true
        ORDER BY j."Nome"`
@@ -17,6 +18,23 @@ router.get('/', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('[jogadores:list]', err.message);
     res.status(500).json({ error: 'Erro ao listar jogadores.' });
+  }
+});
+
+// PATCH /api/jogadores/:id/tier  { tier: 'S+'|'A'|'B' }  (bet-admin) -> define o tier
+// usado só pra sugerir a odd inicial dos mercados de aposta.
+router.patch('/:id/tier', requireAuth, requireBetAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const tier = String(req.body.tier || '').toUpperCase();
+    if (!TIERS_VALIDOS.has(tier)) {
+      return res.status(400).json({ error: "Tier inválido (use 'S+', 'A' ou 'B')." });
+    }
+    await query('UPDATE "Jogadores" SET "Tier" = $1 WHERE "Id" = $2', [tier, id]);
+    res.json({ ok: true, tier });
+  } catch (err) {
+    console.error('[jogadores:tier]', err.message);
+    res.status(500).json({ error: 'Erro ao atualizar tier.' });
   }
 });
 

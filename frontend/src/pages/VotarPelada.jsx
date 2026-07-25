@@ -11,15 +11,11 @@ export default function VotarPelada() {
   const [notas, setNotas] = useState({}); // jogadorId -> nota
   const [erro, setErro] = useState('');
   const [enviando, setEnviando] = useState(false);
-  const [enviado, setEnviado] = useState(false);
 
   async function carregar() {
     try {
       const d = await api.get(`/peladas/${id}/votacao`);
       setDados(d);
-      const notasIniciais = {};
-      d.participantes.forEach((p) => { if (p.nota != null) notasIniciais[p.jogadorId] = p.nota; });
-      setNotas(notasIniciais);
     } catch (err) {
       setErro(err.message);
     }
@@ -37,8 +33,7 @@ export default function VotarPelada() {
     try {
       const votos = dados.participantes.map((p) => ({ avaliadoJogadorId: p.jogadorId, nota: notas[p.jogadorId] }));
       await api.post(`/peladas/${id}/votos`, { votos });
-      setEnviado(true);
-      await carregar();
+      navigate('/peladas');
     } catch (err) {
       setErro(err.message);
     } finally {
@@ -71,6 +66,8 @@ export default function VotarPelada() {
             </div>
           ))}
         </div>
+      ) : dados.jaVotei ? (
+        <div className="empty"><div className="big">✅</div>Você já avaliou essa pelada. Assim que todo mundo votar, o resultado aparece aqui.</div>
       ) : (
         <div className="card">
           <p style={{ marginBottom: 18 }}>Avalie cada jogador de 0.5 a 5 estrelas. Clique na metade esquerda da estrela para meia nota.</p>
@@ -89,7 +86,7 @@ export default function VotarPelada() {
             </div>
           ))}
           <button className="btn" style={{ marginTop: 20 }} disabled={!todasPreenchidas || enviando} onClick={enviar}>
-            {enviando ? 'Enviando…' : enviado ? 'Votos atualizados ✓' : 'Enviar avaliações →'}
+            {enviando ? 'Enviando…' : 'Enviar avaliações →'}
           </button>
           {!todasPreenchidas && <div className="mini" style={{ marginTop: 10 }}>Avalie todo mundo antes de enviar.</div>}
         </div>

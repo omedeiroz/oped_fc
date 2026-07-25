@@ -92,7 +92,10 @@ export default function PeladaDetalhe() {
       </div>
 
       <div className="between" style={{ marginTop: 16 }}>
-        <Link to="/peladas" className="txt-muted">← Peladas</Link>
+        <div className="row">
+          <Link to="/peladas" className="txt-muted">← Peladas</Link>
+          <Link to={`/peladas/${id}/apostas`} className="btn btn-outline btn-sm">🎲 Apostas</Link>
+        </div>
         {user?.isAdmin && (
           <div className="row">
             {!pelada.Finalizada && !pelada.EstatisticasIniciadas && (

@@ -53,7 +53,7 @@ router.post('/register', async (req, res) => {
       const insUser = await client.query(
         `INSERT INTO "Usuarios" ("Nome","Usuario","Email","SenhaHash","IsAdmin")
          VALUES ($1,$2,$3,$4,$5)
-         RETURNING "Id","Nome","Usuario","Email","IsAdmin","Foto"`,
+         RETURNING "Id","Nome","Usuario","Email","IsAdmin","IsBetAdmin","Foto","SaldoFichas"`,
         [nome, usuario, email, senhaHash, isFirst]
       );
       const u = insUser.rows[0];
@@ -84,8 +84,8 @@ router.post('/login', async (req, res) => {
     }
 
     const result = await query(
-      `SELECT u."Id", u."Nome", u."Usuario", u."Email", u."SenhaHash", u."IsAdmin", u."Ativo", u."Foto",
-              j."Id" AS "JogadorId"
+      `SELECT u."Id", u."Nome", u."Usuario", u."Email", u."SenhaHash", u."IsAdmin", u."IsBetAdmin",
+              u."Ativo", u."Foto", u."SaldoFichas", j."Id" AS "JogadorId"
        FROM "Usuarios" u
        LEFT JOIN "Jogadores" j ON j."UsuarioId" = u."Id"
        WHERE u."Usuario" = $1`,
@@ -113,7 +113,8 @@ router.post('/login', async (req, res) => {
 router.get('/me', requireAuth, async (req, res) => {
   try {
     const r = await query(
-      `SELECT u."Id", u."Nome", u."Usuario", u."Email", u."IsAdmin", u."Foto", j."Id" AS "JogadorId"
+      `SELECT u."Id", u."Nome", u."Usuario", u."Email", u."IsAdmin", u."IsBetAdmin", u."Foto",
+              u."SaldoFichas", j."Id" AS "JogadorId"
        FROM "Usuarios" u
        LEFT JOIN "Jogadores" j ON j."UsuarioId" = u."Id"
        WHERE u."Id" = $1 AND u."Ativo" = true`,
@@ -130,7 +131,8 @@ router.get('/me', requireAuth, async (req, res) => {
 function publicUser(u) {
   return {
     id: u.Id, nome: u.Nome, usuario: u.Usuario, email: u.Email,
-    isAdmin: !!u.IsAdmin, foto: u.Foto || null, jogadorId: u.JogadorId || null,
+    isAdmin: !!u.IsAdmin, isBetAdmin: !!u.IsBetAdmin, foto: u.Foto || null,
+    jogadorId: u.JogadorId || null, saldoFichas: u.SaldoFichas ?? 0,
   };
 }
 

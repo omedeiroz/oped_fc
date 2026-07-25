@@ -1,6 +1,6 @@
 const express = require('express');
 const { query, withTransaction } = require('../db');
-const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { requireAuth, requireAdmin, requireBetAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -29,13 +29,46 @@ router.put('/me/foto', requireAuth, async (req, res) => {
 router.get('/', requireAuth, requireAdmin, async (req, res) => {
   try {
     const r = await query(
-      `SELECT "Id","Nome","Usuario","Email","IsAdmin","Ativo","CriadoEm"
+      `SELECT "Id","Nome","Usuario","Email","IsAdmin","IsBetAdmin","SaldoFichas","Ativo","CriadoEm"
        FROM "Usuarios" WHERE "Ativo" = true ORDER BY "Nome"`
     );
     res.json(r.rows);
   } catch (err) {
     console.error('[usuarios:list]', err.message);
     res.status(500).json({ error: 'Erro ao listar usuários.' });
+  }
+});
+
+// PUT /api/usuarios/:id/saldo  { valor, descricao }  (bet-admin) -> credita (valor > 0)
+// ou debita (valor < 0) fichas de um usuário. Registra em FichasTransacoes.
+router.put('/:id/saldo', requireAuth, requireBetAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const valor = parseInt(req.body.valor, 10);
+    const descricao = String(req.body.descricao || '').slice(0, 200) || null;
+    if (!Number.isInteger(valor) || valor === 0) {
+      return res.status(400).json({ error: 'Informe um valor diferente de zero.' });
+    }
+
+    const novoSaldo = await withTransaction(async (client) => {
+      const atual = await client.query('SELECT "SaldoFichas" FROM "Usuarios" WHERE "Id" = $1', [id]);
+      if (atual.rows.length === 0) throw Object.assign(new Error('Usuário não encontrado.'), { status: 404 });
+      const saldoFinal = atual.rows[0].SaldoFichas + valor;
+      if (saldoFinal < 0) throw Object.assign(new Error('Saldo insuficiente para esse débito.'), { status: 400 });
+
+      await client.query('UPDATE "Usuarios" SET "SaldoFichas" = $1 WHERE "Id" = $2', [saldoFinal, id]);
+      await client.query(
+        `INSERT INTO "FichasTransacoes" ("UsuarioId","Valor","Tipo","Descricao") VALUES ($1,$2,'ajuste_admin',$3)`,
+        [id, valor, descricao]
+      );
+      return saldoFinal;
+    });
+
+    res.json({ ok: true, saldoFichas: novoSaldo });
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ error: err.message });
+    console.error('[usuarios:saldo]', err.message);
+    res.status(500).json({ error: 'Erro ao ajustar saldo.' });
   }
 });
 

@@ -24,6 +24,7 @@ app.use('/api/jogadores', require('./routes/jogadores'));
 app.use('/api/usuarios', require('./routes/usuarios'));
 app.use('/api/peladas', require('./routes/peladas'));
 app.use('/api/stats', require('./routes/stats'));
+app.use('/api/apostas', require('./routes/apostas'));
 
 app.get('/api/health', async (req, res) => {
   try {

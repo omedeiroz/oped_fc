@@ -2,6 +2,7 @@ const express = require('express');
 const { query, withTransaction } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { calcularResultado, NOTAS_VALIDAS } = require('../services/votacao');
+const { gerarMercadosApostas, resolverMercadosAutomaticos } = require('../services/apostas');
 
 const router = express.Router();
 
@@ -201,6 +202,7 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
       );
       const id = ins.rows[0].Id;
       await salvarTimesEParticipacoes(client, id, times, participacoes);
+      await gerarMercadosApostas(client, id, participacoes.map((p) => parseInt(p.jogadorId, 10)).filter(Boolean));
       return id;
     });
     res.status(201).json({ id: peladaId });
@@ -244,6 +246,7 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
       );
 
       await salvarTimesEParticipacoes(client, id, times, participacoes);
+      await gerarMercadosApostas(client, id, participacoes.map((p) => parseInt(p.jogadorId, 10)).filter(Boolean));
     });
     res.json({ id });
   } catch (err) {
@@ -404,7 +407,10 @@ router.post('/:id/finalizar', requireAuth, requireAdmin, async (req, res) => {
     if (!atual.rows[0].EstatisticasIniciadas) {
       return res.status(400).json({ error: 'Adicione as estatísticas da pelada antes de finalizar.' });
     }
-    await query(`UPDATE "Peladas" SET "Finalizada" = true WHERE "Id" = $1`, [id]);
+    await withTransaction(async (client) => {
+      await client.query(`UPDATE "Peladas" SET "Finalizada" = true WHERE "Id" = $1`, [id]);
+      await resolverMercadosAutomaticos(client, id);
+    });
     res.json({ ok: true });
   } catch (err) {
     console.error('[peladas:finalizar]', err.message);
@@ -444,6 +450,7 @@ router.get('/:id/votacao', requireAuth, async (req, res) => {
     }
 
     const podeVotar = !!meuJogador && participantesRes.rows.some((p) => p.Id === meuJogador);
+    const jaVotei = Object.keys(meusVotos).length > 0;
     const outros = participantesRes.rows
       .filter((p) => p.Id !== meuJogador)
       .map((p) => ({ jogadorId: p.Id, nome: p.Nome, foto: p.Foto || null, nota: meusVotos[p.Id] ?? null }));
@@ -452,6 +459,7 @@ router.get('/:id/votacao', requireAuth, async (req, res) => {
 
     res.json({
       podeVotar,
+      jaVotei,
       participantes: outros,
       completo: resultado.completo,
       recebidos: resultado.recebidos,
@@ -490,6 +498,14 @@ router.post('/:id/votos', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Envie ao menos uma avaliação.' });
     }
 
+    const jaVotou = await query(
+      'SELECT 1 FROM "PeladaVotos" WHERE "PeladaId" = $1 AND "VotanteJogadorId" = $2 LIMIT 1',
+      [id, meuJogador]
+    );
+    if (jaVotou.rows.length > 0) {
+      return res.status(403).json({ error: 'Você já enviou sua avaliação para essa pelada e não pode alterá-la.' });
+    }
+
     for (const v of votos) {
       const alvo = parseInt(v.avaliadoJogadorId, 10);
       const nota = Number(v.nota);
@@ -503,8 +519,7 @@ router.post('/:id/votos', requireAuth, async (req, res) => {
         await client.query(
           `INSERT INTO "PeladaVotos" ("PeladaId","VotanteJogadorId","AvaliadoJogadorId","Nota")
            VALUES ($1,$2,$3,$4)
-           ON CONFLICT ("PeladaId","VotanteJogadorId","AvaliadoJogadorId")
-           DO UPDATE SET "Nota" = EXCLUDED."Nota"`,
+           ON CONFLICT ("PeladaId","VotanteJogadorId","AvaliadoJogadorId") DO NOTHING`,
           [id, meuJogador, parseInt(v.avaliadoJogadorId, 10), Number(v.nota)]
         );
       }

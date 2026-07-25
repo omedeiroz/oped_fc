@@ -45,8 +45,12 @@ export function AuthProvider({ children }) {
     setUser((prev) => (prev ? { ...prev, foto } : prev));
   }
 
+  function atualizarSaldo(saldoFichas) {
+    setUser((prev) => (prev ? { ...prev, saldoFichas } : prev));
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, atualizarFoto }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, atualizarFoto, atualizarSaldo }}>
       {children}
     </AuthContext.Provider>
   );

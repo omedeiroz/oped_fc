@@ -10,12 +10,15 @@ import AdminUsuarios from './pages/AdminUsuarios.jsx';
 import Perfil from './pages/Perfil.jsx';
 import VotarPelada from './pages/VotarPelada.jsx';
 import PeladaEstatisticas from './pages/PeladaEstatisticas.jsx';
+import ApostasPelada from './pages/ApostasPelada.jsx';
+import ApostasAdmin from './pages/ApostasAdmin.jsx';
 
-function Protected({ children, adminOnly }) {
+function Protected({ children, adminOnly, betAdminOnly }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading">Carregando…</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (adminOnly && !user.isAdmin) return <Navigate to="/" replace />;
+  if (betAdminOnly && !user.isBetAdmin) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -40,6 +43,7 @@ export default function App() {
         <Route path="/peladas" element={<Peladas />} />
         <Route path="/peladas/:id" element={<PeladaDetalhe />} />
         <Route path="/peladas/:id/votar" element={<VotarPelada />} />
+        <Route path="/peladas/:id/apostas" element={<ApostasPelada />} />
         <Route
           path="/peladas/nova"
           element={<Protected adminOnly><PeladaForm /></Protected>}
@@ -55,6 +59,10 @@ export default function App() {
         <Route
           path="/admin/usuarios"
           element={<Protected adminOnly><AdminUsuarios /></Protected>}
+        />
+        <Route
+          path="/admin/apostas"
+          element={<Protected betAdminOnly><ApostasAdmin /></Protected>}
         />
       </Route>
 
