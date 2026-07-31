@@ -331,6 +331,8 @@ select.inp option { background: var(--surface); color: var(--text); }
 .alert { padding: 12px 14px; border-radius: var(--radius); margin-bottom: 16px; font: 600 13px var(--font); }
 .alert-error { background: rgba(221,51,51,0.1); border: 1px solid #e88; color: #c22; }
 :root[data-theme="dark"] .alert-error { color: #ff9d7a; border-color: #7a2b18; background: rgba(122,43,24,0.2); }
+.alert-ok { background: rgba(61,220,107,0.12); border: 1px solid #7ed99a; color: #1f8a4c; }
+:root[data-theme="dark"] .alert-ok { color: #7ed99a; border-color: #1f5c38; background: rgba(31,138,76,0.2); }
 .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
 .empty .big { font-size: 38px; margin-bottom: 10px; }
 .loading { text-align: center; padding: 60px; color: var(--muted); font-weight: 600; }

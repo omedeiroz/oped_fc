@@ -1,7 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { query, withTransaction } = require('../db');
 const { signToken, requireAuth } = require('../middleware/auth');
+const { enviarCodigoRecuperacao } = require('../services/email');
 
 const router = express.Router();
 
@@ -10,6 +12,9 @@ function normalizeUsuario(u) {
 }
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
+}
+function gerarCodigo() {
+  return String(crypto.randomInt(100000, 1000000)); // 6 dígitos
 }
 
 // POST /api/auth/register  { nome, usuario, senha, email? }
@@ -106,6 +111,103 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error('[login]', err.message);
     return res.status(500).json({ error: 'Erro ao fazer login.' });
+  }
+});
+
+// POST /api/auth/esqueci-senha  { usuario, email } -> envia um código de 6 dígitos por email
+// Identifica a conta pelo usuário (login), não pelo email — assim quem nunca
+// cadastrou um email também consegue recuperar a senha: se a conta ainda não
+// tiver email salvo, o email informado aqui é gravado como o dela.
+router.post('/esqueci-senha', async (req, res) => {
+  try {
+    const usuario = normalizeUsuario(req.body.usuario);
+    const email = normalizeEmail(req.body.email);
+    if (!usuario || !email) return res.status(400).json({ error: 'Informe seu usuário e email.' });
+
+    const r = await query('SELECT "Id", "Email" FROM "Usuarios" WHERE "Usuario" = $1 AND "Ativo" = true', [usuario]);
+    if (r.rows.length > 0) {
+      const conta = r.rows[0];
+      const emailAtual = normalizeEmail(conta.Email);
+      let podeEnviar = false;
+
+      if (!emailAtual) {
+        // Conta sem email cadastrado: tenta vincular o email informado agora.
+        const emEmUso = await query('SELECT "Id" FROM "Usuarios" WHERE "Email" = $1 AND "Id" != $2', [email, conta.Id]);
+        if (emEmUso.rows.length === 0) {
+          await query('UPDATE "Usuarios" SET "Email" = $1 WHERE "Id" = $2', [email, conta.Id]);
+          podeEnviar = true;
+        }
+      } else if (emailAtual === email) {
+        podeEnviar = true;
+      }
+
+      if (podeEnviar) {
+        const usuarioId = conta.Id;
+        const codigo = gerarCodigo();
+        const expiraEm = new Date(Date.now() + 15 * 60 * 1000);
+
+        await query('UPDATE "RedefinicoesSenha" SET "Usado" = true WHERE "UsuarioId" = $1 AND "Usado" = false', [usuarioId]);
+        await query(
+          `INSERT INTO "RedefinicoesSenha" ("UsuarioId","Codigo","ExpiraEm") VALUES ($1,$2,$3)`,
+          [usuarioId, codigo, expiraEm]
+        );
+
+        try {
+          await enviarCodigoRecuperacao(email, codigo);
+        } catch (mailErr) {
+          console.error('[esqueci-senha:email]', mailErr.message);
+        }
+      }
+    }
+
+    // Resposta igual sempre — evita revelar se o usuário existe ou qual email está associado
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[esqueci-senha]', err.message);
+    res.status(500).json({ error: 'Erro ao processar o pedido.' });
+  }
+});
+
+// POST /api/auth/redefinir-senha  { email, codigo, novaSenha }
+router.post('/redefinir-senha', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+    const codigo = String(req.body.codigo || '').trim();
+    const novaSenha = String(req.body.novaSenha || '');
+
+    if (!email || !codigo || !novaSenha) {
+      return res.status(400).json({ error: 'Preencha email, código e a nova senha.' });
+    }
+    if (novaSenha.length < 6) {
+      return res.status(400).json({ error: 'A nova senha deve ter ao menos 6 caracteres.' });
+    }
+
+    const u = await query('SELECT "Id" FROM "Usuarios" WHERE "Email" = $1 AND "Ativo" = true', [email]);
+    if (u.rows.length === 0) {
+      return res.status(400).json({ error: 'Código inválido ou expirado.' });
+    }
+    const usuarioId = u.rows[0].Id;
+
+    const c = await query(
+      `SELECT "Id" FROM "RedefinicoesSenha"
+       WHERE "UsuarioId" = $1 AND "Codigo" = $2 AND "Usado" = false AND "ExpiraEm" > $3
+       ORDER BY "Id" DESC LIMIT 1`,
+      [usuarioId, codigo, new Date()]
+    );
+    if (c.rows.length === 0) {
+      return res.status(400).json({ error: 'Código inválido ou expirado.' });
+    }
+
+    const senhaHash = await bcrypt.hash(novaSenha, 10);
+    await withTransaction(async (client) => {
+      await client.query('UPDATE "Usuarios" SET "SenhaHash" = $1 WHERE "Id" = $2', [senhaHash, usuarioId]);
+      await client.query('UPDATE "RedefinicoesSenha" SET "Usado" = true WHERE "Id" = $1', [c.rows[0].Id]);
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[redefinir-senha]', err.message);
+    res.status(500).json({ error: 'Erro ao redefinir a senha.' });
   }
 });
 

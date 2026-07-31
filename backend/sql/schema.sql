@@ -19,6 +19,17 @@ CREATE TABLE IF NOT EXISTS "Usuarios" (
 CREATE UNIQUE INDEX IF NOT EXISTS "UX_Usuarios_Usuario" ON "Usuarios"("Usuario") WHERE "Usuario" IS NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS "UX_Usuarios_Email"   ON "Usuarios"("Email")   WHERE "Email" IS NOT NULL;
 
+-- Códigos de recuperação de senha (enviados por email, 6 dígitos, expiram em 15min)
+CREATE TABLE IF NOT EXISTS "RedefinicoesSenha" (
+    "Id"        SERIAL PRIMARY KEY,
+    "UsuarioId" INT NOT NULL REFERENCES "Usuarios"("Id"),
+    "Codigo"    VARCHAR(10) NOT NULL,
+    "ExpiraEm"  TIMESTAMP NOT NULL,
+    "Usado"     BOOLEAN NOT NULL DEFAULT FALSE,
+    "CriadoEm"  TIMESTAMP NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS "IX_Redefinicao_UsuarioId" ON "RedefinicoesSenha"("UsuarioId");
+
 -- Apostas: saldo de fichas fictícias de cada usuário e quem administra apostas
 -- (permissão separada do IsAdmin — só quem tiver IsBetAdmin mexe em odds/saldo/resolução manual).
 ALTER TABLE "Usuarios" ADD COLUMN IF NOT EXISTS "SaldoFichas" INT NOT NULL DEFAULT 1000;
