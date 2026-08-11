@@ -27,7 +27,7 @@ app.use('/api/stats', require('./routes/stats'));
 app.use('/api/apostas', require('./routes/apostas'));
 
 app.get('/api/health', async (req, res) => {
-  const email = !!process.env.RESEND_API_KEY;
+  const email = !!process.env.BREVO_API_KEY;
   try {
     await pool.query('SELECT 1 AS ok');
     res.json({ status: 'ok', db: 'conectado', email });
