@@ -1,7 +1,10 @@
 const express = require('express');
-const { query } = require('../db');
+const bcrypt = require('bcryptjs');
+const { query, withTransaction } = require('../db');
 const { requireAuth, requireAdmin, requireBetAdmin } = require('../middleware/auth');
 const { TIERS_VALIDOS } = require('../services/apostas');
+
+const USUARIO_REGEX = /^[a-z0-9._-]{3,60}$/;
 
 const router = express.Router();
 
@@ -56,6 +59,52 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// POST /api/jogadores/:id/criar-login  { usuario, senha, email? }  (admin) -> cria uma
+// conta pra um jogador avulso (sem login) e vincula a ele — não cria um Jogador novo,
+// então todo o histórico de participações/estatísticas já registradas é preservado.
+router.post('/:id/criar-login', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const usuario = String(req.body.usuario || '').trim().toLowerCase();
+    const email = String(req.body.email || '').trim().toLowerCase() || null;
+    const senha = String(req.body.senha || '');
+
+    const jog = await query('SELECT "Id","Nome","UsuarioId" FROM "Jogadores" WHERE "Id" = $1 AND "Ativo" = true', [id]);
+    if (jog.rows.length === 0) return res.status(404).json({ error: 'Jogador não encontrado.' });
+    if (jog.rows[0].UsuarioId) return res.status(400).json({ error: 'Esse jogador já tem login.' });
+
+    if (!USUARIO_REGEX.test(usuario)) {
+      return res.status(400).json({
+        error: 'Usuário deve ter 3+ caracteres (letras, números, ponto, hífen ou _), sem espaços.',
+      });
+    }
+    if (senha.length < 6) return res.status(400).json({ error: 'A senha deve ter ao menos 6 caracteres.' });
+
+    const existe = await query('SELECT "Id" FROM "Usuarios" WHERE "Usuario" = $1', [usuario]);
+    if (existe.rows.length > 0) return res.status(409).json({ error: 'Esse usuário já está em uso.' });
+    if (email) {
+      const eEmail = await query('SELECT "Id" FROM "Usuarios" WHERE "Email" = $1', [email]);
+      if (eEmail.rows.length > 0) return res.status(409).json({ error: 'Esse email já está em uso.' });
+    }
+
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const novoUsuario = await withTransaction(async (client) => {
+      const ins = await client.query(
+        `INSERT INTO "Usuarios" ("Nome","Usuario","Email","SenhaHash","IsAdmin")
+         VALUES ($1,$2,$3,$4,false) RETURNING "Id"`,
+        [jog.rows[0].Nome, usuario, email, senhaHash]
+      );
+      await client.query('UPDATE "Jogadores" SET "UsuarioId" = $1 WHERE "Id" = $2', [ins.rows[0].Id, id]);
+      return ins.rows[0];
+    });
+
+    res.status(201).json({ ok: true, usuarioId: novoUsuario.Id, usuario });
+  } catch (err) {
+    console.error('[jogadores:criar-login]', err.message);
+    res.status(500).json({ error: 'Erro ao criar login.' });
+  }
+});
+
 // GET /api/jogadores/:id -> dados públicos do jogador (para ver o perfil de outros)
 router.get('/:id', requireAuth, async (req, res) => {
   try {
@@ -83,7 +132,7 @@ router.get('/:id/historico', requireAuth, async (req, res) => {
     const r = await query(
       `SELECT p."Id" AS "PeladaId", p."DataPelada", p."Local", p."Finalizada",
               t."Nome" AS "TimeNome", t."Vitorias", t."Empates", t."Derrotas",
-              pp."Gols", pp."Assistencias"
+              pp."Gols", pp."Assistencias", pp."Defesas"
        FROM "PeladaParticipacoes" pp
        JOIN "Peladas" p ON p."Id" = pp."PeladaId"
        LEFT JOIN "PeladaTimes" t ON t."Id" = pp."TimeId"

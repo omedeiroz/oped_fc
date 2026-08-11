@@ -99,7 +99,7 @@ function SecaoTiers() {
 function SecaoTipos() {
   const [tipos, setTipos] = useState([]);
   const [edicoes, setEdicoes] = useState({});
-  const [novo, setNovo] = useState({ nome: '', chave: '', autoResolve: false, oddSPlus: 3, oddA: 4, oddB: 5 });
+  const [novo, setNovo] = useState({ nome: '', chave: '', autoResolve: false, temLinha: true, oddSPlus: 3, oddA: 4, oddB: 5 });
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(true);
 
@@ -124,6 +124,7 @@ function SecaoTipos() {
       await api.put(`/apostas/tipos/${tipo.Id}`, {
         nome: e.Nome ?? tipo.Nome,
         autoResolve: e.AutoResolve ?? tipo.AutoResolve,
+        temLinha: e.TemLinha ?? tipo.TemLinha,
         ativo: e.Ativo ?? tipo.Ativo,
         oddSPlus: Number(e.OddSPlus ?? tipo.OddSPlus),
         oddA: Number(e.OddA ?? tipo.OddA),
@@ -161,6 +162,9 @@ function SecaoTipos() {
             <label className="mini">A <input className="inp inp-sm" type="number" step="0.1" value={campo(t, 'OddA')} onChange={(e) => mudarCampo(t.Id, 'OddA', e.target.value)} /></label>
             <label className="mini">B <input className="inp inp-sm" type="number" step="0.1" value={campo(t, 'OddB')} onChange={(e) => mudarCampo(t.Id, 'OddB', e.target.value)} /></label>
             <label className="check-row mini">
+              <input type="checkbox" checked={campo(t, 'TemLinha')} onChange={(e) => mudarCampo(t.Id, 'TemLinha', e.target.checked)} /> linhas (+0.5/+1.5/+4.5)
+            </label>
+            <label className="check-row mini">
               <input type="checkbox" checked={campo(t, 'Ativo')} onChange={(e) => mudarCampo(t.Id, 'Ativo', e.target.checked)} /> ativo
             </label>
             <button className="txt-action" onClick={() => salvar(t)}>salvar</button>
@@ -178,6 +182,9 @@ function SecaoTipos() {
           <label className="mini">B <input className="inp inp-sm" type="number" step="0.1" value={novo.oddB} onChange={(e) => setNovo({ ...novo, oddB: e.target.value })} /></label>
           <label className="check-row mini">
             <input type="checkbox" checked={novo.autoResolve} onChange={(e) => setNovo({ ...novo, autoResolve: e.target.checked })} /> auto
+          </label>
+          <label className="check-row mini">
+            <input type="checkbox" checked={novo.temLinha} onChange={(e) => setNovo({ ...novo, temLinha: e.target.checked })} /> linhas
           </label>
           <button className="btn btn-sm" type="submit">+ Criar</button>
         </div>

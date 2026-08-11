@@ -22,6 +22,7 @@ router.post('/tipos', requireAuth, requireBetAdmin, async (req, res) => {
     const nome = String(req.body.nome || '').trim();
     const chave = String(req.body.chave || '').trim().toLowerCase();
     const autoResolve = !!req.body.autoResolve;
+    const temLinha = req.body.temLinha !== undefined ? !!req.body.temLinha : true;
     const oddSPlus = Number(req.body.oddSPlus);
     const oddA = Number(req.body.oddA);
     const oddB = Number(req.body.oddB);
@@ -31,9 +32,9 @@ router.post('/tipos', requireAuth, requireBetAdmin, async (req, res) => {
     }
 
     const r = await query(
-      `INSERT INTO "TiposAposta" ("Nome","Chave","AutoResolve","OddSPlus","OddA","OddB")
-       VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [nome, chave, autoResolve, oddSPlus, oddA, oddB]
+      `INSERT INTO "TiposAposta" ("Nome","Chave","AutoResolve","TemLinha","OddSPlus","OddA","OddB")
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [nome, chave, autoResolve, temLinha, oddSPlus, oddA, oddB]
     );
     res.status(201).json(r.rows[0]);
   } catch (err) {
@@ -50,6 +51,7 @@ router.put('/tipos/:id', requireAuth, requireBetAdmin, async (req, res) => {
     const nome = String(req.body.nome || '').trim();
     const ativo = !!req.body.ativo;
     const autoResolve = !!req.body.autoResolve;
+    const temLinha = !!req.body.temLinha;
     const oddSPlus = Number(req.body.oddSPlus);
     const oddA = Number(req.body.oddA);
     const oddB = Number(req.body.oddB);
@@ -57,8 +59,10 @@ router.put('/tipos/:id', requireAuth, requireBetAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Dados inválidos.' });
     }
     await query(
-      `UPDATE "TiposAposta" SET "Nome"=$1,"AutoResolve"=$2,"OddSPlus"=$3,"OddA"=$4,"OddB"=$5,"Ativo"=$6 WHERE "Id"=$7`,
-      [nome, autoResolve, oddSPlus, oddA, oddB, ativo, id]
+      `UPDATE "TiposAposta"
+       SET "Nome"=$1,"AutoResolve"=$2,"TemLinha"=$3,"OddSPlus"=$4,"OddA"=$5,"OddB"=$6,"Ativo"=$7
+       WHERE "Id"=$8`,
+      [nome, autoResolve, temLinha, oddSPlus, oddA, oddB, ativo, id]
     );
     res.json({ ok: true });
   } catch (err) {
@@ -79,15 +83,15 @@ router.get('/mercados/pelada/:peladaId', requireAuth, async (req, res) => {
     if (pelada.rows.length === 0) return res.status(404).json({ error: 'Pelada não encontrada.' });
 
     const mercados = await query(
-      `SELECT m."Id" AS "MercadoId", m."JogadorId", m."Odd", m."Resolvido", m."Resultado",
-              t."Id" AS "TipoApostaId", t."Nome" AS "CategoriaNome", t."AutoResolve",
+      `SELECT m."Id" AS "MercadoId", m."JogadorId", m."Odd", m."Linha", m."Resolvido", m."Resultado",
+              t."Id" AS "TipoApostaId", t."Nome" AS "CategoriaNome", t."AutoResolve", t."TemLinha",
               j."Nome" AS "JogadorNome", u."Foto"
        FROM "PeladaApostaMercados" m
        JOIN "TiposAposta" t ON t."Id" = m."TipoApostaId"
        JOIN "Jogadores" j ON j."Id" = m."JogadorId"
        LEFT JOIN "Usuarios" u ON u."Id" = j."UsuarioId"
        WHERE m."PeladaId" = $1
-       ORDER BY j."Nome", t."Nome"`,
+       ORDER BY j."Nome", t."Nome", m."Linha"`,
       [peladaId]
     );
 
@@ -112,6 +116,8 @@ router.get('/mercados/pelada/:peladaId', requireAuth, async (req, res) => {
         tipoApostaId: m.TipoApostaId,
         categoria: m.CategoriaNome,
         autoResolve: m.AutoResolve,
+        temLinha: m.TemLinha,
+        linha: Number(m.Linha),
         odd: Number(m.Odd),
         resolvido: m.Resolvido,
         resultado: m.Resultado,

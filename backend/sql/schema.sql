@@ -81,6 +81,10 @@ CREATE TABLE IF NOT EXISTS "PeladaParticipacoes" (
 CREATE INDEX IF NOT EXISTS "IX_Part_PeladaId"  ON "PeladaParticipacoes"("PeladaId");
 CREATE INDEX IF NOT EXISTS "IX_Part_JogadorId" ON "PeladaParticipacoes"("JogadorId");
 
+-- Defesas: estatística rastreada igual Gols/Assistencias, pra poder resolver
+-- sozinhas os mercados de aposta "+N defesas".
+ALTER TABLE "PeladaParticipacoes" ADD COLUMN IF NOT EXISTS "Defesas" INT NOT NULL DEFAULT 0;
+
 CREATE TABLE IF NOT EXISTS "PeladaComentarios" (
     "Id"        SERIAL PRIMARY KEY,
     "PeladaId"  INT NOT NULL REFERENCES "Peladas"("Id"),
@@ -135,8 +139,13 @@ CREATE TABLE IF NOT EXISTS "TiposAposta" (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS "UX_TiposAposta_Chave" ON "TiposAposta"("Chave");
 
--- Um mercado por (pelada, jogador, categoria). Gerado automaticamente quando a
--- pelada é criada/editada (Parte 1), com a odd sugerida pelo tier do jogador.
+-- TemLinha = true gera um mercado por linha de handicap (+0.5/+1.5/+4.5, tipo casa de
+-- apostas: "mais de N gols") em vez de um único mercado "aconteceu ou não".
+ALTER TABLE "TiposAposta" ADD COLUMN IF NOT EXISTS "TemLinha" BOOLEAN NOT NULL DEFAULT TRUE;
+
+-- Um mercado por (pelada, jogador, categoria, linha). Gerado automaticamente quando a
+-- pelada é criada/editada (Parte 1), com a odd sugerida pelo tier do jogador. Linha=0
+-- é o sentinel de "sem linha" (categorias com TemLinha=false, ex.: Cair no Chão).
 CREATE TABLE IF NOT EXISTS "PeladaApostaMercados" (
     "Id"           SERIAL PRIMARY KEY,
     "PeladaId"     INT NOT NULL REFERENCES "Peladas"("Id"),
@@ -150,6 +159,10 @@ CREATE TABLE IF NOT EXISTS "PeladaApostaMercados" (
     CONSTRAINT "UQ_Mercado" UNIQUE ("PeladaId", "JogadorId", "TipoApostaId")
 );
 CREATE INDEX IF NOT EXISTS "IX_Mercado_PeladaId" ON "PeladaApostaMercados"("PeladaId");
+
+ALTER TABLE "PeladaApostaMercados" ADD COLUMN IF NOT EXISTS "Linha" NUMERIC(3,1) NOT NULL DEFAULT 0;
+ALTER TABLE "PeladaApostaMercados" DROP CONSTRAINT IF EXISTS "UQ_Mercado";
+ALTER TABLE "PeladaApostaMercados" ADD CONSTRAINT "UQ_Mercado" UNIQUE ("PeladaId", "JogadorId", "TipoApostaId", "Linha");
 
 -- Aposta individual: uma por usuário por mercado. A odd é congelada no momento da
 -- aposta (editar a odd do mercado depois não afeta quem já apostou).
