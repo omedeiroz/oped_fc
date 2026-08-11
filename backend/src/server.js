@@ -27,12 +27,12 @@ app.use('/api/stats', require('./routes/stats'));
 app.use('/api/apostas', require('./routes/apostas'));
 
 app.get('/api/health', async (req, res) => {
-  const smtp = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+  const email = !!process.env.RESEND_API_KEY;
   try {
     await pool.query('SELECT 1 AS ok');
-    res.json({ status: 'ok', db: 'conectado', smtp });
+    res.json({ status: 'ok', db: 'conectado', email });
   } catch (err) {
-    res.status(500).json({ status: 'erro', db: err.message, smtp });
+    res.status(500).json({ status: 'erro', db: err.message, email });
   }
 });
 

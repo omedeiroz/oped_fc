@@ -240,15 +240,15 @@ router.post('/trocar-senha', requireAuth, async (req, res) => {
 });
 
 // POST /api/auth/testar-email  { destino } -> (admin) tenta enviar de verdade e devolve o erro real,
-// pra diagnosticar problemas de SMTP em producao sem depender dos logs do host.
+// pra diagnosticar problemas de envio de email em producao sem depender dos logs do host.
 router.post('/testar-email', requireAuth, requireAdmin, async (req, res) => {
   const destino = normalizeEmail(req.body.destino);
   if (!destino) return res.status(400).json({ error: 'Informe o destino.' });
   try {
     const info = await enviarCodigoRecuperacao(destino, '000000');
-    res.json({ ok: true, messageId: info && info.messageId, response: info && info.response });
+    res.json({ ok: true, info });
   } catch (err) {
-    res.status(500).json({ ok: false, error: err.message, code: err.code });
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 

@@ -22,6 +22,14 @@ export default function Perfil() {
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
 
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [senhaAtual, setSenhaAtual] = useState('');
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [erroSenha, setErroSenha] = useState('');
+  const [sucessoSenha, setSucessoSenha] = useState('');
+  const [trocandoSenha, setTrocandoSenha] = useState(false);
+
   useEffect(() => {
     setCarregando(true);
     setErro('');
@@ -76,6 +84,27 @@ export default function Perfil() {
     }
   }
 
+  async function trocarSenha(e) {
+    e.preventDefault();
+    setErroSenha('');
+    setSucessoSenha('');
+    if (novaSenha !== confirmarSenha) {
+      setErroSenha('As senhas não coincidem.');
+      return;
+    }
+    setTrocandoSenha(true);
+    try {
+      await api.post('/auth/trocar-senha', { senhaAtual, novaSenha });
+      setSenhaAtual(''); setNovaSenha(''); setConfirmarSenha('');
+      setSucessoSenha('Senha alterada com sucesso!');
+      setMostrarSenha(false);
+    } catch (err) {
+      setErroSenha(err.message);
+    } finally {
+      setTrocandoSenha(false);
+    }
+  }
+
   if (!pessoa && carregando) return <div className="loading">Carregando…</div>;
   if (!pessoa) return null;
 
@@ -110,6 +139,41 @@ export default function Perfil() {
       </div>
 
       {erro && <div className="alert alert-error" style={{ marginTop: 16 }}>{erro}</div>}
+      {sucessoSenha && <div className="alert alert-ok" style={{ marginTop: 16 }}>{sucessoSenha}</div>}
+
+      {!ehOutro && (
+        <div className="card" style={{ marginTop: 20 }}>
+          {!mostrarSenha ? (
+            <button type="button" className="txt-muted" onClick={() => { setMostrarSenha(true); setErroSenha(''); setSucessoSenha(''); }}>
+              🔒 Trocar senha
+            </button>
+          ) : (
+            <form onSubmit={trocarSenha}>
+              {erroSenha && <div className="alert alert-error">{erroSenha}</div>}
+              <div className="field">
+                <label>Senha atual</label>
+                <input className="inp" type="password" value={senhaAtual} onChange={(e) => setSenhaAtual(e.target.value)} placeholder="••••••" required />
+              </div>
+              <div className="field">
+                <label>Nova senha</label>
+                <input className="inp" type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} placeholder="••••••" required />
+              </div>
+              <div className="field">
+                <label>Confirmar nova senha</label>
+                <input className="inp" type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} placeholder="••••••" required />
+              </div>
+              <div className="row" style={{ gap: 10 }}>
+                <button className="btn" disabled={trocandoSenha}>
+                  {trocandoSenha ? 'Salvando…' : 'Salvar nova senha'}
+                </button>
+                <button type="button" className="txt-muted" onClick={() => { setMostrarSenha(false); setErroSenha(''); setSenhaAtual(''); setNovaSenha(''); setConfirmarSenha(''); }}>
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      )}
 
       <h1 className="page-title" style={{ fontSize: 18, marginTop: 30, marginBottom: 14 }}>Histórico de peladas</h1>
 
