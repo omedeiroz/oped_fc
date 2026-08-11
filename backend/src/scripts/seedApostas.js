@@ -3,12 +3,15 @@
 // Uso: node src/scripts/seedApostas.js
 const { pool } = require('../db');
 
+// Defesa é AutoResolve porque agora existe um campo "Defesas" na pelada (Parte 2)
+// pra rastrear igual Gols/Assistencias. Gol Contra continua manual mas ganha linhas
+// também. Só Cair no Chão fica sem linha (mercado único "aconteceu ou não").
 const CATEGORIAS = [
-  { nome: 'Gol', chave: 'gol', autoResolve: true, oddSPlus: 1.8, oddA: 2.5, oddB: 3.5 },
-  { nome: 'Assistência', chave: 'assistencia', autoResolve: true, oddSPlus: 2.0, oddA: 2.8, oddB: 4.0 },
-  { nome: 'Defesa', chave: 'defesa', autoResolve: false, oddSPlus: 3.0, oddA: 3.5, oddB: 4.5 },
-  { nome: 'Gol Contra', chave: 'gol_contra', autoResolve: false, oddSPlus: 6.0, oddA: 6.0, oddB: 6.0 },
-  { nome: 'Cair no Chão', chave: 'cair_no_chao', autoResolve: false, oddSPlus: 4.0, oddA: 4.0, oddB: 4.0 },
+  { nome: 'Gol', chave: 'gol', autoResolve: true, temLinha: true, oddSPlus: 1.8, oddA: 2.5, oddB: 3.5 },
+  { nome: 'Assistência', chave: 'assistencia', autoResolve: true, temLinha: true, oddSPlus: 2.0, oddA: 2.8, oddB: 4.0 },
+  { nome: 'Defesa', chave: 'defesa', autoResolve: true, temLinha: true, oddSPlus: 3.0, oddA: 3.5, oddB: 4.5 },
+  { nome: 'Gol Contra', chave: 'gol_contra', autoResolve: false, temLinha: true, oddSPlus: 6.0, oddA: 6.0, oddB: 6.0 },
+  { nome: 'Cair no Chão', chave: 'cair_no_chao', autoResolve: false, temLinha: false, oddSPlus: 4.0, oddA: 4.0, oddB: 4.0 },
 ];
 
 const TIER_S_PLUS = ['Arthur Medeiros', 'Israel Louback'];
@@ -44,11 +47,11 @@ async function aplicarTier(nomeBusca, tier) {
     console.log('2. Criando categorias de aposta padrão...');
     for (const c of CATEGORIAS) {
       const r = await pool.query(
-        `INSERT INTO "TiposAposta" ("Nome","Chave","AutoResolve","OddSPlus","OddA","OddB")
-         VALUES ($1,$2,$3,$4,$5,$6)
+        `INSERT INTO "TiposAposta" ("Nome","Chave","AutoResolve","TemLinha","OddSPlus","OddA","OddB")
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
          ON CONFLICT ("Chave") DO NOTHING
          RETURNING "Nome"`,
-        [c.nome, c.chave, c.autoResolve, c.oddSPlus, c.oddA, c.oddB]
+        [c.nome, c.chave, c.autoResolve, c.temLinha, c.oddSPlus, c.oddA, c.oddB]
       );
       console.log(r.rows.length > 0 ? `  ✅ ${c.nome}` : `  ↷ ${c.nome} (já existia)`);
     }

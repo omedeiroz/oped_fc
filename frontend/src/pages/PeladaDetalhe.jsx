@@ -187,7 +187,8 @@ export default function PeladaDetalhe() {
                   </span>
                   <span>
                     {p.Gols > 0 && <span className="g">⚽ {p.Gols} </span>}
-                    {p.Assistencias > 0 && <span className="a">🅰️ {p.Assistencias}</span>}
+                    {p.Assistencias > 0 && <span className="a">🅰️ {p.Assistencias} </span>}
+                    {p.Defesas > 0 && <span className="a">🧤 {p.Defesas}</span>}
                   </span>
                 </div>
               ))}

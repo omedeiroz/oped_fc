@@ -161,7 +161,7 @@ router.get('/:id', requireAuth, async (req, res) => {
     const times = await query('SELECT * FROM "PeladaTimes" WHERE "PeladaId" = $1 ORDER BY "Id"', [id]);
 
     const participacoes = await query(
-      `SELECT pp."Id", pp."JogadorId", pp."TimeId", pp."Gols", pp."Assistencias", j."Nome" AS "JogadorNome"
+      `SELECT pp."Id", pp."JogadorId", pp."TimeId", pp."Gols", pp."Assistencias", pp."Defesas", j."Nome" AS "JogadorNome"
        FROM "PeladaParticipacoes" pp
        JOIN "Jogadores" j ON j."Id" = pp."JogadorId"
        WHERE pp."PeladaId" = $1
@@ -282,8 +282,8 @@ router.put('/:id/estatisticas', requireAuth, requireAdmin, async (req, res) => {
         const partId = parseInt(p.id, 10);
         if (!partValidas.has(partId)) continue;
         await client.query(
-          `UPDATE "PeladaParticipacoes" SET "Gols"=$1, "Assistencias"=$2 WHERE "Id"=$3`,
-          [parseInt(p.gols, 10) || 0, parseInt(p.assistencias, 10) || 0, partId]
+          `UPDATE "PeladaParticipacoes" SET "Gols"=$1, "Assistencias"=$2, "Defesas"=$3 WHERE "Id"=$4`,
+          [parseInt(p.gols, 10) || 0, parseInt(p.assistencias, 10) || 0, parseInt(p.defesas, 10) || 0, partId]
         );
       }
       await client.query('UPDATE "Peladas" SET "EstatisticasIniciadas" = true WHERE "Id" = $1', [id]);

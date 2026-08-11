@@ -132,7 +132,7 @@ router.get('/:id/historico', requireAuth, async (req, res) => {
     const r = await query(
       `SELECT p."Id" AS "PeladaId", p."DataPelada", p."Local", p."Finalizada",
               t."Nome" AS "TimeNome", t."Vitorias", t."Empates", t."Derrotas",
-              pp."Gols", pp."Assistencias"
+              pp."Gols", pp."Assistencias", pp."Defesas"
        FROM "PeladaParticipacoes" pp
        JOIN "Peladas" p ON p."Id" = pp."PeladaId"
        LEFT JOIN "PeladaTimes" t ON t."Id" = pp."TimeId"

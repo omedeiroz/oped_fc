@@ -4,6 +4,10 @@ import { api } from '../api';
 import { useAuth } from '../auth.jsx';
 import { iniciais, corDoNome } from '../utils';
 
+function rotuloMercado(m) {
+  return m.temLinha ? `${m.categoria} +${m.linha.toFixed(1)}` : m.categoria;
+}
+
 function statusAposta(minhaAposta) {
   if (!minhaAposta) return null;
   if (minhaAposta.status === 'ganhou') return `· ganhou +${minhaAposta.premio} 🎉`;
@@ -104,7 +108,7 @@ export default function ApostasPelada() {
           {j.mercados.map((m) => (
             <div className="votar-linha" key={m.mercadoId}>
               <span className="votar-quem">
-                <span className="nm">{m.categoria}</span>
+                <span className="nm">{rotuloMercado(m)}</span>
                 {m.resolvido && (
                   <span className="mini">{m.resultado ? '✅ aconteceu' : '❌ não rolou'}</span>
                 )}

@@ -18,7 +18,7 @@ export default function PeladaEstatisticas() {
         const d = await api.get(`/peladas/${id}`);
         setPelada(d.pelada);
         setTimes(d.times.map((t) => ({ id: t.Id, nome: t.Nome, vitorias: t.Vitorias, empates: t.Empates, derrotas: t.Derrotas })));
-        setParticipacoes(d.participacoes.map((p) => ({ id: p.Id, jogadorId: p.JogadorId, nome: p.JogadorNome, timeId: p.TimeId, gols: p.Gols, assistencias: p.Assistencias })));
+        setParticipacoes(d.participacoes.map((p) => ({ id: p.Id, jogadorId: p.JogadorId, nome: p.JogadorNome, timeId: p.TimeId, gols: p.Gols, assistencias: p.Assistencias, defesas: p.Defesas })));
       } catch (err) {
         setErro(err.message);
       }
@@ -38,7 +38,7 @@ export default function PeladaEstatisticas() {
     try {
       await api.put(`/peladas/${id}/estatisticas`, {
         times: times.map((t) => ({ id: t.id, vitorias: t.vitorias, empates: t.empates, derrotas: t.derrotas })),
-        participacoes: participacoes.map((p) => ({ id: p.id, gols: p.gols, assistencias: p.assistencias })),
+        participacoes: participacoes.map((p) => ({ id: p.id, gols: p.gols, assistencias: p.assistencias, defesas: p.defesas })),
       });
       navigate(`/peladas/${id}`);
     } catch (err) {
@@ -76,6 +76,7 @@ export default function PeladaEstatisticas() {
                   <div className="row" style={{ gap: 18 }}>
                     <Stepper label="⚽" value={p.gols} onChange={(v) => alterarParticipacao(p.id, 'gols', v)} max={20} />
                     <Stepper label="🅰️" value={p.assistencias} onChange={(v) => alterarParticipacao(p.id, 'assistencias', v)} max={20} />
+                    <Stepper label="🧤" value={p.defesas} onChange={(v) => alterarParticipacao(p.id, 'defesas', v)} max={20} />
                   </div>
                 </div>
               ))}
