@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { query, withTransaction } = require('../db');
-const { signToken, requireAuth } = require('../middleware/auth');
+const { signToken, requireAuth, requireAdmin } = require('../middleware/auth');
 const { enviarCodigoRecuperacao } = require('../services/email');
 
 const router = express.Router();
@@ -208,6 +208,47 @@ router.post('/redefinir-senha', async (req, res) => {
   } catch (err) {
     console.error('[redefinir-senha]', err.message);
     res.status(500).json({ error: 'Erro ao redefinir a senha.' });
+  }
+});
+
+// POST /api/auth/trocar-senha  { senhaAtual, novaSenha } -> troca a senha estando logado
+router.post('/trocar-senha', requireAuth, async (req, res) => {
+  try {
+    const senhaAtual = String(req.body.senhaAtual || '');
+    const novaSenha = String(req.body.novaSenha || '');
+    if (!senhaAtual || !novaSenha) {
+      return res.status(400).json({ error: 'Informe a senha atual e a nova senha.' });
+    }
+    if (novaSenha.length < 6) {
+      return res.status(400).json({ error: 'A nova senha deve ter ao menos 6 caracteres.' });
+    }
+
+    const r = await query('SELECT "SenhaHash" FROM "Usuarios" WHERE "Id" = $1 AND "Ativo" = true', [req.user.id]);
+    if (r.rows.length === 0) return res.status(401).json({ error: 'Sessão inválida.' });
+
+    const ok = await bcrypt.compare(senhaAtual, r.rows[0].SenhaHash);
+    if (!ok) return res.status(401).json({ error: 'Senha atual incorreta.' });
+
+    const senhaHash = await bcrypt.hash(novaSenha, 10);
+    await query('UPDATE "Usuarios" SET "SenhaHash" = $1 WHERE "Id" = $2', [senhaHash, req.user.id]);
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[trocar-senha]', err.message);
+    res.status(500).json({ error: 'Erro ao trocar a senha.' });
+  }
+});
+
+// POST /api/auth/testar-email  { destino } -> (admin) tenta enviar de verdade e devolve o erro real,
+// pra diagnosticar problemas de SMTP em producao sem depender dos logs do host.
+router.post('/testar-email', requireAuth, requireAdmin, async (req, res) => {
+  const destino = normalizeEmail(req.body.destino);
+  if (!destino) return res.status(400).json({ error: 'Informe o destino.' });
+  try {
+    const info = await enviarCodigoRecuperacao(destino, '000000');
+    res.json({ ok: true, messageId: info && info.messageId, response: info && info.response });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message, code: err.code });
   }
 });
 

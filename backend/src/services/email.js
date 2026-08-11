@@ -15,7 +15,7 @@ function getTransporter() {
 }
 
 async function enviarCodigoRecuperacao(destinatario, codigo) {
-  await getTransporter().sendMail({
+  return getTransporter().sendMail({
     from: `"Pelada OPED FC" <${process.env.SMTP_USER}>`,
     to: destinatario,
     subject: 'Código para redefinir sua senha — Pelada OPED FC',
